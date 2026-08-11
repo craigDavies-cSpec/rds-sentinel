@@ -173,7 +173,7 @@ export default function Dashboard() {
   // Helper class for billing active states
   const getBadgeClass = (active: boolean) => 
     active 
-      ? "px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-xs font-semibold text-emerald-500" 
+      ? "px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-xs font-semibold text-emerald-700 dark:text-emerald-400" 
       : "px-2 py-0.5 rounded bg-aws-divider border border-aws-border text-xs text-aws-textSecondary line-through";
 
   return (
@@ -184,10 +184,10 @@ export default function Dashboard() {
           <div className="flex items-center gap-3">
             {/* RDS Sentinel Logo */}
             <div className="flex items-center gap-1.5 font-bold tracking-tight">
-              <span className="text-aws-orange font-extrabold text-xl">RDS</span>
+              <span className="text-aws-orangeHover dark:text-aws-orange font-extrabold text-xl">RDS</span>
               <span className="text-aws-lightTextPrimary dark:text-aws-textPrimary font-semibold">Sentinel</span>
             </div>
-            <span className="text-xs px-2 py-0.5 rounded bg-aws-orange/15 text-aws-orange border border-aws-orange/20 font-bold uppercase tracking-wider">
+            <span className="text-xs px-2 py-0.5 rounded bg-aws-orange/15 text-amber-800 dark:text-aws-orange border border-aws-orange/20 font-bold uppercase tracking-wider">
               AWS Marketplace Partner
             </span>
           </div>
@@ -202,7 +202,7 @@ export default function Dashboard() {
                   onClick={() => setTier(t)}
                   className={`px-3 py-1 rounded text-xs font-bold uppercase transition-all ${
                     tier === t
-                      ? "bg-aws-orange text-white shadow-md"
+                      ? "bg-aws-orange text-aws-lightTextPrimary dark:text-aws-lightTextPrimary shadow-md"
                       : "text-aws-lightTextSecondary dark:text-aws-textSecondary hover:text-aws-orange"
                   }`}
                 >
@@ -228,7 +228,7 @@ export default function Dashboard() {
         <section className="lg:col-span-1 flex flex-col gap-6">
           {/* DB Instances List */}
           <div className="bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border rounded-lg p-4">
-            <h2 className="text-sm font-bold text-aws-orange uppercase tracking-wider mb-3">Target Databases</h2>
+            <h2 className="text-sm font-bold text-aws-lightTextPrimary dark:text-aws-orange uppercase tracking-wider mb-3">Target Databases</h2>
             <div className="flex flex-col gap-2">
               {instances.map(db => {
                 const isSelected = db.id === selectedDbId;
@@ -271,7 +271,7 @@ export default function Dashboard() {
           {/* Active Database Telemetry Gauges */}
           <div className="bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border rounded-lg p-4 flex flex-col gap-4">
             <div className="border-b border-aws-lightBorder dark:border-aws-divider pb-2">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-aws-textSecondary">Instance Telemetry</h3>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-aws-lightTextSecondary dark:text-aws-textSecondary">Instance Telemetry</h3>
               <span className="text-lg font-bold text-aws-lightTextPrimary dark:text-aws-textPrimary font-mono">{selectedDb.name}</span>
             </div>
 
@@ -322,7 +322,7 @@ export default function Dashboard() {
                 <div>
                   <div className="flex justify-between text-xs font-bold mb-1">
                     <span>Historical CPU Profile (Last {cpuHistory[selectedDb.id]?.length || 0} samples)</span>
-                    <span className="text-[10px] text-aws-textSecondary">Clamped to 50 max</span>
+                    <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary">Clamped to 50 max</span>
                   </div>
                   <div className="relative flex items-end gap-0.5 h-12 bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border rounded p-1 font-mono text-[9px] text-aws-textSecondary">
                     {/* Visual Threshold Baseline Gridlines (UI/UX Agent Audit) */}
@@ -350,12 +350,12 @@ export default function Dashboard() {
                 {/* DB Class & Storage Meta */}
                 <div className="grid grid-cols-2 gap-2 pt-2 border-t border-aws-lightBorder dark:border-aws-divider text-xs">
                   <div>
-                    <span className="text-[10px] text-aws-textSecondary block uppercase font-semibold">Instance Class</span>
+                    <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary block uppercase font-semibold">Instance Class</span>
                     <span className="font-bold font-mono">{selectedDb.class}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-aws-textSecondary block uppercase font-semibold">Free Storage</span>
-                    <span className="font-bold font-mono text-aws-green">{selectedDb.freeStorageGb} GB</span>
+                    <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary block uppercase font-semibold">Free Storage</span>
+                    <span className="font-bold font-mono text-emerald-800 dark:text-emerald-400">{selectedDb.freeStorageGb} GB</span>
                   </div>
                 </div>
               </>
@@ -368,23 +368,23 @@ export default function Dashboard() {
           {/* Cost-Performance Balancer */}
           <div className="bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border rounded-lg p-4">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-sm font-bold text-aws-orange uppercase tracking-wider">Cost-Performance Balancer</h2>
-              <span className="text-[11px] font-bold text-aws-textSecondary">Tier Capability: <span className="text-aws-teal uppercase font-extrabold">{tier}</span></span>
+              <h2 className="text-sm font-bold text-aws-lightTextPrimary dark:text-aws-orange uppercase tracking-wider">Cost-Performance Balancer</h2>
+              <span className="text-[11px] font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary">Tier Capability: <span className="text-teal-800 dark:text-aws-teal uppercase font-extrabold">{tier}</span></span>
             </div>
 
             {/* Key Billing Highlights */}
             <div className="grid grid-cols-3 gap-4 mb-4">
               <div className="p-3 bg-aws-lightBg dark:bg-aws-dark rounded border border-aws-lightBorder dark:border-aws-border text-center">
-                <span className="text-[10px] text-aws-textSecondary uppercase block">Base DB Cost</span>
+                <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary uppercase block">Base DB Cost</span>
                 <span className="text-lg font-bold font-mono text-aws-lightTextPrimary dark:text-aws-textPrimary">${totalCost}/mo</span>
               </div>
               <div className="p-3 bg-aws-lightBg dark:bg-aws-dark rounded border border-aws-lightBorder dark:border-aws-border text-center">
-                <span className="text-[10px] text-aws-textSecondary uppercase block">Optimized Savings</span>
-                <span className="text-lg font-bold font-mono text-aws-green">${potentialSavings}/mo</span>
+                <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary uppercase block">Optimized Savings</span>
+                <span className="text-lg font-bold font-mono text-emerald-800 dark:text-emerald-400">${potentialSavings}/mo</span>
               </div>
               <div className="p-3 bg-aws-lightBg dark:bg-aws-dark rounded border border-aws-lightBorder dark:border-aws-border text-center">
-                <span className="text-[10px] text-aws-textSecondary uppercase block">Optimized Cost</span>
-                <span className="text-lg font-bold font-mono text-aws-blue">${totalCost - potentialSavings}/mo</span>
+                <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary uppercase block">Optimized Cost</span>
+                <span className="text-lg font-bold font-mono text-sky-800 dark:text-aws-blue">${totalCost - potentialSavings}/mo</span>
               </div>
             </div>
 
@@ -402,13 +402,13 @@ export default function Dashboard() {
                   <div className="flex justify-between items-start mb-2">
                     <div>
                       <span className={`text-[9px] uppercase font-bold px-1.5 py-0.5 rounded mr-2 ${
-                        rec.costDelta < 0 ? "bg-aws-green/10 text-aws-green" : "bg-aws-blue/10 text-aws-blue"
+                        rec.costDelta < 0 ? "bg-aws-green/10 text-emerald-800 dark:text-emerald-400" : "bg-aws-blue/10 text-sky-800 dark:text-sky-400"
                       }`}>
                         {rec.type}
                       </span>
                       <strong className="text-aws-lightTextPrimary dark:text-aws-textPrimary">{rec.title}</strong>
                     </div>
-                    <span className={`font-mono font-bold text-sm ${rec.costDelta < 0 ? "text-aws-green" : "text-aws-blue"}`}>
+                    <span className={`font-mono font-bold text-sm ${rec.costDelta < 0 ? "text-emerald-800 dark:text-emerald-400" : "text-sky-800 dark:text-sky-400"}`}>
                       {rec.costDelta < 0 ? `-$${Math.abs(rec.costDelta)}` : `+$${rec.costDelta}`} / mo
                     </span>
                   </div>
@@ -427,7 +427,7 @@ export default function Dashboard() {
                   </p>
                   <button 
                     onClick={() => setTier("small")}
-                    className="px-4 py-1.5 bg-aws-orange hover:bg-aws-orangeHover text-white text-xs font-bold rounded shadow transition-all active:scale-95"
+                    className="px-4 py-1.5 bg-aws-orange hover:bg-aws-orangeHover text-aws-lightTextPrimary dark:text-aws-lightTextPrimary text-xs font-bold rounded shadow transition-all active:scale-95"
                   >
                     Unlock Small Business Tier
                   </button>
@@ -440,9 +440,9 @@ export default function Dashboard() {
           <div className="bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border rounded-lg p-4">
             <div className="flex justify-between items-center mb-3">
               <div>
-                <h2 className="text-sm font-bold text-aws-orange uppercase tracking-wider flex items-center gap-2">
+                <h2 className="text-sm font-bold text-aws-lightTextPrimary dark:text-aws-orange uppercase tracking-wider flex items-center gap-2">
                   Slow Query Inspector
-                  <span className="text-[9px] bg-aws-red/10 text-aws-red border border-aws-red/20 px-1.5 py-0.5 rounded font-mono">
+                  <span className="text-[9px] bg-aws-red/10 text-red-800 dark:text-red-400 border border-aws-red/20 px-1.5 py-0.5 rounded font-mono">
                     PII Redacted
                   </span>
                 </h2>
@@ -453,8 +453,8 @@ export default function Dashboard() {
                 onClick={() => setMaskSql(!maskSql)}
                 className={`text-xs px-3 py-1 rounded font-bold border transition-colors ${
                   maskSql 
-                    ? "bg-aws-green/10 text-aws-green border-aws-green/30 hover:bg-aws-green/20" 
-                    : "bg-aws-red/10 text-aws-red border-aws-red/30 hover:bg-aws-red/20"
+                    ? "bg-aws-green/10 text-emerald-800 dark:text-emerald-400 border-aws-green/30 hover:bg-aws-green/20" 
+                    : "bg-aws-red/10 text-red-800 dark:text-red-400 border-aws-red/30 hover:bg-aws-red/20"
                 }`}
               >
                 {maskSql ? "🛡️ Parameter Masking: ACTIVE (Safe)" : "⚠️ Parameter Masking: OFF (Raw)"}
@@ -468,10 +468,10 @@ export default function Dashboard() {
             <div className="flex flex-col gap-3">
               {MOCK_SLOW_QUERIES.map((q) => (
                 <div key={q.id} className="p-3 bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border rounded font-mono text-xs">
-                  <div className="flex justify-between text-[10px] text-aws-textSecondary mb-1.5 pb-1 border-b border-aws-lightBorder dark:border-aws-divider">
+                  <div className="flex justify-between text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary mb-1.5 pb-1 border-b border-aws-lightBorder dark:border-aws-divider">
                     <span>DB: {instances.find(db => db.id === q.dbInstanceId)?.name}</span>
-                    <span>Wait Event: <span className="text-aws-yellow">{q.waitEvent}</span></span>
-                    <span className="text-aws-red font-bold">{q.durationMs}ms</span>
+                    <span>Wait Event: <span className="text-amber-800 dark:text-aws-yellow">{q.waitEvent}</span></span>
+                    <span className="text-red-800 dark:text-red-400 font-bold">{q.durationMs}ms</span>
                   </div>
                   <pre className="whitespace-pre-wrap break-all text-[11px] text-aws-lightTextPrimary dark:text-aws-textPrimary">
                     {maskSql ? q.maskedSql : q.rawSql}
@@ -486,7 +486,7 @@ export default function Dashboard() {
         <section className="lg:col-span-1 flex flex-col gap-6">
           {/* Anomaly Log Watcher */}
           <div className="bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border rounded-lg p-4">
-            <h2 className="text-sm font-bold text-aws-orange uppercase tracking-wider mb-3">Anomaly Log Watcher</h2>
+            <h2 className="text-sm font-bold text-aws-lightTextPrimary dark:text-aws-orange uppercase tracking-wider mb-3">Anomaly Log Watcher</h2>
             
             {!hasFeature("real-time-logs") ? (
               /* Billing Upgrade CTA inside Log Watcher (PO Agent Audit) */
@@ -496,7 +496,7 @@ export default function Dashboard() {
                 <p className="mt-1 mb-4 text-[11px]">Real-time log scanning is a premium feature available in the **Medium** and **Enterprise** tiers.</p>
                 <button 
                   onClick={() => setTier("medium")}
-                  className="px-4 py-2 bg-aws-orange hover:bg-aws-orangeHover text-white text-xs font-bold rounded shadow transition-all active:scale-95"
+                  className="px-4 py-2 bg-aws-orange hover:bg-aws-orangeHover text-aws-lightTextPrimary dark:text-aws-lightTextPrimary text-xs font-bold rounded shadow transition-all active:scale-95"
                 >
                   Unlock Medium Tier
                 </button>
@@ -508,12 +508,12 @@ export default function Dashboard() {
                     <div className="flex justify-between items-center mb-1">
                       <span className={`px-1 rounded text-[9px] font-bold ${
                         log.level === "ERROR" 
-                          ? "bg-aws-red/10 text-aws-red" 
-                          : "bg-aws-yellow/10 text-aws-yellow"
+                          ? "bg-aws-red/10 text-red-800 dark:text-red-400" 
+                          : "bg-aws-yellow/10 text-amber-800 dark:text-aws-yellow"
                       }`}>
                         {log.level}
                       </span>
-                      <span className="text-[9px] text-aws-textSecondary">
+                      <span className="text-[9px] text-aws-lightTextSecondary dark:text-aws-textSecondary">
                         {new Date(log.timestamp).toLocaleTimeString()}
                       </span>
                     </div>
@@ -526,21 +526,21 @@ export default function Dashboard() {
 
           {/* Gaps Implementation Simulator Panel */}
           <div className="bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border rounded-lg p-4 flex flex-col gap-4">
-            <h2 className="text-sm font-bold text-aws-orange uppercase tracking-wider border-b border-aws-lightBorder dark:border-aws-divider pb-2">
+            <h2 className="text-sm font-bold text-aws-lightTextPrimary dark:text-aws-orange uppercase tracking-wider border-b border-aws-lightBorder dark:border-aws-divider pb-2">
               Telemetry Ingest Sandbox
             </h2>
 
             {/* Gap 1: Dynamic Telemetry scrape interval */}
             <div>
-              <span className="text-[10px] text-aws-textSecondary uppercase font-bold block">Dynamic Scrape Window</span>
+              <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary uppercase font-bold block">Dynamic Scrape Window</span>
               <div className="p-2.5 bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border rounded mt-1 text-[11px] leading-relaxed">
                 <div className="flex justify-between font-bold mb-1">
-                  <span>Calculated Interval:</span>
-                  <span className="text-aws-teal">
+                  <span className="text-aws-lightTextPrimary dark:text-aws-textPrimary">Calculated Interval:</span>
+                  <span className="text-teal-800 dark:text-teal-400">
                     {Math.round(calculateNextIntervalMs(selectedDb.cpuLoad, selectedDb.connections, tier) / 1000)}s
                   </span>
                 </div>
-                <p className="text-[10px] text-aws-textSecondary">
+                <p className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary">
                   {selectedDb.cpuLoad > 85 
                     ? "⚠️ Load spike detected! Scraping at 3x frequency (30s) to monitor metrics."
                     : selectedDb.cpuLoad < 15
@@ -552,20 +552,20 @@ export default function Dashboard() {
 
             {/* Gap 2: Outbox queue and Circuit Breaker states */}
             <div>
-              <span className="text-[10px] text-aws-textSecondary uppercase font-bold block">Telemetry Outbox Outflow</span>
+              <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary uppercase font-bold block">Telemetry Outbox Outflow</span>
               <div className="p-2.5 bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border rounded mt-1 text-[11px] leading-relaxed">
                 <div className="flex justify-between font-bold mb-1">
-                  <span>Outbox Queue Count:</span>
+                  <span className="text-aws-lightTextPrimary dark:text-aws-textPrimary">Outbox Queue Count:</span>
                   <span className="font-mono text-aws-blue">{outboxStatus.queueCount}</span>
                 </div>
                 <div className="flex justify-between font-bold mb-2">
-                  <span>Circuit Breaker:</span>
+                  <span className="text-aws-lightTextPrimary dark:text-aws-textPrimary">Circuit Breaker:</span>
                   <span className={`px-1.5 py-0.5 rounded text-[10px] uppercase ${
                     outboxStatus.state === "CLOSED"
-                      ? "bg-aws-green/10 text-aws-green"
+                      ? "bg-aws-green/10 text-emerald-800 dark:text-emerald-400"
                       : outboxStatus.state === "OPEN"
-                      ? "bg-aws-red/10 text-aws-red animate-pulse"
-                      : "bg-aws-yellow/10 text-aws-yellow"
+                      ? "bg-aws-red/10 text-red-800 dark:text-red-400 animate-pulse"
+                      : "bg-aws-yellow/10 text-amber-800 dark:text-amber-400"
                   }`}>
                     {outboxStatus.state}
                   </span>
@@ -578,7 +578,7 @@ export default function Dashboard() {
                     className={`flex-1 text-[10px] py-1 rounded font-bold border transition-colors ${
                       isDbEndpointOnline
                         ? "bg-aws-green text-white border-transparent"
-                        : "bg-transparent text-aws-textSecondary border-aws-border hover:bg-aws-border/40"
+                        : "bg-transparent text-aws-lightTextSecondary dark:text-aws-textSecondary border-aws-lightBorder dark:border-aws-border hover:bg-aws-lightBorder/40 dark:hover:bg-aws-border/40"
                     }`}
                   >
                     Online
@@ -588,7 +588,7 @@ export default function Dashboard() {
                     className={`flex-1 text-[10px] py-1 rounded font-bold border transition-colors ${
                       !isDbEndpointOnline
                         ? "bg-aws-red text-white border-transparent"
-                        : "bg-transparent text-aws-textSecondary border-aws-border hover:bg-aws-border/40"
+                        : "bg-transparent text-aws-lightTextSecondary dark:text-aws-textSecondary border-aws-lightBorder dark:border-aws-border hover:bg-aws-lightBorder/40 dark:hover:bg-aws-border/40"
                     }`}
                   >
                     Disconnect
@@ -596,7 +596,7 @@ export default function Dashboard() {
                 </div>
                 
                 {!isDbEndpointOnline && (
-                  <p className="text-[9px] text-aws-red mt-1.5 leading-snug">
+                  <p className="text-[9px] text-red-800 dark:text-red-400 mt-1.5 leading-snug">
                     ⚠️ Connection offline. Payloads are queueing in local cache. Backing off retry delay: {outboxStatus.retryDelayMs / 1000}s.
                   </p>
                 )}
@@ -605,30 +605,30 @@ export default function Dashboard() {
 
             {/* Gating Status Review */}
             <div>
-              <span className="text-[10px] text-aws-textSecondary uppercase font-bold block mb-1">Billing Feature Matrix</span>
-              <div className="flex flex-col gap-1 text-[10px]">
-                <div className="flex justify-between">
-                  <span>Slow Query Metrics</span>
+              <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary uppercase font-bold block mb-1.5">Billing Feature Matrix</span>
+              <div className="flex flex-col gap-1.5 text-[10px]">
+                <div className="flex justify-between items-center">
+                  <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">Slow Query Metrics</span>
                   <span className={getBadgeClass(true)}>Active</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>Cost Optimizations</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">Cost Optimizations</span>
                   <span className={getBadgeClass(tier !== "trial")}>Active</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>Real-Time Logs Watcher</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">Real-Time Logs Watcher</span>
                   <span className={getBadgeClass(hasFeature("real-time-logs"))}>
                     {hasFeature("real-time-logs") ? "Active" : "Locked"}
                   </span>
                 </div>
-                <div className="flex justify-between">
-                  <span>Replication Latency Suggester</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">Replication Latency Suggester</span>
                   <span className={getBadgeClass(hasFeature("multi-region"))}>
                     {hasFeature("multi-region") ? "Active" : "Locked"}
                   </span>
                 </div>
-                <div className="flex justify-between">
-                  <span>Slack & PagerDuty Integration</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">Slack & PagerDuty Integration</span>
                   <span className={getBadgeClass(hasFeature("webhooks"))}>
                     {hasFeature("webhooks") ? "Active" : "Locked"}
                   </span>

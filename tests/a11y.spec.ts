@@ -1,0 +1,51 @@
+import { test, expect } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
+
+test.describe("Accessibility Audits - rds-sentinel", () => {
+  test("should pass light mode WCAG accessibility guidelines", async ({ page }) => {
+    await page.goto("/");
+    
+    // Toggle console theme to light mode by clicking the button
+    const themeButton = page.locator("button:has-text('Light Console')");
+    await expect(themeButton).toBeVisible();
+    await themeButton.click();
+
+    // Verify it switched successfully to light mode
+    await expect(page.locator("button:has-text('Dark Console')")).toBeVisible();
+    
+    // Wait for DOM variables to reload (html class should not have dark)
+    await expect(page.locator("html")).not.toHaveClass(/dark/);
+    
+    // Move mouse out of the toggle theme button to clear the hover styling contrast scan
+    await page.mouse.move(0, 0);
+    
+    // Analyze page
+    const results = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .exclude("nextjs-portal")
+      .exclude("div[data-nextjs-toast-wrapper]")
+      .analyze();
+      
+    expect(results.violations).toEqual([]);
+  });
+
+  test("should pass dark mode WCAG accessibility guidelines", async ({ page }) => {
+    await page.goto("/");
+    
+    // Default mode is dark; wait for hydration to complete and apply dark class
+    await expect(page.locator("html")).toHaveClass(/dark/);
+    await expect(page.locator("button:has-text('Light Console')")).toBeVisible();
+    
+    // Move mouse out of any default hover/focus components
+    await page.mouse.move(0, 0);
+
+    // Analyze page
+    const results = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .exclude("nextjs-portal")
+      .exclude("div[data-nextjs-toast-wrapper]")
+      .analyze();
+      
+    expect(results.violations).toEqual([]);
+  });
+});

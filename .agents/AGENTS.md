@@ -78,3 +78,19 @@ Audits visual layouts, consistency, accessibility, and user feedback loops. This
 * **AWS Cloudscape Aesthetic**: Ensure slate-950 and deep-blue background palettes, crisp borders (`border-slate-800`), layout grids, and interactive charts align with official AWS aesthetics.
 * **A11y (WCAG 2.1 AA/AAA)**: Enforce contrast ratios, semantic HTML labels, and aria tags.
 * **Micro-interactions**: Enforce clean transitions, hover highlights, loading skeletons, and interactive responsive tables.
+
+---
+
+## 7. Global Code Review Checklist
+
+Whenever performing a codebase review or post-implementation audit, agents must systematically evaluate, verify, and document the following areas:
+
+1. **Visual & Styling Improvements**: Verify that UI layouts, contrast ratios, and color palettes satisfy WCAG 2.1 AA requirements (especially on theme transitions and badge components). Ensure aesthetics match the cloud platform design system.
+2. **Security & Vulnerability Flaws**: Scan for potential injection paths, PII leaks, unmasked query inputs, and unencrypted credentials. Always check dependencies for CVE vulnerability updates.
+3. **Negative Testing & Error Paths**: Verify how the system recovers from network disconnects, rate limits (API throttling), database downtime, and invalid parameters.
+4. **Accurate Testing & Assertions**: Ensure that unit and E2E test suites mock dynamic endpoints correctly, assert precise state transitions, and clean up event loop timers to prevent open handles.
+5. **Code Quality & Type Safety**: Review TypeScript typing to enforce strict boundaries (no implicit `any`), readability, clean modular structure, and adherence to language-specific best practices.
+6. **Implementation & Architectural Sanity**: Ensure proper separation of concerns, lightweight component boundaries (minimizing client components), and correct routing.
+7. **Performance & Footprint Optimization**: Audit database/network overhead, render loops, outbox buffering, CPU utilization benchmarks, and client bundle size.
+8. **Token-Saving Efficiency**: Prioritize running local scripts/commands (such as build compiles, linter checks, and unit tests) to diagnose problems on disk, avoiding raw file content dumps into the LLM context.
+

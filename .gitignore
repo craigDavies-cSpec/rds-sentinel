@@ -44,3 +44,7 @@ node_modules/
 /infra/bin/**/*.d.ts
 /infra/lib/**/*.d.ts
 
+# playwright
+/playwright-report/
+/test-results/
+
