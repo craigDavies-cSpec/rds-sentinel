@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #f2f3f3;
+  --foreground: #16191f;
+  --card-bg: #ffffff;
+  --border-color: #eaeded;
+  --text-primary: #16191f;
+  --text-secondary: #5f6b7a;
+  --divider-color: #eaeded;
+}
+
+:root.dark {
+  --background: #0f1b29;
+  --foreground: #eaeded;
+  --card-bg: #162535;
+  --border-color: #2a3b4c;
+  --text-primary: #eaeded;
+  --text-secondary: #aab7c4;
+  --divider-color: #1d2d3d;
+}
+
+body {
+  color: var(--text-primary);
+  background: var(--background);
+  font-family: "Amazon Ember", "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* Custom scrollbars for telemetry lists */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(135, 135, 135, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(135, 135, 135, 0.4);
+}

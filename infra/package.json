@@ -1,0 +1,21 @@
+{
+  "name": "rds-sentinel-infra",
+  "version": "0.1.0",
+  "bin": {
+    "rds-sentinel-infra": "bin/rds-sentinel-infra.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.100.0",
+    "constructs": "^10.0.0",
+    "source-map-support": "^0.5.21"
+  }
+}
