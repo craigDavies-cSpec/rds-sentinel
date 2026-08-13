@@ -245,6 +245,20 @@ export default function Dashboard() {
     setTimeout(() => setToastMessage(null), 4000);
   };
 
+  // Pre-Launch UI/UX Polish: Global Keyboard Escape Key Listener for Modals & Drawers
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setIsSettingsModalOpen(false);
+        setIsMfaModalOpen(false);
+        setIsGraphQLModalOpen(false);
+        setIsEvidenceDrawerOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   // Option B: Webhook Dispatch Simulator state
   const [webhookTarget, setWebhookTarget] = useState<"slack" | "pagerduty">("slack");
   const [webhookUrl, setWebhookUrl] = useState("https://hooks.slack.com/services/T00000000/B00000000/XXXXX");
@@ -2384,7 +2398,7 @@ export default function Dashboard() {
       {/* Phase 11A: Interactive Audit Evidence Inspector Drawer */}
       {isEvidenceDrawerOpen && activeEvidencePkg && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex justify-end">
-          <div className="bg-aws-lightContainer dark:bg-aws-container border-l-2 border-aws-orange w-[520px] max-w-full h-full shadow-2xl flex flex-col p-6 font-sans overflow-y-auto">
+          <div className="bg-aws-lightContainer dark:bg-aws-container border-l-2 border-aws-orange w-[520px] max-w-full h-full shadow-2xl flex flex-col p-6 font-sans overflow-y-auto animate-in fade-in slide-in-from-right-4 duration-300">
             <div className="flex justify-between items-center border-b border-aws-lightBorder dark:border-aws-divider pb-3">
               <div>
                 <strong className="text-base font-bold text-aws-lightTextPrimary dark:text-aws-orange block">
