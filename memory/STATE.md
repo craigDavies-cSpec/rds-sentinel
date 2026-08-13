@@ -38,8 +38,8 @@ _Last Updated: 2026-08-13_
 - **Circuit Breaker state**: `CLOSED`
 - **Outbox Queue count**: `0` (Ingested successfully)
 - **Sanitizer Parameter Masking**: `Active` (All sensitive SQL query parameters and emails redacted at edge).
-- **Interactive Evidence Inspector**: `Active` (Slide-over SOC2 Type II Audit Evidence Inspector Drawer with live Trust Services Criteria CC6.1, CC6.6, CC6.8 control inspection and 1-click proof copying).
-- **Automated Test Coverage**: **96/96 Tests Passing** (65 Jest unit + 29 Playwright E2E + 1 Layout E2E + 1 LocalStack E2E).
+- **Terraform HCL Infrastructure Exporter**: `Active` (Production-ready Terraform HCL infrastructure exporter generating downloadable `main.tf`, `variables.tf`, `outputs.tf` cross-account IAM monitoring role modules).
+- **Automated Test Coverage**: **97/97 Tests Passing** (66 Jest unit + 30 Playwright E2E + 1 Layout E2E + 1 LocalStack E2E).
 
 ---
 

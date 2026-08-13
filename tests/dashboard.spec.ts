@@ -396,4 +396,15 @@ test.describe("RDS Sentinel Dashboard Functional E2E Tests", () => {
     // Close drawer
     await page.locator("#close-evidence-drawer-btn").click();
   });
+
+  test("should render Terraform HCL export button in Settings Tab 2", async ({ page }) => {
+    // Open settings modal
+    await page.locator("#open-settings-modal-btn").click();
+
+    // Navigate to AWS Accounts & Infrastructure tab (Tab 2)
+    await page.locator("#tab-aws-accounts-btn").click();
+
+    // Assert Terraform export button is visible
+    await expect(page.locator("#export-terraform-hcl-btn")).toBeVisible();
+  });
 });

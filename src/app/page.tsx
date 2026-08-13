@@ -63,6 +63,10 @@ import {
   downloadAuditEvidencePackageFile,
   AuditEvidencePackage,
 } from "@/lib/auditEvidenceExporter";
+import {
+  generateTerraformModule,
+  downloadTerraformFile,
+} from "@/lib/terraformExporter";
 
 // Initialize the telemetry outbox queue
 const outbox = new TelemetryOutboxQueue();
@@ -1812,7 +1816,7 @@ export default function Dashboard() {
                           </span>
                         </div>
                       </div>
-                      <div className="flex gap-2 pt-1">
+                      <div className="flex gap-2 pt-1 flex-wrap">
                         <button
                           id="export-cfn-template-btn"
                           onClick={() => {
@@ -1834,6 +1838,17 @@ export default function Dashboard() {
                           className="px-3 py-1.5 rounded bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-xs shadow cursor-pointer flex items-center gap-1"
                         >
                           📦 Download Service Catalog Blueprint (.json)
+                        </button>
+                        <button
+                          id="export-terraform-hcl-btn"
+                          onClick={() => {
+                            const tfBundle = generateTerraformModule("123456789012", testExtId);
+                            downloadTerraformFile(tfBundle.mainTf, "main.tf");
+                            showToast("🛠️ Terraform HCL main.tf Exported!");
+                          }}
+                          className="px-3 py-1.5 rounded bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs shadow cursor-pointer flex items-center gap-1"
+                        >
+                          🛠️ Download Terraform HCL (.tf)
                         </button>
                       </div>
                     </div>
