@@ -1911,7 +1911,7 @@ export default function Dashboard() {
                           id="export-cfn-template-btn"
                           onClick={() => {
                             const accountIdMatch = testRoleArn.match(/arn:aws:iam::(\d{12}):role/);
-                            const targetAccountId = accountIdMatch ? accountIdMatch[1] : "616399034957";
+                            const targetAccountId = accountIdMatch && accountIdMatch[1] !== "123456789012" ? accountIdMatch[1] : "616399034957";
                             const template = generateCloudFormationRoleTemplate({ externalId: testExtId, saasAccountId: targetAccountId });
                             downloadTemplateFile(template, "rds-sentinel-monitoring-role.yaml", "text/yaml");
                             showToast("📥 CloudFormation Stack Template Exported!");
