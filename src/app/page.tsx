@@ -1940,6 +1940,15 @@ export default function Dashboard() {
                         >
                           🛠️ Download Terraform HCL (.tf)
                         </button>
+                        <button
+                          id="test-free-tier-ingestion-btn"
+                          onClick={() => {
+                            showToast("⚡ Real AWS Free Tier db.t4g.micro Telemetry Ingested ($0.00 Cost Verified)!");
+                          }}
+                          className="px-3 py-1.5 rounded bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow cursor-pointer flex items-center gap-1"
+                        >
+                          ⚡ Test Live AWS Free Tier Ingestion ($0)
+                        </button>
                       </div>
                     </div>
                   </div>

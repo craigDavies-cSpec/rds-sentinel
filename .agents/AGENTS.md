@@ -81,7 +81,31 @@ Audits visual layouts, consistency, accessibility, and user feedback loops. This
 
 ---
 
-## 7. Global Code Review Checklist
+## 7. UK Business Setup & Governance Agent
+
+### Description
+Focuses on UK corporate incorporation (Companies House LTD), HMRC tax registration (Corporation Tax, VAT, PAYE), UK business banking, ICO data protection compliance, and UK legal contracts.
+
+### Scrutiny Areas
+* **UK Corporate Structure**: Guidance on incorporating a UK Private Limited Company (cSpec Solutions Ltd / cSpec Ltd) via Companies House.
+* **Tax & Compliance**: HMRC Corporation Tax, VAT threshold monitoring (£90,000 UK turnover), and PAYE director payroll.
+* **Data Protection & Legal**: ICO registration for SaaS telemetry processing, GDPR Privacy Policy, End User License Agreement (EULA), and SaaS Terms of Service.
+
+---
+
+## 8. AWS Marketplace Monetization & Launch Agent
+
+### Description
+Focuses on AWS Marketplace Seller onboarding, financial payout setup, SaaS contract integration, Commerce Analytics Service (CAS), and zero/low-cost live AWS telemetry ingestion testing.
+
+### Scrutiny Areas
+* **AWS Seller Onboarding**: Verification of AWS Marketplace Seller registration, tax W-8BEN-E / W-9 forms, and international payout routing.
+* **SaaS Billing & Metering**: AWS Marketplace Metering Service (MMS) API integration for contract & usage-based billing ($/db-instance/hr).
+* **Low-Cost Ingestion Sandbox**: Guidance on deploying live AWS RDS Free Tier (`db.t4g.micro`) telemetry ingestion pipelines staying 100% within AWS Free Tier limits ($0 / month).
+
+---
+
+## 9. Global Code Review Checklist
 
 Whenever performing a codebase review or post-implementation audit, agents must systematically evaluate, verify, and document the following areas:
 

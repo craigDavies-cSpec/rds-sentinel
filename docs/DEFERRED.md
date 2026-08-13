@@ -39,7 +39,9 @@ A living backlog of deferred items, future roadmap features, and architectural i
 
 ---
 
-## 5. Completed Roadmap Milestones & Agent Pipeline
+---
+
+## 5. Completed v1.0 Roadmap Milestones
 
 * **Phase 9A (Enterprise Localization & UX Personalization)**: ✅ **Completed & Verified** (EN, DE, FR, JP & 4 Accent Themes).
 * **Phase 9B (Advanced AWS Governance & Security)**: ✅ **Completed & Verified** (AWS Control Tower `CT.RDS.PR.1-4`, SOC2 Monitor, MFA).
@@ -48,15 +50,17 @@ A living backlog of deferred items, future roadmap features, and architectural i
 * **Phase 10B (API Key & Rate-Limiting Control Panel)**: ✅ **Completed & Verified** (Developer API Key Vault, Rate Limits, Secret Key Toggles).
 * **Phase 10C (Automated SOC2 Type II Audit Evidence Package Downloader)**: ✅ **Completed & Verified** (1-Click JSON Evidence Package Exporter).
 * **Phase 11A (Interactive Audit Evidence Inspector Drawer)**: ✅ **Completed & Verified** (Slide-Over Live Evidence Inspector & Proof Copying).
+* **Phase 11B (Terraform HCL Provider & Infrastructure Exporter)**: ✅ **Completed & Verified** (HashiCorp HCL Exporter).
+* **Phase 11C (Multi-Region Database Replication Engine)**: ✅ **Completed & Verified** (Cross-Region Lag Matrix & Failover Simulator).
 
 ---
 
-## 6. Future Roadmap Candidates (Recorded Post-Phase 11A)
+## 6. v2.0 Post-Launch Feature Roadmap (Approved Post-v1.0 Launch)
 
-* **Keyboard `Escape` Key Listener for Drawers** (QA Agent): Global `Esc` key listener for closing slide-over panels.
-* **Animated Drawer Entry/Exit Backdrop Blur Transitions** (UI/UX Agent): CSS transition animations for drawer panels.
 * **Cryptographic SHA-256 Hash Verification Badge** (Security Auditor): Live SHA-256 checksum badge for evidence packages.
 * **Evidence Search & Filter Input Bar** (Senior Dev): Live keyword filter inside the Evidence Inspector Drawer.
 * **SOC2 Audit Evidence PDF Summary Generator** (PO Agent): Printable PDF executive audit summary exporter.
 * **AWS Audit Manager Direct Integration Webhook** (AWS Expert): Webhook dispatch of evidence packages directly to AWS Audit Manager.
+* **Multi-Region Active-Active Latency Visualizer** (AWS Expert): Topology graph overlay showing active-active Aurora Global DB latency vectors.
+* **AWS Route 53 Application Recovery Controller (ARC) Integration** (PO Agent): Automatic DNS routing failover trigger.
 

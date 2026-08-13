@@ -38,8 +38,9 @@ _Last Updated: 2026-08-13_
 - **Circuit Breaker state**: `CLOSED`
 - **Outbox Queue count**: `0` (Ingested successfully)
 - **Sanitizer Parameter Masking**: `Active` (All sensitive SQL query parameters and emails redacted at edge).
-- **Multi-Region Replication Engine**: `Active` (Cross-region replication latency lag matrix, inter-region transfer bandwidth cost modeling, and Aurora Global Database zero-data-loss failover simulation).
-- **Automated Test Coverage**: **98/98 Tests Passing** (68 Jest unit + 31 Playwright E2E + 1 Layout E2E + 1 LocalStack E2E).
+- **UK Business Incorporation & Legal Suite**: `Active` (cSpec Solutions Ltd setup guides, UK Companies House LTD filings, HMRC tax & PAYE compliance, ICO registration, and UK GDPR/EULA contract generators in `src/lib/ukLegalContracts.ts`).
+- **AWS Marketplace Monetization & Free Tier Ingestion**: `Active` (AWS Free Tier $0 live telemetry ingestion guide in `docs/AWS_FREE_TIER_INGESTION_GUIDE.md` and AWS Marketplace seller onboarding in `docs/AWS_MARKETPLACE_ONBOARDING.md`).
+- **Automated Test Coverage**: **103/103 Tests Passing** (69 Jest unit + 32 Playwright E2E + 1 Layout E2E + 1 LocalStack E2E).
 
 ---
 

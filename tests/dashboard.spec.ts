@@ -418,4 +418,18 @@ test.describe("RDS Sentinel Dashboard Functional E2E Tests", () => {
     // Trigger test failover
     await page.locator("#test-failover-btn").click();
   });
+
+  test("should render Live AWS Free Tier Ingestion test button in Settings Tab 2", async ({ page }) => {
+    // Open settings modal
+    await page.locator("#open-settings-modal-btn").click();
+
+    // Navigate to AWS Accounts & Services tab (Tab 2)
+    await page.locator("#tab-aws-accounts-btn").click();
+
+    // Assert Free Tier Ingestion button is visible and click it
+    const btn = page.locator("#test-free-tier-ingestion-btn");
+    await expect(btn).toBeVisible();
+    await btn.click();
+    await expect(page.getByText(/Real AWS Free Tier/)).toBeVisible();
+  });
 });
