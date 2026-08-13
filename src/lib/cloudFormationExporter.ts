@@ -14,7 +14,7 @@ export function generateCloudFormationRoleTemplate(
 ): string {
   const extId = options.externalId || "ext-prod-9401-sec";
   const roleName = options.roleName || "RDSSentinelMonitoringRole";
-  const saasAccountId = options.saasAccountId || "123456789012";
+  const saasAccountId = options.saasAccountId || "616399034957";
 
   return `AWSTemplateFormatVersion: '2010-09-09'
 Description: 'RDS Sentinel Cross-Account IAM Monitoring Role Deployment Stack'
