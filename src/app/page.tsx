@@ -67,6 +67,12 @@ import {
   generateTerraformModule,
   downloadTerraformFile,
 } from "@/lib/terraformExporter";
+import {
+  calculateReplicationMetrics,
+  simulateFailoverEvent,
+  INITIAL_REGIONS,
+  RegionReplicationStatus,
+} from "@/lib/multiRegionReplication";
 
 // Initialize the telemetry outbox queue
 const outbox = new TelemetryOutboxQueue();
@@ -228,6 +234,9 @@ export default function Dashboard() {
   // Phase 11A: Interactive Audit Evidence Inspector Drawer state
   const [isEvidenceDrawerOpen, setIsEvidenceDrawerOpen] = useState<boolean>(false);
   const [activeEvidencePkg, setActiveEvidencePkg] = useState<AuditEvidencePackage | null>(null);
+
+  // Phase 11C: Multi-Region Database Replication state
+  const [regions, setRegions] = useState<RegionReplicationStatus[]>(INITIAL_REGIONS);
 
   const controlTowerAudit = useMemo(() => evaluateControlTowerGuardrails(instances), [instances]);
 
@@ -1398,8 +1407,75 @@ export default function Dashboard() {
               </div>
             </div>
 
+            {/* Phase 11C: Multi-Region Database Replication & Latency Simulation Engine */}
+            <div id="multi-region-replication-card" className="mt-3">
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary uppercase font-bold block">
+                  🌐 Multi-Region Database Replication & Failover Engine
+                </span>
+                {hasFeature("multi-region") && (
+                  <button
+                    id="test-failover-btn"
+                    onClick={() => {
+                      const res = simulateFailoverEvent("us-east-1", "eu-central-1");
+                      showToast(`⚡ Regional Failover Simulated! New Primary: ${res.newPrimary} (${res.failoverDurationMs}ms)`);
+                    }}
+                    className="px-2 py-0.5 rounded bg-amber-800 hover:bg-amber-900 text-white font-mono font-bold text-[9px] cursor-pointer"
+                  >
+                    ⚡ Test Failover
+                  </button>
+                )}
+              </div>
+              <div className="p-2.5 bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border rounded text-[11px] leading-relaxed">
+                {hasFeature("multi-region") ? (
+                  <div className="flex flex-col gap-2 font-mono text-[10px]">
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {regions.map((r) => (
+                        <div
+                          key={r.regionCode}
+                          className="p-1.5 rounded bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border flex flex-col gap-0.5"
+                        >
+                          <div className="flex justify-between items-center font-bold">
+                            <span className="text-amber-700 dark:text-aws-orange">{r.regionCode}</span>
+                            <span
+                              className={`text-[8px] px-1 rounded ${
+                                r.role === "PRIMARY_WRITER"
+                                  ? "bg-emerald-500/20 text-emerald-800 dark:text-emerald-300"
+                                  : r.role === "DISASTER_RECOVERY"
+                                  ? "bg-purple-500/20 text-purple-800 dark:text-purple-300"
+                                  : "bg-sky-500/20 text-sky-800 dark:text-sky-300"
+                              }`}
+                            >
+                              {r.role === "PRIMARY_WRITER" ? "WRITER" : r.role === "DISASTER_RECOVERY" ? "DR" : "REPLICA"}
+                            </span>
+                          </div>
+                          <span className="text-[9px] text-aws-lightTextSecondary dark:text-aws-textSecondary truncate">{r.regionName}</span>
+                          <div className="flex justify-between items-center text-[9px] pt-1 border-t border-aws-lightBorder dark:border-aws-divider mt-0.5">
+                            <span>Lag: {r.replicationLagMs}ms</span>
+                            <span className="font-bold text-emerald-800 dark:text-emerald-400">${r.monthlyTransferCostEstUsd}/mo</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center p-2">
+                    <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary block mb-1">
+                      🔒 Multi-Region Replication Engine locked on {tier} tier.
+                    </span>
+                    <button
+                      onClick={() => setTier("medium")}
+                      className="px-3 py-1 bg-aws-orange text-aws-lightTextPrimary dark:text-aws-lightTextPrimary text-[10px] font-bold rounded"
+                    >
+                      Upgrade to Medium Tier
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
             {/* Option B: Enterprise Webhook Dispatch Simulator */}
-            <div id="webhook-simulator-card">
+            <div id="webhook-simulator-card" className="mt-3">
               <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary uppercase font-bold block mb-1">
                 Enterprise Webhook Dispatch Simulator
               </span>

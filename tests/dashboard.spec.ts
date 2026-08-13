@@ -407,4 +407,15 @@ test.describe("RDS Sentinel Dashboard Functional E2E Tests", () => {
     // Assert Terraform export button is visible
     await expect(page.locator("#export-terraform-hcl-btn")).toBeVisible();
   });
+
+  test("should render Multi-Region Replication card nodes and trigger failover test simulation", async ({ page }) => {
+    // Verify Multi-Region card nodes are visible (unlocked by default on Medium tier)
+    const card = page.locator("#multi-region-replication-card");
+    await expect(card).toBeVisible();
+    await expect(card.getByText("us-east-1", { exact: true })).toBeVisible();
+    await expect(card.getByText("eu-central-1", { exact: true })).toBeVisible();
+
+    // Trigger test failover
+    await page.locator("#test-failover-btn").click();
+  });
 });
