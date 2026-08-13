@@ -12,6 +12,9 @@ export interface DBInstance {
   iops: number;
   storageGb: number;
   freeStorageGb: number;
+  accountId?: string;
+  accountName?: string;
+  projectTag?: string;
 }
 
 export interface CostRecommendation {
@@ -57,6 +60,9 @@ export const MOCK_INSTANCES: DBInstance[] = [
     iops: 4800,
     storageGb: 500,
     freeStorageGb: 142,
+    accountId: "123456789012",
+    accountName: "Production AWS Account",
+    projectTag: "E-Commerce Platform",
   },
   {
     id: "db-billing-rds",
@@ -70,6 +76,9 @@ export const MOCK_INSTANCES: DBInstance[] = [
     iops: 1200,
     storageGb: 200,
     freeStorageGb: 110,
+    accountId: "123456789012",
+    accountName: "Production AWS Account",
+    projectTag: "FinTech Billing",
   },
   {
     id: "db-dev-sandbox",
@@ -80,9 +89,12 @@ export const MOCK_INSTANCES: DBInstance[] = [
     status: "available",
     cpuLoad: 12,
     connections: 3,
-    iops: 250,
+    iops: 300,
     storageGb: 50,
     freeStorageGb: 48,
+    accountId: "987654321098",
+    accountName: "Staging & Dev AWS Account",
+    projectTag: "Developer Sandbox",
   },
   {
     id: "db-analytics-aurora",
@@ -93,10 +105,13 @@ export const MOCK_INSTANCES: DBInstance[] = [
     status: "available",
     cpuLoad: 45,
     connections: 18,
-    iops: 1800,
+    iops: 2400,
     storageGb: 800,
     freeStorageGb: 420,
-  }
+    accountId: "987654321098",
+    accountName: "Staging & Dev AWS Account",
+    projectTag: "Analytics Data Pipeline",
+  },
 ];
 
 // 2. Cost Recommendations seed data

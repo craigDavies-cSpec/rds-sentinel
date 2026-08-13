@@ -38,9 +38,8 @@ _Last Updated: 2026-08-13_
 - **Circuit Breaker state**: `CLOSED`
 - **Outbox Queue count**: `0` (Ingested successfully)
 - **Sanitizer Parameter Masking**: `Active` (All sensitive SQL query parameters and emails redacted at edge).
-- **Layout State Persistence**: `Active` (Saved to `rds-sentinel.db` via Next.js Server Actions).
-- **LocalStack Cloud Sandbox**: `Verified` (`npm run test:localstack` passed).
-- **Automated Test Coverage**: **35/35 Tests Passing** (24 Jest unit + 11 Playwright E2E + 1 Layout E2E + 1 LocalStack E2E).
+- **Interactive Evidence Inspector**: `Active` (Slide-over SOC2 Type II Audit Evidence Inspector Drawer with live Trust Services Criteria CC6.1, CC6.6, CC6.8 control inspection and 1-click proof copying).
+- **Automated Test Coverage**: **96/96 Tests Passing** (65 Jest unit + 29 Playwright E2E + 1 Layout E2E + 1 LocalStack E2E).
 
 ---
 

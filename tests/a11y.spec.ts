@@ -6,14 +6,11 @@ test.describe("Accessibility Audits - rds-sentinel", () => {
     await page.goto("/");
     
     // Toggle console theme to light mode by clicking the button
-    const themeButton = page.locator("button:has-text('Light Console')");
+    const themeButton = page.locator("button[title='Toggle Theme']");
     await expect(themeButton).toBeVisible();
     await themeButton.click();
 
     // Verify it switched successfully to light mode
-    await expect(page.locator("button:has-text('Dark Console')")).toBeVisible();
-    
-    // Wait for DOM variables to reload (html class should not have dark)
     await expect(page.locator("html")).not.toHaveClass(/dark/);
     
     // Move mouse out of the toggle theme button to clear the hover styling contrast scan
@@ -34,7 +31,7 @@ test.describe("Accessibility Audits - rds-sentinel", () => {
     
     // Default mode is dark; wait for hydration to complete and apply dark class
     await expect(page.locator("html")).toHaveClass(/dark/);
-    await expect(page.locator("button:has-text('Light Console')")).toBeVisible();
+    await expect(page.locator("button[title='Toggle Theme']")).toBeVisible();
     
     // Move mouse out of any default hover/focus components
     await page.mouse.move(0, 0);

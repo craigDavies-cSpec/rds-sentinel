@@ -99,6 +99,25 @@ export class TelemetryOutboxQueue {
   }
 
   /**
+   * Forces circuit breaker state reset to CLOSED (Chaos Engineering Simulator)
+   */
+  public resetCircuitBreaker(): void {
+    this.circuitBreakerState = "CLOSED";
+    this.consecutiveFailures = 0;
+    this.retryDelayMs = 2000;
+  }
+
+  /**
+   * Simulates a failed telemetry request (Chaos Engineering Simulator)
+   */
+  public recordFailure(): void {
+    this.consecutiveFailures += 1;
+    if (this.consecutiveFailures >= 3) {
+      this.circuitBreakerState = "OPEN";
+    }
+  }
+
+  /**
    * Simulates telemetry submission to the AWS performance endpoint.
    * If connection fails, increments failure counts and calculates exponential backoff.
    */

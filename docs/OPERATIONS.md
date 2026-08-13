@@ -53,3 +53,13 @@ npx cdk synth
 The synthesized templates are written to `infra/cdk.out/` and can be deployed to AWS via `npx cdk deploy`.
 - **`RDSMonitoringRoleStack`**: Client-side IAM stack.
 - **`RDSIngestionStack`**: SaaS-side serverless ingestion resources stack.
+
+---
+
+## 5. Standard Mandatory Workspace Agent Review & Memory Protocol
+
+To maintain world-class visual aesthetics, security compliance, and zero documentation drift:
+1. **Post-Phase Agent Audits:** Upon completing every phase, all 6 workspace agent personas (Senior PO, Senior AWS Expert, Senior UI/UX Designer, Senior Developer, QA Agent, Safety & Security Auditor) conduct systematic post-implementation audits.
+2. **Immediate Fix Application:** High-value recommendations, fixes, and visual refinements proposed by the agents are evaluated and applied immediately to the codebase.
+3. **Memory & Docs Synchronization:** `memory/STATE.md`, `memory/LEARNINGS.md`, `agent_review_report.md`, and `implementation_plan.md` must be updated with zero stale entries before proceeding to subsequent phase executions.
+4. **Mandatory Automated Test Suite Updating:** Unit test suites (in `src/lib/__tests__/`) and Playwright E2E integration test suites (in `tests/`) must be updated after every phase to maintain 100% test coverage of newly added features and guarantee zero regression failures.

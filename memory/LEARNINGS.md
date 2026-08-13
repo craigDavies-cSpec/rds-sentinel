@@ -4,9 +4,15 @@
 
 ## 2026-08-13
 
-* **React Hydration Error Elimination (Next.js SSR)**
-  - *Problem*: Next.js threw `Error: Text content does not match server-rendered HTML` when loading the dashboard console in the browser.
-  - *Learning*: Avoid non-deterministic function evaluations (`Math.random()`, dynamic `Date.now()` timestamps) during initial state declarations and mock data exports. Use fixed deterministic seed arrays for initial state and a static base timestamp for mock data exports. Apply `suppressHydrationWarning` to RootLayout tags for theme class toggles.
+* **React Hydration Mismatch on Dynamic Date Formatting (`toLocaleTimeString`)**
+  - *Problem*: Next.js threw `Error: Text content does not match server-rendered HTML. Server: "07:49:51" Client: "07:55:48"` because `toLocaleTimeString()` was invoked on dynamic date objects inside JSX.
+  - *Learning*: `toLocaleTimeString()` relies on system wall-clock time which differs between server SSR execution and browser client hydration. Replace dynamic `toLocaleTimeString()` evaluations with static ISO/formatted timestamp strings (`log.timestamp`) and attach `suppressHydrationWarning={true}` to timestamp DOM nodes.
+
+* **UX Header De-crowding (2-Tier Structured Header Architecture)**
+  - *Problem*: Accumulating 12+ action buttons, dropdowns, and status badges into a single `<header>` bar caused severe line wrapping, overlapping text, and visually overcrowded UI on standard resolutions.
+  - *Learning*: Implement a **2-Tier Header Architecture**:
+    1. **Primary Top Bar**: Dedicated strictly to branding logo, partner badge, mode toggle (`🌐 SaaS` vs `⚡ AWS Extension`), primary CTA (`🎯 2-Min Tour`), export buttons, and settings modal trigger.
+    2. **Sub-Header Context & Control Strip**: A semi-transparent backdrop bar (`bg-aws-lightBg/60 dark:bg-aws-dark/60 backdrop-blur-sm`) housing contextual filters (AWS account selector, cost center tag pills) and key status indicators (health score badge, identified savings badge, quick tier pills).
 
 * **Docker Container Auto-Removal in LocalStack E2E Testing**
   - *Problem*: LocalStack accumulated hundreds of exited Lambda execution containers in Docker Desktop after multiple test runs.

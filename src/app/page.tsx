@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { 
   MOCK_INSTANCES, 
   MOCK_RECOMMENDATIONS, 
@@ -14,6 +14,55 @@ import { calculateNextIntervalMs, TelemetryOutboxQueue } from "@/lib/dynamicTele
 import { getLayoutAction, saveLayoutAction } from "./actions";
 import { exportCSVReport } from "@/lib/reportExporter";
 import { dispatchWebhookAlert, WebhookDispatchResult } from "@/lib/webhookSimulator";
+import { analyzeSlowQuery, IndexRecommendation } from "@/lib/indexAdvisor";
+import { getClusterTopology, ClusterNode, ClusterTopologyData } from "@/lib/clusterTopology";
+import { PRODUCT_TOUR_STEPS, TourStep, isTourCompleted, markTourCompleted, resetTourState } from "@/lib/productTour";
+import { generateComplianceReport, downloadCompliancePackage } from "@/lib/complianceExporter";
+import {
+  UserAppPreferences,
+  LinkedAwsAccount,
+  TIER_PRICING_PLANS,
+  INITIAL_APP_PREFERENCES,
+  INITIAL_LINKED_AWS_ACCOUNTS,
+  calculateTierProration,
+  checkInstanceCapacity,
+  testIamRoleConnection,
+  TierType,
+} from "@/lib/accountSettings";
+import {
+  calculateAccountHealthScore,
+  getAvailableCostCenterTags,
+  filterInstancesByCostCenter,
+  getAggregatedMultiAccountInstances,
+} from "@/lib/enterpriseConsolidation";
+import {
+  scanAwsOrganizationsForDatabases,
+  generateHipaaBaaAgreement,
+  HipaaBaaAgreement,
+} from "@/lib/agentBacklogEnhancements";
+import { t, LanguageCode, SUPPORTED_LANGUAGES } from "@/lib/localization";
+import { AccentTheme, ACCENT_THEMES } from "@/lib/themeAccent";
+import { evaluateControlTowerGuardrails } from "@/lib/controlTower";
+import { validateMfaToken } from "@/lib/securityControlMonitor";
+import { WebSocketStreamListener, WebSocketTelemetryPacket } from "@/lib/webSocketStream";
+import { queryGraphQLTelemetry } from "@/lib/graphQLResolver";
+import { injectChaosLatency } from "@/lib/chaosNetwork";
+import {
+  generateCloudFormationRoleTemplate,
+  generateServiceCatalogBlueprint,
+  downloadTemplateFile,
+} from "@/lib/cloudFormationExporter";
+import {
+  ApiKey,
+  INITIAL_API_KEYS,
+  generateApiKey,
+  revokeApiKey,
+} from "@/lib/apiKeyManager";
+import {
+  generateAuditEvidencePackage,
+  downloadAuditEvidencePackageFile,
+  AuditEvidencePackage,
+} from "@/lib/auditEvidenceExporter";
 
 // Initialize the telemetry outbox queue
 const outbox = new TelemetryOutboxQueue();
@@ -91,6 +140,97 @@ export default function Dashboard() {
 
   // Interactive CPU sparkline hover tooltip state
   const [hoveredSample, setHoveredSample] = useState<{ index: number; value: number } | null>(null);
+
+  // Multi-AWS Account Selector state
+  const [selectedAccountId, setSelectedAccountId] = useState<string>("all");
+
+  // Phase 7: Master Enterprise Consolidation state
+  const [appMode, setAppMode] = useState<"mode_a" | "mode_b">("mode_a");
+  const [selectedCostCenterTag, setSelectedCostCenterTag] = useState<string>("ALL_TAGS");
+
+  // AWS ROI Calculator Slider state
+  const [roiDbCount, setRoiDbCount] = useState<number>(10);
+
+  // Filtered instances based on selected AWS account & Cost Center Tag
+  const filteredInstances = useMemo(() => {
+    let list = getAggregatedMultiAccountInstances(instances, selectedAccountId === "all" || selectedAccountId === "ALL_ACCOUNTS" ? "ALL_ACCOUNTS" : selectedAccountId);
+    return filterInstancesByCostCenter(list, selectedCostCenterTag);
+  }, [instances, selectedAccountId, selectedCostCenterTag]);
+
+  const availableTags = useMemo(() => {
+    return getAvailableCostCenterTags(instances);
+  }, [instances]);
+
+  const healthMetrics = useMemo(() => {
+    return calculateAccountHealthScore(filteredInstances, MOCK_RECOMMENDATIONS, MOCK_SLOW_QUERIES, maskSql);
+  }, [filteredInstances, maskSql]);
+
+  // Auto-switch selected DB if current selected DB is filtered out by AWS Account selector
+  useEffect(() => {
+    if (filteredInstances.length > 0 && !filteredInstances.some(db => db.id === selectedDbId)) {
+      setSelectedDbId(filteredInstances[0].id);
+    }
+  }, [filteredInstances, selectedDbId]);
+
+  // Active selected Index Advisor recommendation state
+  const [activeAdvisorQueryId, setActiveAdvisorQueryId] = useState<string | null>(null);
+  const [copiedDdlQueryId, setCopiedDdlQueryId] = useState<string | null>(null);
+
+  // Phase 3: Cluster Topology Visualizer state
+  const [selectedTopologyNode, setSelectedTopologyNode] = useState<ClusterNode | null>(null);
+  const topologyData = useMemo(() => getClusterTopology(selectedAccountId), [selectedAccountId]);
+
+  // Phase 4: Guided Product Tour state
+  const [isTourActive, setIsTourActive] = useState<boolean>(false);
+  const [currentTourStepIndex, setCurrentTourStepIndex] = useState<number>(0);
+
+  // Phase 6: Account Settings & Subscription Billing Portal state
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState<boolean>(false);
+  const [settingsTab, setSettingsTab] = useState<"preferences" | "aws_accounts" | "billing" | "security">("preferences");
+  const [appPreferences, setAppPreferences] = useState<UserAppPreferences>(INITIAL_APP_PREFERENCES);
+  const [linkedAccounts, setLinkedAccounts] = useState<LinkedAwsAccount[]>(INITIAL_LINKED_AWS_ACCOUNTS);
+  const [iamTestResult, setIamTestResult] = useState<{ success?: boolean; message?: string } | null>(null);
+  const [testRoleArn, setTestRoleArn] = useState<string>("arn:aws:iam::123456789012:role/RDSSentinelRole");
+  const [testExtId, setTestExtId] = useState<string>("ext-prod-9401-sec");
+
+  // Phase 8: Post-Launch Agent Backlog Enhancements state
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [hipaaBaa, setHipaaBaa] = useState<HipaaBaaAgreement | null>(null);
+  const [autoDiscoveredCount, setAutoDiscoveredCount] = useState<number | null>(null);
+
+  // Phase 9A: Enterprise Localization & UX Personalization state
+  const [language, setLanguage] = useState<LanguageCode>("en");
+  const [accentTheme, setAccentTheme] = useState<AccentTheme>("aws_orange");
+
+  // Phase 9B: Advanced AWS Governance & Security state
+  const [isMfaModalOpen, setIsMfaModalOpen] = useState<boolean>(false);
+  const [pendingTierChange, setPendingTierChange] = useState<TierType | null>(null);
+  const [mfaCodeInput, setMfaCodeInput] = useState<string>("");
+  const [mfaErrorMsg, setMfaErrorMsg] = useState<string | null>(null);
+
+  // Phase 9C: Real-Time Stream Engine & Developer API state
+  const [isWsConnected, setIsWsConnected] = useState<boolean>(false);
+  const [wsPacket, setWsPacket] = useState<WebSocketTelemetryPacket | null>(null);
+  const [isGraphQLModalOpen, setIsGraphQLModalOpen] = useState<boolean>(false);
+  const [graphQLQuery, setGraphQLQuery] = useState<string>("query {\n  getInstances {\n    id\n    name\n    cpuLoad\n  }\n}");
+  const [graphQLResult, setGraphQLResult] = useState<string>("");
+
+  // Phase 10B: API Key & Rate-Limiting Control Panel state
+  const [apiKeys, setApiKeys] = useState<ApiKey[]>(INITIAL_API_KEYS);
+  const [newKeyNameInput, setNewKeyNameInput] = useState<string>("");
+  const [newKeyRateLimit, setNewKeyRateLimit] = useState<number>(1000);
+  const [showFullKeys, setShowFullKeys] = useState<boolean>(false);
+
+  // Phase 11A: Interactive Audit Evidence Inspector Drawer state
+  const [isEvidenceDrawerOpen, setIsEvidenceDrawerOpen] = useState<boolean>(false);
+  const [activeEvidencePkg, setActiveEvidencePkg] = useState<AuditEvidencePackage | null>(null);
+
+  const controlTowerAudit = useMemo(() => evaluateControlTowerGuardrails(instances), [instances]);
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 4000);
+  };
 
   // Option B: Webhook Dispatch Simulator state
   const [webhookTarget, setWebhookTarget] = useState<"slack" | "pagerduty">("slack");
@@ -276,59 +416,181 @@ export default function Dashboard() {
     active 
       ? "px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-xs font-semibold text-emerald-700 dark:text-emerald-400" 
       : "px-2 py-0.5 rounded bg-aws-divider border border-aws-border text-xs text-aws-textSecondary line-through";
-
   return (
     <div className="min-h-screen bg-aws-lightBg dark:bg-aws-dark transition-colors duration-200">
       {/* 1. Global AWS Header */}
       <header className="sticky top-0 z-40 w-full border-b border-aws-lightBorder dark:border-aws-border bg-aws-lightContainer dark:bg-aws-container shadow-sm">
-        <div className="mx-auto px-4 h-14 flex items-center justify-between">
+        {/* Main Top Header Bar */}
+        <div className="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between">
+          {/* Left: Brand Logo & Partner Badge */}
           <div className="flex items-center gap-3">
-            {/* RDS Sentinel Logo */}
             <div className="flex items-center gap-1.5 font-bold tracking-tight">
               <span className="text-aws-orangeHover dark:text-aws-orange font-extrabold text-xl">RDS</span>
-              <span className="text-aws-lightTextPrimary dark:text-aws-textPrimary font-semibold">Sentinel</span>
+              <span className="text-aws-lightTextPrimary dark:text-aws-textPrimary font-semibold text-lg">Sentinel</span>
             </div>
-            <span className="text-xs px-2 py-0.5 rounded bg-aws-orange/15 text-amber-800 dark:text-aws-orange border border-aws-orange/20 font-bold uppercase tracking-wider">
+            <span className="text-[10px] px-2 py-0.5 rounded bg-aws-orange/15 text-amber-800 dark:text-aws-orange border border-aws-orange/20 font-bold uppercase tracking-wider hidden sm:inline-block">
               AWS Marketplace Partner
             </span>
+
+            {/* Phase 7: Dual Mode Switcher Toggle */}
+            <button
+              id="toggle-app-mode-btn"
+              onClick={() => setAppMode(appMode === "mode_a" ? "mode_b" : "mode_a")}
+              className="px-2 py-0.5 rounded bg-aws-orange/10 hover:bg-aws-orange/20 border border-aws-orange/30 text-amber-900 dark:text-aws-orange text-[10px] font-bold transition-all cursor-pointer flex items-center gap-1"
+              title="Toggle between Mode A (Standalone SaaS Console) and Mode B (AWS Management Console Extension)"
+            >
+              {appMode === "mode_a" ? "🌐 Mode A: SaaS" : "⚡ Mode B: AWS Extension"}
+            </button>
           </div>
 
-          {/* Quick Gating Tier Controller & Theme Toggles */}
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1.5 bg-aws-lightBg dark:bg-aws-dark p-1 rounded-lg border border-aws-lightBorder dark:border-aws-border">
-              <span className="text-[10px] uppercase font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary px-2">Tier:</span>
-              {(["trial", "small", "medium", "enterprise"] as const).map(t => (
-                <button
-                  key={t}
-                  onClick={() => setTier(t)}
-                  className={`px-3 py-1 rounded text-xs font-bold uppercase transition-all ${
-                    tier === t
-                      ? "bg-aws-orange text-aws-lightTextPrimary dark:text-aws-lightTextPrimary shadow-md"
-                      : "text-aws-lightTextSecondary dark:text-aws-textSecondary hover:text-aws-orange"
-                  }`}
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
+          {/* Right: Consolidated Action Buttons */}
+          <div className="flex items-center gap-2">
+            {/* Phase 4: Guided Product Tour Header Trigger */}
+            <button
+              id="start-product-tour-btn"
+              onClick={() => {
+                resetTourState();
+                setCurrentTourStepIndex(0);
+                setIsTourActive(true);
+              }}
+              className="text-xs px-2.5 py-1.5 rounded font-bold bg-aws-orange hover:bg-aws-orangeHover text-aws-lightTextPrimary transition-all shadow flex items-center gap-1 cursor-pointer"
+            >
+              {t("tourBtn", language)}
+            </button>
 
             {/* Option A: Export CSV Report Button */}
             <button
               onClick={() => exportCSVReport(instances, MOCK_RECOMMENDATIONS, MOCK_SLOW_QUERIES)}
-              className="px-3 py-1.5 rounded bg-aws-orange hover:bg-aws-orangeHover text-aws-lightTextPrimary dark:text-aws-lightTextPrimary text-xs font-bold transition-all shadow-sm active:scale-95 flex items-center gap-1.5"
-              title="Export CSV Performance & Cost Audit Report"
+              className="px-2.5 py-1.5 rounded bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/10 border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs font-bold transition-all shadow-sm flex items-center gap-1 cursor-pointer"
+              title="Export CSV Performance Report"
             >
-              📥 Export CSV Report
+              {t("exportCsvBtn", language)}
+            </button>
+
+            {/* Phase 5: SOC2 / HIPAA Compliance Report Export Button */}
+            <button
+              id="export-soc2-compliance-btn"
+              onClick={() => {
+                const report = generateComplianceReport(
+                  MOCK_SLOW_QUERIES.map((q) => q.rawSql),
+                  maskSql,
+                  "AWS Enterprise Customer"
+                );
+                downloadCompliancePackage(report);
+              }}
+              className="px-2.5 py-1.5 rounded bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1 cursor-pointer"
+              title="Download SOC2 Type II & HIPAA Compliance Package"
+            >
+              {t("soc2Btn", language)}
+            </button>
+
+            {/* Phase 9C: GraphQL Telemetry API Inspector Trigger Button */}
+            <button
+              id="open-graphql-modal-btn"
+              onClick={() => {
+                const res = queryGraphQLTelemetry(graphQLQuery);
+                setGraphQLResult(JSON.stringify(res, null, 2));
+                setIsGraphQLModalOpen(true);
+              }}
+              className="px-2.5 py-1.5 rounded bg-indigo-700 hover:bg-indigo-800 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1 cursor-pointer"
+              title="Open GraphQL Telemetry Developer API Inspector"
+            >
+              ⚡ GraphQL API
+            </button>
+
+            {/* Phase 6: Account Settings & Subscription Billing Portal Trigger Button */}
+            <button
+              id="open-settings-modal-btn"
+              onClick={() => setIsSettingsModalOpen(true)}
+              className="px-2.5 py-1.5 rounded bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/10 border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs font-bold transition-all shadow-sm flex items-center gap-1 cursor-pointer"
+              title="Open Account Settings & Subscription Billing Portal"
+            >
+              {t("settingsBtn", language)}
             </button>
 
             {/* Light/Dark Toggle */}
             <button
               onClick={() => setIsDarkMode(!isDarkMode)}
-              className="p-2 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border text-aws-lightTextSecondary dark:text-aws-textSecondary hover:text-aws-orange transition-colors"
               title="Toggle Theme"
+              className="p-1.5 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border text-aws-lightTextSecondary dark:text-aws-textSecondary hover:text-aws-orange transition-colors cursor-pointer"
             >
-              {isDarkMode ? "☀️ Light Console" : "🌙 Dark Console"}
+              {isDarkMode ? "☀️" : "🌙"}
             </button>
+          </div>
+        </div>
+
+        {/* Sub-Header Context & Control Strip */}
+        <div className="border-t border-aws-lightBorder/60 dark:border-aws-border/60 bg-aws-lightBg/60 dark:bg-aws-dark/60 backdrop-blur-sm">
+          <div className="max-w-7xl mx-auto px-4 py-1.5 flex flex-wrap items-center justify-between gap-2">
+            {/* Left: AWS Account & Cost Center Tag Filters */}
+            <div className="flex items-center gap-3">
+              {/* Multi-AWS Account Selector */}
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] uppercase font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary">Account:</span>
+                <select
+                  id="aws-account-selector"
+                  aria-label="Select AWS Account"
+                  value={selectedAccountId}
+                  onChange={(e) => setSelectedAccountId(e.target.value)}
+                  className="bg-aws-lightContainer dark:bg-aws-container text-xs font-bold text-aws-lightTextPrimary dark:text-aws-textPrimary p-1 rounded border border-aws-lightBorder dark:border-aws-border cursor-pointer focus:outline-none"
+                >
+                  <option value="all" className="bg-aws-lightContainer dark:bg-aws-container">🌐 All AWS Accounts ({instances.length} DBs)</option>
+                  <option value="123456789012" className="bg-aws-lightContainer dark:bg-aws-container">Production (123456789012)</option>
+                  <option value="987654321098" className="bg-aws-lightContainer dark:bg-aws-container">Staging/Dev (987654321098)</option>
+                </select>
+              </div>
+
+              {/* Phase 7: Cost Center Tag Filter Bar */}
+              <div className="flex items-center gap-1">
+                <span className="text-[10px] uppercase font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary px-1">Tag:</span>
+                {availableTags.map((tag) => (
+                  <button
+                    key={tag}
+                    onClick={() => setSelectedCostCenterTag(tag)}
+                    className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold transition-all ${
+                      selectedCostCenterTag === tag
+                        ? "bg-aws-orange text-aws-lightTextPrimary shadow-sm"
+                        : "bg-aws-lightBg dark:bg-aws-dark text-aws-lightTextSecondary dark:text-aws-textSecondary border border-aws-lightBorder dark:border-aws-border hover:text-aws-orange"
+                    }`}
+                  >
+                    {tag === "ALL_TAGS" ? "All Tags" : tag}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Right: Key Performance & Subscription Badges */}
+            <div className="flex items-center gap-2">
+              {/* Phase 7: Account Health Score Badge */}
+              <div className="flex items-center gap-1 px-2.5 py-0.5 rounded bg-aws-blue/15 border border-aws-blue/30 text-sky-950 dark:text-sky-300 font-mono font-bold text-[11px]">
+                <span>🛡️ Health Score:</span>
+                <span className="text-sky-950 dark:text-sky-300 font-extrabold">{healthMetrics.healthScore}/100 ({healthMetrics.grade})</span>
+              </div>
+
+              {/* Identified Savings Header Badge */}
+              <div className="flex items-center gap-1 px-2.5 py-0.5 rounded bg-emerald-500/20 dark:bg-emerald-500/10 border border-emerald-600/40 text-slate-950 dark:text-emerald-300 font-mono font-bold text-[11px]">
+                <span>💰 Savings:</span>
+                <span className="text-slate-950 dark:text-emerald-300 font-extrabold">${potentialSavings.toFixed(2)}/mo</span>
+              </div>
+
+              {/* Quick Gating Tier Controller */}
+              <div className="flex items-center gap-1 bg-aws-lightContainer dark:bg-aws-container p-0.5 rounded border border-aws-lightBorder dark:border-aws-border">
+                <span className="text-[9px] uppercase font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary px-1">Tier:</span>
+                {(["trial", "small", "medium", "enterprise"] as const).map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => setTier(t)}
+                    className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase transition-all ${
+                      tier === t
+                        ? "bg-aws-orange text-aws-lightTextPrimary shadow-sm"
+                        : "text-aws-lightTextSecondary dark:text-aws-textSecondary hover:text-aws-orange"
+                    }`}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </header>
@@ -357,7 +619,7 @@ export default function Dashboard() {
               </div>
             </div>
             <div className="flex flex-col gap-2">
-              {instances.map(db => {
+              {filteredInstances.map(db => {
                 const isSelected = db.id === selectedDbId;
                 const isTrialRestricted = tier === "trial" && (db.id === "db-dev-sandbox" || db.id === "db-analytics-aurora");
                 return (
@@ -641,6 +903,98 @@ export default function Dashboard() {
                 </div>
               )}
 
+              {/* Phase 3: Interactive Aurora Cluster & Read Replica Topology Visualizer Card */}
+              <div id="topology-visualizer-card" className="p-3.5 bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border rounded text-xs">
+                <div className="flex justify-between items-center mb-2 pb-1.5 border-b border-aws-lightBorder dark:border-aws-divider">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[9px] uppercase font-bold px-1.5 py-0.5 rounded bg-aws-orange/10 text-amber-800 dark:text-aws-orange border border-aws-orange/20">
+                      Topology Visualizer
+                    </span>
+                    <strong className="text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs font-mono">
+                      {topologyData.clusterName}
+                    </strong>
+                  </div>
+                  <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-800 dark:text-emerald-400 font-mono font-bold text-[10px] border border-emerald-500/20">
+                    ⚡ {topologyData.failoverReadinessPct}% Failover Ready
+                  </span>
+                </div>
+
+                <p className="text-[11px] text-aws-lightTextSecondary dark:text-aws-textSecondary mb-3">
+                  Interactive multi-region cluster node graph. Click any node to inspect instance class, IOPS throughput, and promotion priority.
+                </p>
+
+                {/* Visual Node Graph */}
+                <div className="relative p-3 bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border rounded-lg flex flex-col gap-3">
+                  <div className="flex flex-wrap justify-around items-center gap-3">
+                    {topologyData.nodes.map((node) => {
+                      const isWriter = node.role === "writer";
+                      const isCrossRegion = node.role === "cross-region-replica";
+                      const isSelected = selectedTopologyNode?.id === node.id;
+
+                      return (
+                        <button
+                          key={node.id}
+                          onClick={() => setSelectedTopologyNode(isSelected ? null : node)}
+                          className={`p-2.5 rounded-lg border transition-all flex flex-col items-center gap-1.5 min-w-[140px] text-left cursor-pointer ${
+                            isSelected
+                              ? "bg-aws-orange/15 border-aws-orange shadow-md scale-105"
+                              : isWriter
+                              ? "bg-emerald-500/10 border-emerald-500/40 hover:bg-emerald-500/20"
+                              : isCrossRegion
+                              ? "bg-teal-500/10 border-teal-500/40 hover:bg-teal-500/20"
+                              : "bg-aws-lightBg dark:bg-aws-dark border-aws-lightBorder dark:border-aws-border hover:border-aws-orange/40"
+                          }`}
+                        >
+                          <div className="flex items-center gap-1.5 w-full justify-between">
+                            <span className={`w-2 h-2 rounded-full ${isWriter ? "bg-aws-green animate-pulse" : "bg-aws-blue"}`} />
+                            <span className="text-[9px] uppercase font-bold font-mono px-1 py-0.2 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-divider text-aws-lightTextSecondary dark:text-aws-textSecondary">
+                              {node.role === "writer" ? "Primary Writer" : node.role === "cross-region-replica" ? "Cross-Region" : "Read Replica"}
+                            </span>
+                          </div>
+
+                          <span className="font-mono font-bold text-[11px] text-aws-lightTextPrimary dark:text-aws-textPrimary truncate max-w-[130px]">
+                            {node.name.split(" ")[0]}
+                          </span>
+
+                          <div className="flex justify-between w-full text-[9px] font-mono text-aws-lightTextSecondary dark:text-aws-textSecondary pt-1 border-t border-aws-lightBorder dark:border-aws-divider">
+                            <span>{node.region.split(" ")[0]}</span>
+                            <span className={node.replicationLagMs > 20 ? "text-amber-800 dark:text-aws-yellow font-bold" : "text-emerald-800 dark:text-emerald-400 font-bold"}>
+                              {node.replicationLagMs === 0 ? "0ms lag" : `${node.replicationLagMs}ms lag`}
+                            </span>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Topology Node Detail Modal / Panel */}
+                  {selectedTopologyNode && (
+                    <div className="mt-2 p-2.5 bg-aws-lightBg dark:bg-aws-dark border border-aws-orange/40 rounded text-xs font-mono leading-relaxed animate-fade-in">
+                      <div className="flex justify-between items-center mb-1.5 pb-1 border-b border-aws-lightBorder dark:border-aws-divider">
+                        <span className="font-bold text-amber-800 dark:text-aws-orange text-[11px] uppercase">
+                          🔍 Node Inspector: {selectedTopologyNode.name}
+                        </span>
+                        <button
+                          onClick={() => setSelectedTopologyNode(null)}
+                          className="text-[10px] px-1.5 py-0.5 rounded bg-aws-lightContainer dark:bg-aws-container hover:bg-aws-orange/20 text-aws-lightTextSecondary dark:text-aws-textSecondary"
+                        >
+                          ✕ Close
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 text-[10px]">
+                        <div><span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">Engine:</span> <strong>{selectedTopologyNode.engine}</strong></div>
+                        <div><span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">Instance Class:</span> <strong>{selectedTopologyNode.instanceClass}</strong></div>
+                        <div><span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">Region:</span> <strong>{selectedTopologyNode.region}</strong></div>
+                        <div><span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">Failover Priority:</span> <strong>Tier-{selectedTopologyNode.failoverPriority}</strong></div>
+                        <div><span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">Replication Lag:</span> <strong className="text-emerald-800 dark:text-emerald-400">{selectedTopologyNode.replicationLagMs}ms</strong></div>
+                        <div><span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">IOPS Throughput:</span> <strong>{selectedTopologyNode.iops} IOPS</strong></div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
               {/* Multi-Region Replication Latency Modeler Card (Medium/Enterprise Tier) */}
               {hasFeature("multi-region") && (
                 <div className="p-3 bg-aws-teal/5 border border-aws-teal/20 rounded text-xs">
@@ -662,6 +1016,55 @@ export default function Dashboard() {
                   </div>
                 </div>
               )}
+
+              {/* Interactive AWS ROI Savings Calculator Panel */}
+              <div className="p-3.5 bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border rounded text-xs mt-2">
+                <div className="flex justify-between items-center mb-2 pb-1.5 border-b border-aws-lightBorder dark:border-aws-divider">
+                  <span className="font-bold text-aws-lightTextPrimary dark:text-aws-orange uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                    📊 Interactive AWS Bill ROI Calculator
+                  </span>
+                  <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-800 dark:text-emerald-400 font-mono font-bold text-xs border border-emerald-500/20">
+                    {((roiDbCount * 145) / (tier === "enterprise" ? 499 : tier === "medium" ? 179 : tier === "small" ? 59 : 179)).toFixed(1)}x Net ROI
+                  </span>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <div className="flex justify-between items-center text-[11px]">
+                    <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">Database Instances Managed:</span>
+                    <span className="font-mono font-bold text-amber-800 dark:text-aws-orange">{roiDbCount} Instances</span>
+                  </div>
+
+                  <input 
+                    type="range"
+                    id="roi-db-slider"
+                    aria-label="Database Instances Count for ROI Calculation"
+                    min="1"
+                    max="50"
+                    value={roiDbCount}
+                    onChange={(e) => setRoiDbCount(Number(e.target.value))}
+                    className="w-full accent-aws-orange cursor-pointer h-1.5 bg-aws-lightBorder dark:bg-aws-border rounded-lg appearance-none"
+                  />
+
+                  <div className="grid grid-cols-3 gap-2 mt-1 font-mono text-[10px] text-center">
+                    <div className="p-1.5 bg-aws-lightContainer dark:bg-aws-container rounded border border-aws-lightBorder dark:border-aws-border">
+                      <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary block text-[9px]">Est. AWS Bill Savings</span>
+                      <strong className="text-emerald-800 dark:text-emerald-400 text-xs">${(roiDbCount * 145).toLocaleString()}/mo</strong>
+                    </div>
+                    <div className="p-1.5 bg-aws-lightContainer dark:bg-aws-container rounded border border-aws-lightBorder dark:border-aws-border">
+                      <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary block text-[9px]">Subscription Cost ({tier})</span>
+                      <strong className="text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs">
+                        ${tier === "enterprise" ? 499 : tier === "medium" ? 179 : tier === "small" ? 59 : 0}/mo
+                      </strong>
+                    </div>
+                    <div className="p-1.5 bg-aws-lightContainer dark:bg-aws-container rounded border border-aws-lightBorder dark:border-aws-border">
+                      <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary block text-[9px]">Net Annual Savings</span>
+                      <strong className="text-sky-800 dark:text-aws-blue text-xs">
+                        ${((roiDbCount * 145 - (tier === "enterprise" ? 499 : tier === "medium" ? 179 : tier === "small" ? 59 : 0)) * 12).toLocaleString()}/yr
+                      </strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
               
               {tier === "trial" && (
                 /* Billing Upgrade CTA inside locked cost-recommendations (PO Agent Audit) */
@@ -684,7 +1087,7 @@ export default function Dashboard() {
           </div>
 
           {/* Slow Query Monitor */}
-          <div className="bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border rounded-lg p-4">
+          <div id="slow-query-inspector-card" className="bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border rounded-lg p-4">
             <div className="flex justify-between items-center mb-3">
               <div>
                 <h2 className="text-sm font-bold text-aws-lightTextPrimary dark:text-aws-orange uppercase tracking-wider flex items-center gap-2">
@@ -713,18 +1116,69 @@ export default function Dashboard() {
             </p>
 
             <div className="flex flex-col gap-3">
-              {MOCK_SLOW_QUERIES.map((q) => (
-                <div key={q.id} className="p-3 bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border rounded font-mono text-xs">
-                  <div className="flex justify-between text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary mb-1.5 pb-1 border-b border-aws-lightBorder dark:border-aws-divider">
-                    <span>DB: {instances.find(db => db.id === q.dbInstanceId)?.name}</span>
-                    <span>Wait Event: <span className="text-amber-800 dark:text-aws-yellow">{q.waitEvent}</span></span>
-                    <span className="text-red-800 dark:text-red-400 font-bold">{q.durationMs}ms</span>
+              {MOCK_SLOW_QUERIES.map((q) => {
+                const rec = analyzeSlowQuery(q);
+                const isExpanded = activeAdvisorQueryId === q.id;
+                const isCopied = copiedDdlQueryId === q.id;
+
+                return (
+                  <div key={q.id} className="p-3 bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border rounded font-mono text-xs">
+                    <div className="flex justify-between text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary mb-1.5 pb-1 border-b border-aws-lightBorder dark:border-aws-divider">
+                      <span>DB: {instances.find(db => db.id === q.dbInstanceId)?.name}</span>
+                      <span>Wait Event: <span className="text-amber-800 dark:text-aws-yellow">{q.waitEvent}</span></span>
+                      <span className="text-red-800 dark:text-red-400 font-bold">{q.durationMs}ms</span>
+                    </div>
+
+                    <pre className="whitespace-pre-wrap break-all text-[11px] text-aws-lightTextPrimary dark:text-aws-textPrimary mb-2">
+                      {maskSql ? q.maskedSql : q.rawSql}
+                    </pre>
+
+                    <div className="flex justify-between items-center pt-2 border-t border-aws-lightBorder dark:border-aws-divider text-[10px]">
+                      <button
+                        onClick={() => setActiveAdvisorQueryId(isExpanded ? null : q.id)}
+                        className="px-2 py-1 rounded bg-aws-orange/10 hover:bg-aws-orange/20 text-amber-800 dark:text-aws-orange border border-aws-orange/20 font-bold transition-all flex items-center gap-1"
+                      >
+                        {isExpanded ? "▲ Hide Index Advisor" : "⚡ Analyze & Suggest Index"}
+                      </button>
+
+                      <span className="text-emerald-800 dark:text-emerald-400 font-bold">
+                        Est. Speedup: -{rec.estimatedSpeedupPct}%
+                      </span>
+                    </div>
+
+                    {isExpanded && (
+                      <div className="mt-2.5 p-2.5 bg-aws-lightContainer dark:bg-aws-container border border-aws-orange/30 rounded text-xs font-sans leading-relaxed animate-fade-in">
+                        <div className="flex justify-between items-center mb-1.5 pb-1 border-b border-aws-lightBorder dark:border-aws-divider font-mono">
+                          <span className="font-bold text-amber-800 dark:text-aws-orange text-[10px] uppercase">
+                            💡 Automated Index Advisor DDL
+                          </span>
+                          <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-800 dark:text-emerald-400 font-bold text-[10px]">
+                            {rec.originalDurationMs}ms ➔ {rec.optimizedDurationMs}ms (-{rec.estimatedSpeedupPct}% Faster)
+                          </span>
+                        </div>
+
+                        <p className="text-[11px] text-aws-lightTextSecondary dark:text-aws-textSecondary mb-2">
+                          {rec.explanation}
+                        </p>
+
+                        <div className="relative bg-aws-lightBg dark:bg-aws-dark p-2 rounded border border-aws-lightBorder dark:border-aws-border font-mono text-[11px] text-emerald-800 dark:text-emerald-400 font-bold">
+                          <code>{rec.suggestedDdl}</code>
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(rec.suggestedDdl);
+                              setCopiedDdlQueryId(q.id);
+                              setTimeout(() => setCopiedDdlQueryId(null), 2000);
+                            }}
+                            className="absolute right-1.5 top-1.5 px-2 py-0.5 rounded bg-aws-orange hover:bg-aws-orangeHover text-aws-lightTextPrimary text-[9px] font-bold transition-all shadow"
+                          >
+                            {isCopied ? "✅ Copied!" : "📋 Copy DDL"}
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <pre className="whitespace-pre-wrap break-all text-[11px] text-aws-lightTextPrimary dark:text-aws-textPrimary">
-                    {maskSql ? q.maskedSql : q.rawSql}
-                  </pre>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </section>
@@ -777,8 +1231,8 @@ export default function Dashboard() {
                       }`}>
                         {log.level}
                       </span>
-                      <span className="text-[9px] text-aws-lightTextSecondary dark:text-aws-textSecondary">
-                        {new Date(log.timestamp).toLocaleTimeString()}
+                      <span className="text-[9px] text-aws-lightTextSecondary dark:text-aws-textSecondary font-mono" suppressHydrationWarning={true}>
+                        {log.timestamp}
                       </span>
                     </div>
                     <p className="text-aws-lightTextPrimary dark:text-aws-textPrimary">{log.maskedMessage}</p>
@@ -849,7 +1303,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Connection switch controller */}
-                <div className="flex gap-2">
+                <div className="flex gap-2 mb-2">
                   <button
                     onClick={() => setIsDbEndpointOnline(true)}
                     className={`flex-1 text-[10px] py-1 rounded font-bold border transition-colors ${
@@ -869,6 +1323,33 @@ export default function Dashboard() {
                     }`}
                   >
                     Disconnect
+                  </button>
+                </div>
+
+                {/* Chaos Engineering Circuit Breaker toggle */}
+                <div className="flex justify-between items-center pt-2 border-t border-aws-lightBorder dark:border-aws-divider text-[10px]">
+                  <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary font-bold">
+                    Chaos Simulator:
+                  </span>
+                  <button
+                    id="chaos-circuit-breaker-toggle"
+                    onClick={() => {
+                      if (outboxStatus.state === "OPEN") {
+                        outbox.resetCircuitBreaker();
+                      } else {
+                        for (let i = 0; i < 5; i++) {
+                          outbox.recordFailure();
+                        }
+                      }
+                      setOutboxStatus(outbox.getStatus());
+                    }}
+                    className={`px-2 py-0.5 rounded font-mono font-bold transition-all border ${
+                      outboxStatus.state === "OPEN"
+                        ? "bg-aws-green/10 text-emerald-800 dark:text-emerald-400 border-aws-green/30"
+                        : "bg-aws-red/10 text-red-800 dark:text-red-400 border-aws-red/30"
+                    }`}
+                  >
+                    {outboxStatus.state === "OPEN" ? "🛡️ Reset to CLOSED" : "⚡ Force Trip OPEN"}
                   </button>
                 </div>
                 
@@ -914,7 +1395,7 @@ export default function Dashboard() {
             </div>
 
             {/* Option B: Enterprise Webhook Dispatch Simulator */}
-            <div>
+            <div id="webhook-simulator-card">
               <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary uppercase font-bold block mb-1">
                 Enterprise Webhook Dispatch Simulator
               </span>
@@ -998,6 +1479,908 @@ export default function Dashboard() {
           </div>
         </section>
       </main>
+
+      {/* Phase 4: Floating Guided Product Tour Overlay Card */}
+      {isTourActive && (
+        <div className="fixed bottom-6 right-6 z-50 w-96 p-4 bg-aws-lightContainer dark:bg-aws-container border-2 border-aws-orange rounded-xl shadow-2xl animate-fade-in font-sans">
+          <div className="flex justify-between items-start mb-2 pb-1 border-b border-aws-lightBorder dark:border-aws-divider">
+            <div className="flex items-center gap-2">
+              <span className="px-1.5 py-0.5 rounded bg-aws-orange/20 text-amber-800 dark:text-aws-orange text-[9px] font-mono font-bold uppercase">
+                {PRODUCT_TOUR_STEPS[currentTourStepIndex].badgeText}
+              </span>
+              <span className="text-[10px] font-mono text-aws-lightTextSecondary dark:text-aws-textSecondary">
+                {PRODUCT_TOUR_STEPS[currentTourStepIndex].subtitle}
+              </span>
+            </div>
+            <button
+              onClick={() => setIsTourActive(false)}
+              className="text-[11px] text-aws-lightTextSecondary dark:text-aws-textSecondary hover:text-aws-orange cursor-pointer font-bold"
+            >
+              ✕ Skip
+            </button>
+          </div>
+
+          <h3 className="text-sm font-bold text-aws-lightTextPrimary dark:text-aws-textPrimary mb-1">
+            {PRODUCT_TOUR_STEPS[currentTourStepIndex].title}
+          </h3>
+
+          <p className="text-[11px] text-aws-lightTextSecondary dark:text-aws-textSecondary leading-relaxed mb-3">
+            {PRODUCT_TOUR_STEPS[currentTourStepIndex].description}
+          </p>
+
+          <div className="flex justify-between items-center pt-2 border-t border-aws-lightBorder dark:border-aws-divider">
+            <div className="flex gap-1">
+              {PRODUCT_TOUR_STEPS.map((_, idx) => (
+                <span
+                  key={idx}
+                  className={`h-2 rounded-full transition-all ${
+                    idx === currentTourStepIndex ? "bg-aws-orange w-4" : "bg-aws-lightBorder dark:bg-aws-divider w-2"
+                  }`}
+                />
+              ))}
+            </div>
+
+            <div className="flex gap-2">
+              {currentTourStepIndex > 0 && (
+                <button
+                  onClick={() => setCurrentTourStepIndex((prev) => prev - 1)}
+                  className="px-2.5 py-1 rounded bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/10 text-aws-lightTextPrimary dark:text-aws-textPrimary border border-aws-lightBorder dark:border-aws-border text-[10px] font-bold cursor-pointer"
+                >
+                  ◀ Back
+                </button>
+              )}
+
+              {currentTourStepIndex < PRODUCT_TOUR_STEPS.length - 1 ? (
+                <button
+                  onClick={() => setCurrentTourStepIndex((prev) => prev + 1)}
+                  className="px-3 py-1 rounded bg-aws-orange hover:bg-aws-orangeHover text-aws-lightTextPrimary text-[10px] font-bold shadow cursor-pointer"
+                >
+                  Next Step ▶
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    markTourCompleted();
+                    setIsTourActive(false);
+                  }}
+                  className="px-3 py-1 rounded bg-aws-green hover:bg-emerald-600 text-white text-[10px] font-bold shadow cursor-pointer"
+                >
+                  🎉 Finish Tour
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Phase 6: Account Settings & Subscription Billing Portal Modal Overlay */}
+      {isSettingsModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden text-xs">
+            {/* Modal Header */}
+            <div className="p-4 bg-aws-lightBg dark:bg-aws-dark border-b border-aws-lightBorder dark:border-aws-divider flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <span className="text-base font-bold text-aws-lightTextPrimary dark:text-aws-orange">
+                  ⚙️ Account Settings & Subscription Billing Portal
+                </span>
+                <span className="text-[10px] px-2 py-0.5 rounded bg-aws-orange/20 text-amber-800 dark:text-aws-orange font-mono font-bold uppercase">
+                  Current Tier: {tier.toUpperCase()}
+                </span>
+              </div>
+              <button
+                id="close-settings-modal-btn"
+                onClick={() => setIsSettingsModalOpen(false)}
+                className="text-sm font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary hover:text-aws-orange cursor-pointer px-2 py-1"
+              >
+                ✕ Close
+              </button>
+            </div>
+
+            {/* Navigation Tabs */}
+            <div className="flex border-b border-aws-lightBorder dark:border-aws-divider bg-aws-lightBg/50 dark:bg-aws-dark/50 px-4 pt-2 gap-2">
+              <button
+                id="tab-preferences-btn"
+                onClick={() => setSettingsTab("preferences")}
+                className={`px-4 py-2 font-bold border-b-2 transition-all ${
+                  settingsTab === "preferences"
+                    ? "border-aws-orange text-aws-orange"
+                    : "border-transparent text-aws-lightTextSecondary dark:text-aws-textSecondary hover:text-aws-lightTextPrimary dark:hover:text-aws-textPrimary"
+                }`}
+              >
+                🎨 App Preferences
+              </button>
+              <button
+                id="tab-aws-accounts-btn"
+                onClick={() => setSettingsTab("aws_accounts")}
+                className={`px-4 py-2 font-bold border-b-2 transition-all ${
+                  settingsTab === "aws_accounts"
+                    ? "border-aws-orange text-aws-orange"
+                    : "border-transparent text-aws-lightTextSecondary dark:text-aws-textSecondary hover:text-aws-lightTextPrimary dark:hover:text-aws-textPrimary"
+                }`}
+              >
+                ☁️ AWS Accounts & Services
+              </button>
+              <button
+                id="tab-billing-btn"
+                onClick={() => setSettingsTab("billing")}
+                className={`px-4 py-2 font-bold border-b-2 transition-all ${
+                  settingsTab === "billing"
+                    ? "border-aws-orange text-aws-orange"
+                    : "border-transparent text-aws-lightTextSecondary dark:text-aws-textSecondary hover:text-aws-lightTextPrimary dark:hover:text-aws-textPrimary"
+                }`}
+              >
+                💳 Subscription & Billing
+              </button>
+              <button
+                id="tab-security-btn"
+                onClick={() => setSettingsTab("security")}
+                className={`px-4 py-2 font-bold border-b-2 transition-all ${
+                  settingsTab === "security"
+                    ? "border-aws-orange text-aws-orange"
+                    : "border-transparent text-aws-lightTextSecondary dark:text-aws-textSecondary hover:text-aws-lightTextPrimary dark:hover:text-aws-textPrimary"
+                }`}
+              >
+                🛡️ Security & Vault
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 overflow-y-auto flex-1">
+              {/* Tab 1: App Preferences */}
+              {settingsTab === "preferences" && (
+                <div className="flex flex-col gap-4">
+                  <h4 className="font-bold text-sm text-aws-lightTextPrimary dark:text-aws-textPrimary">Dashboard Display & Notification Preferences</h4>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[11px] font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary mb-1">Color Theme Mode</label>
+                      <select
+                        value={isDarkMode ? "dark" : "light"}
+                        onChange={(e) => setIsDarkMode(e.target.value === "dark")}
+                        className="w-full p-2 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary font-semibold"
+                      >
+                        <option value="dark">🌙 Dark Slate (AWS Console Theme)</option>
+                        <option value="light">☀️ Light Slate</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary mb-1">Telemetry Auto-Refresh Rate</label>
+                      <select
+                        value={appPreferences.telemetryRefreshIntervalMs}
+                        onChange={(e) => setAppPreferences({ ...appPreferences, telemetryRefreshIntervalMs: Number(e.target.value) })}
+                        className="w-full p-2 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary font-semibold"
+                      >
+                        <option value={5000}>⚡ 5 Seconds (Real-Time High-Frequency)</option>
+                        <option value={15000}>⏱️ 15 Seconds (Standard Balanced)</option>
+                        <option value={30000}>🐢 30 Seconds (Low Bandwidth)</option>
+                      </select>
+                    </div>
+
+                    {/* Phase 9A: Multi-Language Selector */}
+                    <div>
+                      <label className="block text-[11px] font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary mb-1">Display Language (Localization)</label>
+                      <select
+                        id="language-selector"
+                        value={language}
+                        onChange={(e) => {
+                          const newLang = e.target.value as LanguageCode;
+                          setLanguage(newLang);
+                          showToast(`🌐 Language updated to ${SUPPORTED_LANGUAGES.find(l => l.code === newLang)?.name}`);
+                        }}
+                        className="w-full p-2 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary font-semibold cursor-pointer"
+                      >
+                        {SUPPORTED_LANGUAGES.map((lang) => (
+                          <option key={lang.code} value={lang.code}>
+                            {lang.flag} {lang.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Phase 9A: Custom Accent Palette Theme Selector */}
+                    <div className="col-span-2">
+                      <label className="block text-[11px] font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary mb-1">Custom Accent Color Palette</label>
+                      <div className="flex gap-2">
+                        {ACCENT_THEMES.map((theme) => (
+                          <button
+                            key={theme.id}
+                            id={`accent-theme-${theme.id}`}
+                            onClick={() => {
+                              setAccentTheme(theme.id);
+                              showToast(`🎨 Accent theme switched to ${theme.name}`);
+                            }}
+                            className={`flex-1 py-1.5 px-2 rounded text-[10px] font-bold transition-all border ${
+                              accentTheme === theme.id
+                                ? "border-aws-orange shadow-md ring-2 ring-aws-orange"
+                                : "border-aws-lightBorder dark:border-aws-border opacity-80 hover:opacity-100"
+                            }`}
+                            style={{ backgroundColor: theme.primaryColor, color: "#ffffff" }}
+                          >
+                            {theme.name}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary mb-1">Alert Notification Frequency</label>
+                      <select
+                        value={appPreferences.notificationFrequency}
+                        onChange={(e) => setAppPreferences({ ...appPreferences, notificationFrequency: e.target.value as any })}
+                        className="w-full p-2 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary font-semibold"
+                      >
+                        <option value="immediate">🚨 Immediate Real-Time Anomaly Alerts</option>
+                        <option value="daily_digest">📅 Daily Summary Digest Email</option>
+                        <option value="weekly_summary">📊 Weekly Executive Report</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary mb-1">Primary Timezone</label>
+                      <input
+                        type="text"
+                        value={appPreferences.timezone}
+                        onChange={(e) => setAppPreferences({ ...appPreferences, timezone: e.target.value })}
+                        className="w-full p-2 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary font-semibold"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Tab 2: AWS Accounts & Monitored Services */}
+              {settingsTab === "aws_accounts" && (
+                <div className="flex flex-col gap-4">
+                  <div className="flex justify-between items-center">
+                    <h4 className="font-bold text-sm text-aws-lightTextPrimary dark:text-aws-textPrimary">Linked AWS Sub-Accounts & Monitored Databases</h4>
+                    <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary font-mono">
+                      {linkedAccounts.length} Linked Sub-Accounts Active
+                    </span>
+                  </div>
+
+                  {/* List of Accounts */}
+                  <div className="flex flex-col gap-2">
+                    {linkedAccounts.map((acct) => (
+                      <div key={acct.id} className="p-3 bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border rounded flex justify-between items-center font-mono">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <strong className="text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs">{acct.accountName}</strong>
+                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-aws-blue/10 text-sky-800 dark:text-sky-300">({acct.id})</span>
+                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-800 dark:text-emerald-300">Region: {acct.region}</span>
+                          </div>
+                          <p className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary mt-0.5 truncate max-w-md">
+                            Role: {acct.roleArn}
+                          </p>
+                        </div>
+                        <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-950 dark:text-emerald-300 font-bold uppercase">
+                          ● {acct.status}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* IAM Connection Tester Sandbox */}
+                  <div className="p-3.5 bg-aws-lightBg dark:bg-aws-dark border border-aws-orange/30 rounded flex flex-col gap-2 mt-2">
+                    <h5 className="font-bold text-xs text-aws-lightTextPrimary dark:text-aws-orange flex items-center gap-1.5">
+                      🧪 Test AWS STS AssumeRole Connection
+                    </h5>
+                    <div className="grid grid-cols-2 gap-2">
+                      <input
+                        type="text"
+                        placeholder="IAM Role ARN (arn:aws:iam::123456789012:role/...)"
+                        value={testRoleArn}
+                        onChange={(e) => setTestRoleArn(e.target.value)}
+                        className="p-2 rounded bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border text-[11px] font-mono"
+                      />
+                      <input
+                        type="text"
+                        placeholder="ExternalId Token"
+                        value={testExtId}
+                        onChange={(e) => setTestExtId(e.target.value)}
+                        className="p-2 rounded bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border text-[11px] font-mono"
+                      />
+                    </div>
+
+                    <div className="flex justify-between items-center pt-1">
+                      <button
+                        id="test-iam-role-connection-btn"
+                        onClick={() => {
+                          const res = testIamRoleConnection(testRoleArn, testExtId);
+                          setIamTestResult(res);
+                        }}
+                        className="px-3 py-1 rounded bg-aws-orange hover:bg-aws-orangeHover text-aws-lightTextPrimary text-xs font-bold shadow cursor-pointer"
+                      >
+                        ⚡ Test IAM Connection
+                      </button>
+
+                      {iamTestResult && (
+                        <span className={`text-[11px] font-bold ${iamTestResult.success ? "text-emerald-800 dark:text-emerald-400" : "text-red-800 dark:text-red-400"}`}>
+                          {iamTestResult.message}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Phase 10A: CloudFormation & Service Catalog Deployment Exporter */}
+                    <div className="mt-3 p-3.5 bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border rounded flex flex-col gap-2">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <strong className="text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs block">
+                            📦 AWS Infrastructure Exporter (CloudFormation & Service Catalog)
+                          </strong>
+                          <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary">
+                            Deploy IAM cross-account monitoring role in client AWS accounts with 1-click infrastructure templates.
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 pt-1">
+                        <button
+                          id="export-cfn-template-btn"
+                          onClick={() => {
+                            const template = generateCloudFormationRoleTemplate({ externalId: testExtId });
+                            downloadTemplateFile(template, "rds-sentinel-monitoring-role.yaml", "text/yaml");
+                            showToast("📥 CloudFormation Stack Template Exported!");
+                          }}
+                          className="px-3 py-1.5 rounded bg-aws-orange hover:bg-aws-orangeHover text-aws-lightTextPrimary font-bold text-xs shadow cursor-pointer flex items-center gap-1"
+                        >
+                          📥 Download CloudFormation IAM Template (.yaml)
+                        </button>
+                        <button
+                          id="export-service-catalog-btn"
+                          onClick={() => {
+                            const blueprint = generateServiceCatalogBlueprint();
+                            downloadTemplateFile(blueprint, "rds-sentinel-service-catalog-product.json", "application/json");
+                            showToast("📦 Service Catalog Blueprint Exported!");
+                          }}
+                          className="px-3 py-1.5 rounded bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-xs shadow cursor-pointer flex items-center gap-1"
+                        >
+                          📦 Download Service Catalog Blueprint (.json)
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Tab 3: Subscription & Billing Portal */}
+              {settingsTab === "billing" && (
+                <div className="flex flex-col gap-4">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h4 className="font-bold text-sm text-aws-lightTextPrimary dark:text-aws-textPrimary">Subscription Tiers & Billing Charging Mechanism</h4>
+                      <p className="text-[11px] text-aws-lightTextSecondary dark:text-aws-textSecondary">
+                        Switch plans anytime. AWS Marketplace usage is metered hourly on your AWS invoice.
+                      </p>
+                    </div>
+                    <div className="px-3 py-1 rounded bg-aws-blue/10 border border-aws-blue/30 text-sky-800 dark:text-sky-300 font-mono text-[11px] font-bold">
+                      Billing Method: AWS Marketplace Invoice
+                    </div>
+                  </div>
+
+                  {/* Pricing Cards Grid */}
+                  <div className="grid grid-cols-4 gap-3">
+                    {(["trial", "small", "medium", "enterprise"] as const).map((planKey) => {
+                      const plan = TIER_PRICING_PLANS[planKey];
+                      const isCurrent = tier === planKey;
+                      const proration = calculateTierProration(tier, planKey);
+                      const capCheck = checkInstanceCapacity(instances.length, planKey);
+
+                      return (
+                        <div
+                          key={planKey}
+                          className={`p-3 rounded-lg border flex flex-col justify-between transition-all ${
+                            isCurrent
+                              ? "bg-aws-orange/10 border-aws-orange shadow-md"
+                              : "bg-aws-lightBg dark:bg-aws-dark border-aws-lightBorder dark:border-aws-border hover:border-aws-orange/40"
+                          }`}
+                        >
+                          <div>
+                            <div className="flex justify-between items-start mb-1">
+                              <strong className="text-xs font-bold text-aws-lightTextPrimary dark:text-aws-textPrimary">{plan.name}</strong>
+                              {isCurrent && (
+                                <span className="text-[9px] px-1.5 py-0.5 rounded bg-aws-orange text-aws-lightTextPrimary font-bold uppercase">
+                                  Current
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="text-lg font-extrabold text-aws-lightTextPrimary dark:text-aws-textPrimary font-mono my-1">
+                              ${plan.monthlyPrice}
+                              <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary font-normal">/mo</span>
+                            </div>
+
+                            <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary font-mono block mb-2">
+                              Max DBs: {plan.maxInstances === -1 ? "Unlimited" : plan.maxInstances}
+                            </span>
+
+                            <ul className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary flex flex-col gap-1 border-t border-aws-lightBorder dark:border-aws-divider pt-2">
+                              {plan.features.map((feat, fIdx) => (
+                                <li key={fIdx} className="flex items-center gap-1">
+                                  <span className="text-emerald-800 dark:text-emerald-400">✓</span> {feat}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+
+                          <div className="mt-3 pt-2 border-t border-aws-lightBorder dark:border-aws-divider flex flex-col gap-1.5">
+                            {!isCurrent && (
+                              <span className="text-[9px] font-mono text-center text-sky-800 dark:text-sky-300 font-bold">
+                                {proration.textSummary}
+                              </span>
+                            )}
+
+                            {!isCurrent ? (
+                              <button
+                                onClick={() => {
+                                  if (!capCheck.allowed) {
+                                    alert(capCheck.message);
+                                    return;
+                                  }
+                                  setTier(planKey);
+                                }}
+                                className={`w-full py-1 rounded text-[10px] font-bold shadow transition-all ${
+                                  capCheck.allowed
+                                    ? "bg-aws-orange hover:bg-aws-orangeHover text-aws-lightTextPrimary"
+                                    : "bg-gray-400 text-white cursor-not-allowed opacity-60"
+                                }`}
+                              >
+                                {capCheck.allowed ? `Switch to ${plan.name}` : "Cap Exceeded"}
+                              </button>
+                            ) : (
+                              <div className="w-full py-1 rounded bg-aws-orange/20 text-amber-800 dark:text-aws-orange font-bold text-[10px] text-center">
+                                Active Plan
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Tab 4: Security & Vault */}
+              {settingsTab === "security" && (
+                <div className="flex flex-col gap-4">
+                  <h4 className="font-bold text-sm text-aws-lightTextPrimary dark:text-aws-textPrimary">Cross-Account IAM Role Vault & Security Audit Status</h4>
+                  
+                  <div className="p-3.5 bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border rounded flex flex-col gap-2 font-mono">
+                    <div className="flex justify-between items-center">
+                      <span>AssumeRole ExternalId Key Vault Encryption:</span>
+                      <span className="text-emerald-800 dark:text-emerald-400 font-bold">AES-256 KMS Encrypted</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span>Client Edge Sanitization Pipeline:</span>
+                      <span className="text-emerald-800 dark:text-emerald-400 font-bold">ACTIVE (100% Parameter Masking)</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span>SOC2 Compliance Scanner Status:</span>
+                      <span className="text-emerald-800 dark:text-emerald-400 font-bold">100% Compliant (Zero Secret Leaks)</span>
+                    </div>
+
+                    {/* Phase 8: HIPAA BAA Portal Action */}
+                    <div className="pt-3 border-t border-aws-lightBorder dark:border-aws-divider flex justify-between items-center">
+                      <div>
+                        <strong className="text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs block">HIPAA BAA Agreement Portal</strong>
+                        <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary">Generate executed electronic BAA document for healthcare accounts.</span>
+                      </div>
+                      <button
+                        id="sign-hipaa-baa-btn"
+                        onClick={() => {
+                          const agreement = generateHipaaBaaAgreement("Enterprise Healthcare Partner", "compliance@healthcorp.com");
+                          setHipaaBaa(agreement);
+                          showToast(`✅ HIPAA BAA Agreement Executed! (${agreement.agreementId})`);
+                        }}
+                        className="px-3 py-1.5 rounded bg-aws-orange hover:bg-aws-orangeHover text-aws-lightTextPrimary font-bold text-xs shadow cursor-pointer"
+                      >
+                        📜 Execute HIPAA BAA
+                      </button>
+                    </div>
+
+                    {hipaaBaa && (
+                      <div className="p-2.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300 font-mono text-[10px] flex justify-between items-center">
+                        <span>BAA Active: {hipaaBaa.agreementId}</span>
+                        <span className="font-bold uppercase">● {hipaaBaa.status}</span>
+                      </div>
+                    )}
+
+                    {/* Phase 9B: AWS Control Tower Guardrail Audit Status */}
+                    <div className="pt-4 border-t border-aws-lightBorder dark:border-aws-divider flex flex-col gap-2">
+                      <div className="flex justify-between items-center">
+                        <strong className="text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs block">
+                          🏰 AWS Control Tower Guardrail Compliance Audit
+                        </strong>
+                        <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 font-mono text-[10px] font-bold">
+                          Score: {controlTowerAudit.score}% ({controlTowerAudit.grade})
+                        </span>
+                      </div>
+                      <div className="flex flex-col gap-1.5 mt-1">
+                        {controlTowerAudit.guardrails.map((g) => (
+                          <div key={g.id} className="p-2 rounded bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border flex justify-between items-center text-[10px]">
+                            <div>
+                              <span className="font-bold text-aws-lightTextPrimary dark:text-aws-textPrimary">{g.code} — {g.name}</span>
+                              <p className="text-aws-lightTextSecondary dark:text-aws-textSecondary text-[9px]">{g.details}</p>
+                            </div>
+                            <span className={`px-1.5 py-0.5 rounded font-bold ${g.status === "COMPLIANT" ? "bg-emerald-500/15 text-emerald-800 dark:text-emerald-400" : "bg-amber-500/15 text-amber-800 dark:text-amber-400"}`}>
+                              {g.status}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Phase 10B: Developer API Key & Rate-Limiting Management */}
+                    <div className="pt-4 border-t border-aws-lightBorder dark:border-aws-divider flex flex-col gap-2">
+                      <div className="flex justify-between items-center">
+                        <strong className="text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs block">
+                          🔑 Developer API Key & Request Rate-Limiting Vault
+                        </strong>
+                        <div className="flex items-center gap-2">
+                          <button
+                            id="toggle-show-keys-btn"
+                            onClick={() => setShowFullKeys(!showFullKeys)}
+                            className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary hover:text-aws-orange cursor-pointer font-bold"
+                          >
+                            {showFullKeys ? "🙈 Hide Secrets" : "👁️ Reveal Secrets"}
+                          </button>
+                          <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary font-mono">
+                            {apiKeys.filter((k) => k.status === "ACTIVE").length} Active Keys
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Generate New API Key Input Bar */}
+                      <div className="flex gap-2 items-center pt-1">
+                        <input
+                          id="new-api-key-name-input"
+                          type="text"
+                          placeholder="API Key Name (e.g. Grafana Stream)"
+                          value={newKeyNameInput}
+                          onChange={(e) => setNewKeyNameInput(e.target.value)}
+                          className="flex-1 p-1.5 rounded bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border text-xs font-semibold"
+                        />
+                        <select
+                          id="new-api-key-ratelimit-select"
+                          value={newKeyRateLimit}
+                          onChange={(e) => setNewKeyRateLimit(Number(e.target.value))}
+                          className="p-1.5 rounded bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border text-xs font-semibold"
+                        >
+                          <option value={500}>500 req/min</option>
+                          <option value={1000}>1000 req/min</option>
+                          <option value={5000}>5000 req/min</option>
+                        </select>
+                        <button
+                          id="generate-api-key-btn"
+                          onClick={() => {
+                            if (!newKeyNameInput.trim()) return;
+                            const created = generateApiKey(newKeyNameInput, newKeyRateLimit);
+                            setApiKeys([created, ...apiKeys]);
+                            setNewKeyNameInput("");
+                            showToast(`🔑 API Key "${created.name}" Created!`);
+                          }}
+                          className="px-3 py-1.5 rounded bg-aws-orange hover:bg-aws-orangeHover text-aws-lightTextPrimary font-bold text-xs shadow cursor-pointer"
+                        >
+                          + Create Key
+                        </button>
+                      </div>
+
+                      {/* API Keys Table */}
+                      <div className="flex flex-col gap-1.5 mt-2">
+                        {apiKeys.map((k) => (
+                          <div
+                            key={k.id}
+                            className="p-2 rounded bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border flex justify-between items-center font-mono text-[10px]"
+                          >
+                            <div className="flex flex-col">
+                              <span className="font-bold text-aws-lightTextPrimary dark:text-aws-textPrimary">{k.name}</span>
+                              <span className="text-[9px] text-aws-lightTextSecondary dark:text-aws-textSecondary">
+                                {showFullKeys ? k.key : `${k.key.substring(0, 18)}••••••••`} • {k.rateLimitReqPerMin} req/min
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => {
+                                  if (typeof navigator !== "undefined") {
+                                    navigator.clipboard.writeText(k.key);
+                                    showToast(`📋 Copied API Key "${k.name}" to clipboard!`);
+                                  }
+                                }}
+                                className="px-2 py-0.5 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border text-[9px] font-bold text-aws-lightTextPrimary dark:text-aws-textPrimary hover:text-aws-orange cursor-pointer"
+                              >
+                                📋 Copy
+                              </button>
+                              <span
+                                className={`px-1.5 py-0.5 rounded font-bold ${
+                                  k.status === "ACTIVE"
+                                    ? "bg-emerald-500/15 text-emerald-800 dark:text-emerald-400"
+                                    : "bg-red-500/15 text-red-800 dark:text-red-400"
+                                }`}
+                              >
+                                {k.status}
+                              </span>
+                              {k.status === "ACTIVE" && (
+                                <button
+                                  id={`revoke-key-btn-${k.id}`}
+                                  onClick={() => {
+                                    setApiKeys(revokeApiKey(k.id, apiKeys));
+                                    showToast(`🚨 API Key "${k.name}" REVOKED!`);
+                                  }}
+                                  className="px-2 py-0.5 rounded bg-red-700 hover:bg-red-800 text-white font-bold text-[9px] cursor-pointer"
+                                >
+                                  Revoke
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Phase 10C: Automated SOC2 Type II Audit Evidence Package Exporter */}
+                    <div className="pt-4 border-t border-aws-lightBorder dark:border-aws-divider flex justify-between items-center">
+                      <div>
+                        <strong className="text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs block">
+                          📜 Automated SOC2 Type II Compliance Evidence Package
+                        </strong>
+                        <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary">
+                          Export complete JSON audit evidence bundle containing Trust Services Criteria & IAM/KMS proofs.
+                        </span>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          id="inspect-soc2-evidence-btn"
+                          onClick={() => {
+                            const pkg = generateAuditEvidencePackage("AWS Enterprise Account", "soc2-auditor@enterprise.aws");
+                            setActiveEvidencePkg(pkg);
+                            setIsEvidenceDrawerOpen(true);
+                          }}
+                          className="px-3 py-1.5 rounded bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-xs shadow cursor-pointer flex items-center gap-1"
+                        >
+                          👁️ Inspect Live Evidence
+                        </button>
+                        <button
+                          id="download-soc2-evidence-btn"
+                          onClick={() => {
+                            const pkg = generateAuditEvidencePackage("AWS Enterprise Account", "soc2-auditor@enterprise.aws");
+                            downloadAuditEvidencePackageFile(pkg);
+                            showToast(`📜 SOC2 Evidence Package Downloaded! (${pkg.auditId})`);
+                          }}
+                          className="px-3 py-1.5 rounded bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow cursor-pointer flex items-center gap-1"
+                        >
+                          📦 Download SOC2 Evidence Package (.json)
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Phase 9B: MFA Verification Prompt Modal */}
+      {isMfaModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-aws-lightContainer dark:bg-aws-container border-2 border-aws-orange rounded-xl p-6 w-96 shadow-2xl flex flex-col gap-4 font-sans">
+            <div className="flex justify-between items-center border-b border-aws-lightBorder dark:border-aws-divider pb-2">
+              <span className="font-bold text-sm text-aws-lightTextPrimary dark:text-aws-orange flex items-center gap-1.5">
+                🔐 MFA Security Verification Required
+              </span>
+              <button
+                onClick={() => {
+                  setIsMfaModalOpen(false);
+                  setPendingTierChange(null);
+                }}
+                className="text-xs text-aws-lightTextSecondary dark:text-aws-textSecondary hover:text-aws-orange cursor-pointer font-bold"
+              >
+                ✕
+              </button>
+            </div>
+            <p className="text-xs text-aws-lightTextSecondary dark:text-aws-textSecondary leading-relaxed">
+              Enter your 6-digit TOTP authenticator code to confirm subscription plan modification to <strong className="text-aws-orange uppercase">{pendingTierChange}</strong>:
+            </p>
+            <input
+              id="mfa-code-input"
+              type="text"
+              placeholder="123456"
+              maxLength={6}
+              value={mfaCodeInput}
+              onChange={(e) => {
+                setMfaCodeInput(e.target.value);
+                setMfaErrorMsg(null);
+              }}
+              className="w-full p-2.5 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border font-mono text-center text-lg tracking-widest text-aws-lightTextPrimary dark:text-aws-textPrimary focus:outline-none focus:border-aws-orange"
+            />
+            {mfaErrorMsg && (
+              <span className="text-[11px] text-red-500 font-mono text-center font-bold">{mfaErrorMsg}</span>
+            )}
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                onClick={() => {
+                  setIsMfaModalOpen(false);
+                  setPendingTierChange(null);
+                }}
+                className="px-3 py-1.5 rounded bg-aws-lightBg dark:bg-aws-dark text-aws-lightTextSecondary dark:text-aws-textSecondary text-xs font-bold"
+              >
+                Cancel
+              </button>
+              <button
+                id="verify-mfa-submit-btn"
+                onClick={() => {
+                  const res = validateMfaToken(mfaCodeInput);
+                  if (res.valid) {
+                    if (pendingTierChange) setTier(pendingTierChange);
+                    setIsMfaModalOpen(false);
+                    setPendingTierChange(null);
+                    setMfaCodeInput("");
+                    showToast(`🔐 MFA Verified! Tier updated to ${pendingTierChange?.toUpperCase()}`);
+                  } else {
+                    setMfaErrorMsg(res.message);
+                  }
+                }}
+                className="px-4 py-1.5 rounded bg-aws-orange hover:bg-aws-orangeHover text-aws-lightTextPrimary text-xs font-bold shadow cursor-pointer"
+              >
+                Verify & Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Phase 9C: GraphQL API Inspector Modal */}
+      {isGraphQLModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-aws-lightContainer dark:bg-aws-container border-2 border-indigo-500 rounded-xl p-6 w-[600px] max-w-full shadow-2xl flex flex-col gap-4 font-sans">
+            <div className="flex justify-between items-center border-b border-aws-lightBorder dark:border-aws-divider pb-2">
+              <span className="font-bold text-sm text-indigo-400 flex items-center gap-1.5">
+                ⚡ GraphQL Telemetry Developer API Inspector
+              </span>
+              <button
+                id="close-graphql-modal-btn"
+                onClick={() => setIsGraphQLModalOpen(false)}
+                className="text-xs text-aws-lightTextSecondary dark:text-aws-textSecondary hover:text-aws-orange cursor-pointer font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-[11px] font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary mb-1">
+                  GraphQL Selection Query
+                </label>
+                <textarea
+                  id="graphql-query-input"
+                  rows={8}
+                  value={graphQLQuery}
+                  onChange={(e) => setGraphQLQuery(e.target.value)}
+                  className="w-full p-2.5 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border font-mono text-xs text-aws-lightTextPrimary dark:text-aws-textPrimary focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary mb-1">
+                  JSON Response Payload
+                </label>
+                <pre className="w-full p-2.5 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border font-mono text-[10px] text-emerald-800 dark:text-emerald-400 h-[172px] overflow-y-auto">
+                  {graphQLResult}
+                </pre>
+              </div>
+            </div>
+
+            <div className="flex justify-between items-center pt-2 border-t border-aws-lightBorder dark:border-aws-divider">
+              <span className="text-[10px] font-mono text-aws-lightTextSecondary dark:text-aws-textSecondary">
+                Endpoint: POST https://telemetry.rds-sentinel.aws/graphql
+              </span>
+              <div className="flex gap-2">
+                <button
+                  id="execute-graphql-query-btn"
+                  onClick={() => {
+                    const res = queryGraphQLTelemetry(graphQLQuery);
+                    setGraphQLResult(JSON.stringify(res, null, 2));
+                    showToast("⚡ GraphQL Query Executed!");
+                  }}
+                  className="px-4 py-1.5 rounded bg-indigo-700 hover:bg-indigo-800 text-white text-xs font-bold shadow cursor-pointer"
+                >
+                  ▶ Execute Query
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Phase 11A: Interactive Audit Evidence Inspector Drawer */}
+      {isEvidenceDrawerOpen && activeEvidencePkg && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex justify-end">
+          <div className="bg-aws-lightContainer dark:bg-aws-container border-l-2 border-aws-orange w-[520px] max-w-full h-full shadow-2xl flex flex-col p-6 font-sans overflow-y-auto">
+            <div className="flex justify-between items-center border-b border-aws-lightBorder dark:border-aws-divider pb-3">
+              <div>
+                <strong className="text-base font-bold text-aws-lightTextPrimary dark:text-aws-orange block">
+                  📜 SOC2 Type II Audit Evidence Inspector
+                </strong>
+                <span className="text-xs font-mono text-aws-lightTextSecondary dark:text-aws-textSecondary">
+                  Audit ID: {activeEvidencePkg.auditId}
+                </span>
+              </div>
+              <button
+                id="close-evidence-drawer-btn"
+                onClick={() => setIsEvidenceDrawerOpen(false)}
+                className="text-sm font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary hover:text-aws-orange cursor-pointer px-2 py-1"
+              >
+                ✕ Close
+              </button>
+            </div>
+
+            <div className="flex flex-col gap-4 mt-4 text-xs">
+              <div className="p-3 rounded bg-emerald-500/10 border border-emerald-500/30 flex justify-between items-center font-mono">
+                <span>Compliance Status:</span>
+                <span className="font-bold text-emerald-800 dark:text-emerald-300 uppercase">● {activeEvidencePkg.overallStatus}</span>
+              </div>
+
+              <div>
+                <h5 className="font-bold text-aws-lightTextPrimary dark:text-aws-textPrimary mb-2">Trust Services Criteria Control Evidence</h5>
+                <div className="flex flex-col gap-2">
+                  {activeEvidencePkg.trustServicesCriteria.map((c) => (
+                    <div key={c.controlId} className="p-3 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border flex flex-col gap-1">
+                      <div className="flex justify-between items-center font-mono text-[11px]">
+                        <span className="font-bold text-aws-orange">{c.controlId} — {c.category}</span>
+                        <span className="text-emerald-800 dark:text-emerald-400 font-bold">{c.status}</span>
+                      </div>
+                      <p className="text-aws-lightTextSecondary dark:text-aws-textSecondary text-[11px]">{c.description}</p>
+                      <div className="p-2 rounded bg-aws-lightContainer dark:bg-aws-container font-mono text-[10px] text-aws-lightTextPrimary dark:text-aws-textPrimary flex justify-between items-center mt-1">
+                        <span>Proof: {c.evidenceSnippet}</span>
+                        <button
+                          onClick={() => {
+                            if (typeof navigator !== "undefined") {
+                              navigator.clipboard.writeText(`${c.controlId}: ${c.evidenceSnippet}`);
+                              showToast(`📋 Copied proof for ${c.controlId}!`);
+                            }
+                          }}
+                          className="px-2 py-0.5 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border text-[9px] font-bold cursor-pointer hover:text-aws-orange"
+                        >
+                          📋 Copy Proof
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="p-3 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border flex flex-col gap-2 font-mono text-[11px]">
+                <strong className="text-aws-lightTextPrimary dark:text-aws-textPrimary">KMS & IAM Cryptographic Proofs</strong>
+                <div className="flex justify-between">
+                  <span>KMS Key Status:</span>
+                  <span className="font-bold text-emerald-800 dark:text-emerald-400">{activeEvidencePkg.encryptionProof.kmsKeyStatus}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>In-Transit Encryption:</span>
+                  <span className="font-bold text-emerald-800 dark:text-emerald-400">{activeEvidencePkg.encryptionProof.tlsVersion}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-auto pt-4 border-t border-aws-lightBorder dark:border-aws-divider flex justify-end gap-2">
+              <button
+                onClick={() => {
+                  downloadAuditEvidencePackageFile(activeEvidencePkg);
+                  showToast(`📜 SOC2 Evidence Package Downloaded! (${activeEvidencePkg.auditId})`);
+                }}
+                className="w-full py-2 rounded bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow cursor-pointer"
+              >
+                📦 Download Complete Audit Evidence Package (.json)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Phase 8: Floating Sticky Save Toast Banner */}
+      {toastMessage && (
+        <div className="fixed top-5 right-5 z-50 px-4 py-2.5 rounded-lg bg-emerald-800 text-white font-mono text-xs font-bold shadow-2xl animate-bounce flex items-center gap-2 border border-emerald-500">
+          <span>{toastMessage}</span>
+        </div>
+      )}
     </div>
   );
 }
