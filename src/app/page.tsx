@@ -11,6 +11,9 @@ import {
 } from "@/lib/mockTelemetry";
 import { maskSQLQuery, maskLogLine } from "@/lib/logSanitizer";
 import { calculateNextIntervalMs, TelemetryOutboxQueue } from "@/lib/dynamicTelemetry";
+import { getLayoutAction, saveLayoutAction } from "./actions";
+import { exportCSVReport } from "@/lib/reportExporter";
+import { dispatchWebhookAlert, WebhookDispatchResult } from "@/lib/webhookSimulator";
 
 // Initialize the telemetry outbox queue
 const outbox = new TelemetryOutboxQueue();
@@ -36,17 +39,77 @@ export default function Dashboard() {
   // Simulated Outbox Queue state (from dynamicTelemetry)
   const [outboxStatus, setOutboxStatus] = useState(outbox.getStatus());
   const [isDbEndpointOnline, setIsDbEndpointOnline] = useState(true);
+  const [customIngestionUrl, setCustomIngestionUrl] = useState("");
+
+  const [layoutOrder, setLayoutOrder] = useState<string[]>([
+    "databases",
+    "balancer",
+    "logs"
+  ]);
+
+  // Fetch saved layout configuration on mount
+  useEffect(() => {
+    const loadLayout = async () => {
+      const persisted = await getLayoutAction();
+      const validPanels = ["databases", "balancer", "logs"];
+      const filtered = persisted.filter(p => validPanels.includes(p));
+      if (filtered.length === validPanels.length) {
+        setLayoutOrder(filtered);
+      }
+    };
+    loadLayout();
+  }, []);
+
+  const moveLeft = async (panelId: string) => {
+    const idx = layoutOrder.indexOf(panelId);
+    if (idx <= 0) return;
+    const newOrder = [...layoutOrder];
+    [newOrder[idx], newOrder[idx - 1]] = [newOrder[idx - 1], newOrder[idx]];
+    setLayoutOrder(newOrder);
+    await saveLayoutAction(newOrder);
+  };
+
+  const moveRight = async (panelId: string) => {
+    const idx = layoutOrder.indexOf(panelId);
+    if (idx < 0 || idx >= layoutOrder.length - 1) return;
+    const newOrder = [...layoutOrder];
+    [newOrder[idx], newOrder[idx + 1]] = [newOrder[idx + 1], newOrder[idx]];
+    setLayoutOrder(newOrder);
+    await saveLayoutAction(newOrder);
+  };
 
   // Real-time ticking telemetry simulation
   const [tickCount, setTickCount] = useState(0);
 
   // Memory Cap (Developer Agent Audit): Store limited history in state (max 50)
   const [cpuHistory, setCpuHistory] = useState<Record<string, number[]>>({
-    "db-prod-aurora": Array.from({ length: 24 }, () => Math.round(60 + Math.random() * 20)),
-    "db-billing-rds": Array.from({ length: 24 }, () => Math.round(20 + Math.random() * 15)),
-    "db-dev-sandbox": Array.from({ length: 24 }, () => Math.round(8 + Math.random() * 5)),
-    "db-analytics-aurora": Array.from({ length: 24 }, () => Math.round(40 + Math.random() * 15)),
+    "db-prod-aurora": [65, 68, 70, 72, 75, 71, 69, 74, 76, 70, 68, 72, 75, 73, 71, 69, 72, 74, 76, 71, 70, 73, 72, 70],
+    "db-billing-rds": [25, 28, 24, 22, 26, 28, 30, 27, 25, 29, 28, 26, 24, 27, 29, 25, 28, 26, 24, 28, 27, 25, 29, 28],
+    "db-dev-sandbox": [10, 12, 11, 9, 10, 12, 11, 10, 9, 12, 11, 10, 12, 9, 11, 10, 12, 11, 9, 10, 12, 11, 10, 12],
+    "db-analytics-aurora": [45, 48, 50, 47, 46, 49, 51, 48, 46, 50, 48, 47, 45, 49, 51, 47, 46, 49, 48, 50, 47, 46, 49, 45],
   });
+
+  // Interactive CPU sparkline hover tooltip state
+  const [hoveredSample, setHoveredSample] = useState<{ index: number; value: number } | null>(null);
+
+  // Option B: Webhook Dispatch Simulator state
+  const [webhookTarget, setWebhookTarget] = useState<"slack" | "pagerduty">("slack");
+  const [webhookUrl, setWebhookUrl] = useState("https://hooks.slack.com/services/T00000000/B00000000/XXXXX");
+  const [webhookResult, setWebhookResult] = useState<WebhookDispatchResult | null>(null);
+  const [isDispatchingWebhook, setIsDispatchingWebhook] = useState(false);
+
+  const handleSendWebhook = async () => {
+    setIsDispatchingWebhook(true);
+    const result = await dispatchWebhookAlert(
+      webhookTarget,
+      webhookUrl,
+      selectedDb.name,
+      "CPU Utilization Spike (> 85%)",
+      `Database ${selectedDb.name} CPU utilization spiked to ${selectedDb.cpuLoad}%. Immediate inspection required.`
+    );
+    setWebhookResult(result);
+    setIsDispatchingWebhook(false);
+  };
 
   // Synchronize document theme class
   useEffect(() => {
@@ -70,6 +133,19 @@ export default function Dashboard() {
     }, 500);
 
     return () => clearTimeout(timer);
+  };
+
+  // Handle manual CPU simulator slider changes for testing real-time scrape cadence
+  const handleCpuSliderChange = (newCpu: number) => {
+    setSelectedDb(prev => ({ ...prev, cpuLoad: newCpu }));
+    setInstances(prev =>
+      prev.map(instance => (instance.id === selectedDb.id ? { ...instance, cpuLoad: newCpu } : instance))
+    );
+    setCpuHistory(prev => {
+      const currentHistory = prev[selectedDb.id] || [];
+      const updatedHistory = [...currentHistory, newCpu].slice(-50);
+      return { ...prev, [selectedDb.id]: updatedHistory };
+    });
   };
 
   // Telemetry loop to simulate real-time metrics drifting slightly
@@ -141,15 +217,40 @@ export default function Dashboard() {
 
       // Process telemetry payload queue based on connection state
       await outbox.processQueue(async (payload) => {
-        // Resolve target connection simulation state
-        return isDbEndpointOnline;
+        if (!isDbEndpointOnline) {
+          return false;
+        }
+
+        const ingestionUrl = customIngestionUrl || process.env.NEXT_PUBLIC_INGESTION_URL;
+        if (ingestionUrl) {
+          try {
+            const isInvokeApi = ingestionUrl.includes("/invocations");
+            const requestBody = isInvokeApi 
+              ? JSON.stringify({ body: JSON.stringify(payload) })
+              : JSON.stringify(payload);
+
+            console.log("Telemetry outbox sending fetch to URL:", ingestionUrl, "with body:", requestBody);
+            const res = await fetch(ingestionUrl, {
+              method: "POST",
+              headers: { "Content-Type": "text/plain" },
+              body: requestBody
+            });
+            console.log("Telemetry outbox fetch response status:", res.status);
+            return res.ok;
+          } catch (e) {
+            console.error("Telemetry ingest post failed:", e);
+            return false;
+          }
+        }
+
+        return true;
       });
 
       setOutboxStatus(outbox.getStatus());
     };
 
     runQueueSimulation();
-  }, [tickCount, isDbEndpointOnline, selectedDb]);
+  }, [tickCount, isDbEndpointOnline, selectedDb, customIngestionUrl]);
 
   // Compute total monthly database cost & savings recommendations
   const totalCost = 1420; // Simulated current AWS base cost
@@ -211,6 +312,15 @@ export default function Dashboard() {
               ))}
             </div>
 
+            {/* Option A: Export CSV Report Button */}
+            <button
+              onClick={() => exportCSVReport(instances, MOCK_RECOMMENDATIONS, MOCK_SLOW_QUERIES)}
+              className="px-3 py-1.5 rounded bg-aws-orange hover:bg-aws-orangeHover text-aws-lightTextPrimary dark:text-aws-lightTextPrimary text-xs font-bold transition-all shadow-sm active:scale-95 flex items-center gap-1.5"
+              title="Export CSV Performance & Cost Audit Report"
+            >
+              📥 Export CSV Report
+            </button>
+
             {/* Light/Dark Toggle */}
             <button
               onClick={() => setIsDarkMode(!isDarkMode)}
@@ -225,10 +335,27 @@ export default function Dashboard() {
 
       <main className="max-w-[1600px] mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* LEFT COLUMN: Database Selectors & Health Telemetry */}
-        <section className="lg:col-span-1 flex flex-col gap-6">
-          {/* DB Instances List */}
+        <section className="lg:col-span-1 flex flex-col gap-6" style={{ order: layoutOrder.indexOf("databases") }}>
           <div className="bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border rounded-lg p-4">
-            <h2 className="text-sm font-bold text-aws-lightTextPrimary dark:text-aws-orange uppercase tracking-wider mb-3">Target Databases</h2>
+            <div className="flex justify-between items-center mb-3">
+              <h2 className="text-sm font-bold text-aws-lightTextPrimary dark:text-aws-orange uppercase tracking-wider">Target Databases</h2>
+              <div className="flex gap-1" data-testid="layout-controls-databases">
+                <button
+                  onClick={() => moveLeft("databases")}
+                  aria-label="Move Databases Left"
+                  className="px-1.5 py-0.5 bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/20 border border-aws-lightBorder dark:border-aws-border rounded text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary transition-colors"
+                >
+                  ◀
+                </button>
+                <button
+                  onClick={() => moveRight("databases")}
+                  aria-label="Move Databases Right"
+                  className="px-1.5 py-0.5 bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/20 border border-aws-lightBorder dark:border-aws-border rounded text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary transition-colors"
+                >
+                  ▶
+                </button>
+              </div>
+            </div>
             <div className="flex flex-col gap-2">
               {instances.map(db => {
                 const isSelected = db.id === selectedDbId;
@@ -302,6 +429,28 @@ export default function Dashboard() {
                       style={{ width: `${selectedDb.cpuLoad}%` }}
                     />
                   </div>
+
+                  {/* Interactive CPU Load Simulator Slider */}
+                  <div className="mt-2.5 p-2 bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border rounded">
+                    <div className="flex justify-between items-center text-[10px] font-bold mb-1">
+                      <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary uppercase">Simulate Load Spike</span>
+                      <span className={`px-1.5 py-0.5 rounded font-mono ${
+                        selectedDb.cpuLoad > 85 ? "bg-aws-red/10 text-red-800 dark:text-red-400" : "text-amber-800 dark:text-aws-orange"
+                      }`}>
+                        {selectedDb.cpuLoad}%
+                      </span>
+                    </div>
+                    <input 
+                      type="range" 
+                      id="cpu-simulator-slider"
+                      aria-label="Simulate CPU Utilization Load"
+                      min="0" 
+                      max="100" 
+                      value={selectedDb.cpuLoad}
+                      onChange={(e) => handleCpuSliderChange(Number(e.target.value))}
+                      className="w-full accent-aws-orange cursor-pointer h-1.5 bg-aws-lightBorder dark:bg-aws-border rounded-lg appearance-none"
+                    />
+                  </div>
                 </div>
 
                 {/* Connections count */}
@@ -324,26 +473,62 @@ export default function Dashboard() {
                     <span>Historical CPU Profile (Last {cpuHistory[selectedDb.id]?.length || 0} samples)</span>
                     <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary">Clamped to 50 max</span>
                   </div>
-                  <div className="relative flex items-end gap-0.5 h-12 bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border rounded p-1 font-mono text-[9px] text-aws-textSecondary">
-                    {/* Visual Threshold Baseline Gridlines (UI/UX Agent Audit) */}
-                    <div className="absolute left-0 right-0 top-1/4 border-t border-dashed border-aws-lightBorder/40 dark:border-aws-border/40 pointer-events-none" title="75% CPU" />
-                    <div className="absolute left-0 right-0 top-2/4 border-t border-dashed border-aws-lightBorder/40 dark:border-aws-border/40 pointer-events-none" title="50% CPU" />
-                    <div className="absolute left-0 right-0 top-3/4 border-t border-dashed border-aws-lightBorder/40 dark:border-aws-border/40 pointer-events-none" title="25% CPU" />
 
-                    {(cpuHistory[selectedDb.id] || []).map((cpuValue, i) => (
-                      <div 
-                        key={i} 
-                        className={`flex-grow transition-all ${
-                          cpuValue > 85 
-                            ? "bg-aws-red/50 hover:bg-aws-red" 
-                            : cpuValue > 60 
-                            ? "bg-aws-yellow/50 hover:bg-aws-yellow" 
-                            : "bg-aws-blue/50 hover:bg-aws-blue"
-                        }`}
-                        style={{ height: `${cpuValue}%` }}
-                        title={`Sample ${i + 1}: CPU ${cpuValue}%`}
-                      />
-                    ))}
+                  {/* Benchmark Grid Legend & Tooltip Header */}
+                  <div className="flex justify-between items-center text-[9px] font-mono text-aws-lightTextSecondary dark:text-aws-textSecondary mb-1">
+                    <div className="flex gap-2">
+                      <span className="flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-aws-red"></span> 85%+ Critical
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-aws-yellow"></span> 60%+ High
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-aws-blue"></span> Normal
+                      </span>
+                    </div>
+
+                    {/* Interactive Floating Hover Tooltip Detail */}
+                    {hoveredSample ? (
+                      <div className="px-2 py-0.5 bg-aws-lightContainer dark:bg-aws-dark border border-aws-orange text-aws-orange rounded font-bold transition-all shadow-sm animate-fade-in">
+                        Sample #{hoveredSample.index + 1}: <span className="font-extrabold">{hoveredSample.value}% CPU</span>
+                        {hoveredSample.value > 85 && " ⚠️ Alert"}
+                      </div>
+                    ) : (
+                      <span className="text-[9px] italic text-slate-600 dark:text-aws-textSecondary">Hover over bar to view sample</span>
+                    )}
+                  </div>
+
+                  <div className="relative flex items-end gap-0.5 h-14 bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border rounded p-1 font-mono text-[9px] text-aws-textSecondary">
+                    {/* Threshold Benchmark Overlay Lines */}
+                    <div className="absolute left-0 right-0 top-0 border-t border-dashed border-red-500/40 pointer-events-none" title="100% Benchmark" />
+                    <div className="absolute left-0 right-0 top-1/4 border-t border-dashed border-amber-500/40 pointer-events-none" title="75% Benchmark" />
+                    <div className="absolute left-0 right-0 top-2/4 border-t border-dashed border-blue-500/30 pointer-events-none" title="50% Benchmark" />
+                    <div className="absolute left-0 right-0 top-3/4 border-t border-dashed border-teal-500/25 pointer-events-none" title="25% Benchmark" />
+
+                    {(cpuHistory[selectedDb.id] || []).map((cpuValue, i) => {
+                      const isHovered = hoveredSample?.index === i;
+                      return (
+                        <div 
+                          key={i} 
+                          onMouseEnter={() => setHoveredSample({ index: i, value: cpuValue })}
+                          onMouseLeave={() => setHoveredSample(null)}
+                          className={`flex-grow cursor-pointer transition-all ${
+                            isHovered
+                              ? "ring-2 ring-aws-orange z-10 scale-110"
+                              : ""
+                          } ${
+                            cpuValue > 85 
+                              ? "bg-aws-red/50 hover:bg-aws-red" 
+                              : cpuValue > 60 
+                              ? "bg-aws-yellow/50 hover:bg-aws-yellow" 
+                              : "bg-aws-blue/50 hover:bg-aws-blue"
+                          }`}
+                          style={{ height: `${cpuValue}%` }}
+                          title={`Sample ${i + 1}: CPU ${cpuValue}%`}
+                        />
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -364,11 +549,29 @@ export default function Dashboard() {
         </section>
 
         {/* MIDDLE COLUMN: Cost-Performance Balancer & Slow Query list */}
-        <section className="lg:col-span-2 flex flex-col gap-6">
+        <section className="lg:col-span-2 flex flex-col gap-6" style={{ order: layoutOrder.indexOf("balancer") }}>
           {/* Cost-Performance Balancer */}
           <div className="bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border rounded-lg p-4">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-sm font-bold text-aws-lightTextPrimary dark:text-aws-orange uppercase tracking-wider">Cost-Performance Balancer</h2>
+              <div className="flex items-center gap-3">
+                <h2 className="text-sm font-bold text-aws-lightTextPrimary dark:text-aws-orange uppercase tracking-wider">Cost-Performance Balancer</h2>
+                <div className="flex gap-1" data-testid="layout-controls-balancer">
+                  <button
+                    onClick={() => moveLeft("balancer")}
+                    aria-label="Move Balancer Left"
+                    className="px-1.5 py-0.5 bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/20 border border-aws-lightBorder dark:border-aws-border rounded text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary transition-colors"
+                  >
+                    ◀
+                  </button>
+                  <button
+                    onClick={() => moveRight("balancer")}
+                    aria-label="Move Balancer Right"
+                    className="px-1.5 py-0.5 bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/20 border border-aws-lightBorder dark:border-aws-border rounded text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary transition-colors"
+                  >
+                    ▶
+                  </button>
+                </div>
+              </div>
               <span className="text-[11px] font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary">Tier Capability: <span className="text-teal-800 dark:text-aws-teal uppercase font-extrabold">{tier}</span></span>
             </div>
 
@@ -415,6 +618,50 @@ export default function Dashboard() {
                   <p className="text-[11px] text-aws-lightTextSecondary dark:text-aws-textSecondary leading-relaxed">{rec.reason}</p>
                 </div>
               ))}
+
+              {/* RDS Proxy Connection Pooling Advisor Card (Medium/Enterprise Tier) */}
+              {hasFeature("real-time-logs") && (
+                <div className="p-3 bg-aws-blue/5 border border-aws-blue/20 rounded text-xs">
+                  <div className="flex justify-between items-start mb-1.5">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[9px] uppercase font-bold px-1.5 py-0.5 rounded bg-aws-blue/10 text-sky-800 dark:text-sky-400">
+                        RDS Proxy
+                      </span>
+                      <strong className="text-aws-lightTextPrimary dark:text-aws-textPrimary">RDS Proxy Connection Pooling Advisor</strong>
+                    </div>
+                    <span className="font-mono font-bold text-xs text-sky-800 dark:text-sky-400">+82% Pool Efficiency</span>
+                  </div>
+                  <p className="text-[11px] text-aws-lightTextSecondary dark:text-aws-textSecondary leading-relaxed mb-2">
+                    Current active connection pool on <strong>{selectedDb.name}</strong> is at <strong>{selectedDb.connections} / 150</strong>. Provisioning an RDS Proxy target will multiplex database connections, reducing memory overhead and preventing CPU spikes during surge traffic.
+                  </p>
+                  <div className="flex justify-between items-center text-[10px] font-mono pt-1.5 border-t border-aws-blue/10">
+                    <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">Estimated Latency Gain: <strong className="text-emerald-800 dark:text-emerald-400">-12ms handshake</strong></span>
+                    <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">Memory Savings: <strong className="text-sky-800 dark:text-sky-400">~1.4 GB RAM</strong></span>
+                  </div>
+                </div>
+              )}
+
+              {/* Multi-Region Replication Latency Modeler Card (Medium/Enterprise Tier) */}
+              {hasFeature("multi-region") && (
+                <div className="p-3 bg-aws-teal/5 border border-aws-teal/20 rounded text-xs">
+                  <div className="flex justify-between items-start mb-1.5">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[9px] uppercase font-bold px-1.5 py-0.5 rounded bg-teal-500/10 text-teal-800 dark:text-teal-400">
+                        Multi-Region
+                      </span>
+                      <strong className="text-aws-lightTextPrimary dark:text-aws-textPrimary">Cross-Region Latency & Cost Modeler</strong>
+                    </div>
+                    <span className="font-mono font-bold text-xs text-teal-800 dark:text-teal-400">98.5% Failover Ready</span>
+                  </div>
+                  <p className="text-[11px] text-aws-lightTextSecondary dark:text-aws-textSecondary leading-relaxed mb-2">
+                    Cross-region read replica (<strong>us-east-1 ➔ us-west-2</strong>) synchronization lag averages <strong>62ms</strong>. Data transfer egress is optimized at ~$14.20/mo.
+                  </p>
+                  <div className="flex justify-between items-center text-[10px] font-mono pt-1.5 border-t border-teal-500/10">
+                    <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">Sync Latency: <strong className="text-teal-800 dark:text-teal-400">62ms avg</strong></span>
+                    <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">Egress Cost: <strong className="text-aws-lightTextPrimary dark:text-aws-textPrimary">$14.20/mo</strong></span>
+                  </div>
+                </div>
+              )}
               
               {tier === "trial" && (
                 /* Billing Upgrade CTA inside locked cost-recommendations (PO Agent Audit) */
@@ -483,10 +730,27 @@ export default function Dashboard() {
         </section>
 
         {/* RIGHT COLUMN: Log Watcher, Gaps Demo & Agents Audits */}
-        <section className="lg:col-span-1 flex flex-col gap-6">
-          {/* Anomaly Log Watcher */}
+        <section className="lg:col-span-1 flex flex-col gap-6" style={{ order: layoutOrder.indexOf("logs") }}>
           <div className="bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border rounded-lg p-4">
-            <h2 className="text-sm font-bold text-aws-lightTextPrimary dark:text-aws-orange uppercase tracking-wider mb-3">Anomaly Log Watcher</h2>
+            <div className="flex justify-between items-center mb-3">
+              <h2 className="text-sm font-bold text-aws-lightTextPrimary dark:text-aws-orange uppercase tracking-wider">Anomaly Log Watcher</h2>
+              <div className="flex gap-1" data-testid="layout-controls-logs">
+                <button
+                  onClick={() => moveLeft("logs")}
+                  aria-label="Move Logs Left"
+                  className="px-1.5 py-0.5 bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/20 border border-aws-lightBorder dark:border-aws-border rounded text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary transition-colors"
+                >
+                  ◀
+                </button>
+                <button
+                  onClick={() => moveRight("logs")}
+                  aria-label="Move Logs Right"
+                  className="px-1.5 py-0.5 bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/20 border border-aws-lightBorder dark:border-aws-border rounded text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary transition-colors"
+                >
+                  ▶
+                </button>
+              </div>
+            </div>
             
             {!hasFeature("real-time-logs") ? (
               /* Billing Upgrade CTA inside Log Watcher (PO Agent Audit) */
@@ -529,6 +793,19 @@ export default function Dashboard() {
             <h2 className="text-sm font-bold text-aws-lightTextPrimary dark:text-aws-orange uppercase tracking-wider border-b border-aws-lightBorder dark:border-aws-divider pb-2">
               Telemetry Ingest Sandbox
             </h2>
+
+            {/* Custom Ingestion Endpoint Override input (E2E LocalStack test support) */}
+            <div>
+              <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary uppercase font-bold block mb-1">Ingestion Endpoint Override</span>
+              <input
+                type="text"
+                id="ingestion-url-override"
+                value={customIngestionUrl}
+                onChange={(e) => setCustomIngestionUrl(e.target.value)}
+                placeholder="http://localhost:4566/2015-03-31/functions/.../url/"
+                className="w-full px-2.5 py-1 text-[10px] bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border rounded text-aws-lightTextPrimary dark:text-aws-textPrimary font-mono focus:outline-none focus:border-aws-orange"
+              />
+            </div>
 
             {/* Gap 1: Dynamic Telemetry scrape interval */}
             <div>
@@ -633,6 +910,89 @@ export default function Dashboard() {
                     {hasFeature("webhooks") ? "Active" : "Locked"}
                   </span>
                 </div>
+              </div>
+            </div>
+
+            {/* Option B: Enterprise Webhook Dispatch Simulator */}
+            <div>
+              <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary uppercase font-bold block mb-1">
+                Enterprise Webhook Dispatch Simulator
+              </span>
+              <div className="p-2.5 bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border rounded text-[11px] leading-relaxed">
+                {hasFeature("webhooks") ? (
+                  <div className="flex flex-col gap-2">
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => {
+                          setWebhookTarget("slack");
+                          setWebhookUrl("https://hooks.slack.com/services/T00000000/B00000000/XXXXX");
+                        }}
+                        className={`flex-1 text-[10px] py-1 rounded font-bold border transition-colors ${
+                          webhookTarget === "slack"
+                            ? "bg-aws-orange text-aws-lightTextPrimary dark:text-aws-lightTextPrimary border-transparent"
+                            : "bg-transparent text-aws-lightTextSecondary dark:text-aws-textSecondary border-aws-lightBorder dark:border-aws-border"
+                        }`}
+                      >
+                        Slack Webhook
+                      </button>
+                      <button
+                        onClick={() => {
+                          setWebhookTarget("pagerduty");
+                          setWebhookUrl("https://events.pagerduty.com/v2/enqueue");
+                        }}
+                        className={`flex-1 text-[10px] py-1 rounded font-bold border transition-colors ${
+                          webhookTarget === "pagerduty"
+                            ? "bg-aws-orange text-aws-lightTextPrimary dark:text-aws-lightTextPrimary border-transparent"
+                            : "bg-transparent text-aws-lightTextSecondary dark:text-aws-textSecondary border-aws-lightBorder dark:border-aws-border"
+                        }`}
+                      >
+                        PagerDuty API
+                      </button>
+                    </div>
+
+                    <input
+                      type="text"
+                      id="webhook-url-input"
+                      value={webhookUrl}
+                      onChange={(e) => setWebhookUrl(e.target.value)}
+                      placeholder="Webhook endpoint URL..."
+                      className="w-full px-2 py-1 text-[10px] bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border rounded font-mono"
+                    />
+
+                    <button
+                      onClick={handleSendWebhook}
+                      disabled={isDispatchingWebhook}
+                      className="w-full py-1 bg-aws-orange hover:bg-aws-orangeHover text-aws-lightTextPrimary dark:text-aws-lightTextPrimary text-[10px] font-bold rounded transition-all active:scale-95 disabled:opacity-50"
+                    >
+                      {isDispatchingWebhook ? "Sending Alert..." : "🚀 Trigger Test Anomaly Alert"}
+                    </button>
+
+                    {webhookResult && (
+                      <div className={`p-2 rounded text-[10px] border mt-1 font-mono ${
+                        webhookResult.success
+                          ? "bg-aws-green/10 text-emerald-800 dark:text-emerald-400 border-aws-green/30"
+                          : "bg-aws-red/10 text-red-800 dark:text-red-400 border-aws-red/30"
+                      }`}>
+                        <div className="font-bold mb-0.5">{webhookResult.responseMessage}</div>
+                        <pre className="text-[9px] whitespace-pre-wrap opacity-90 overflow-x-auto max-h-24 p-1 bg-aws-lightBg dark:bg-aws-dark rounded mt-1">
+                          {webhookResult.payloadJson}
+                        </pre>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="text-center p-2">
+                    <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary block mb-1">
+                      🔒 Slack & PagerDuty Webhooks locked on {tier} tier.
+                    </span>
+                    <button
+                      onClick={() => setTier("enterprise")}
+                      className="px-3 py-1 bg-aws-orange text-aws-lightTextPrimary dark:text-aws-lightTextPrimary text-[10px] font-bold rounded"
+                    >
+                      Upgrade to Enterprise Tier
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>

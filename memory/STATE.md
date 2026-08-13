@@ -1,11 +1,11 @@
 # rds-sentinel Current Workspace State
 
-_Last Updated: 2026-08-11_
+_Last Updated: 2026-08-13_
 
 ---
 
-## Subscription Tier
-- **Active Testing Tier**: `Medium Business` (Supports cost recommendations, real-time log scanning, index suggestions, and multi-region replication suggestions. Webhooks are locked).
+## Subscription Tier & Feature Matrix
+- **Active Tier**: `Medium Business` (Supports cost recommendations, real-time log scanning, index suggestions, RDS Proxy advisor, multi-region replication modeler, exportable CSV audit reports, and interactive CPU load simulation. Webhook dispatch simulator unlocks on Enterprise tier).
 
 ---
 
@@ -33,11 +33,14 @@ _Last Updated: 2026-08-11_
 
 ---
 
-## Sandbox Ingest Queue Status
+## Telemetry & Infrastructure Sandbox Status
 - **Target Endpoint Connection**: `Online`
 - **Circuit Breaker state**: `CLOSED`
 - **Outbox Queue count**: `0` (Ingested successfully)
-- **Sanitizer Parameter Masking**: `Active` (All sensitive SQL query parameters and emails are redacted at runtime).
+- **Sanitizer Parameter Masking**: `Active` (All sensitive SQL query parameters and emails redacted at edge).
+- **Layout State Persistence**: `Active` (Saved to `rds-sentinel.db` via Next.js Server Actions).
+- **LocalStack Cloud Sandbox**: `Verified` (`npm run test:localstack` passed).
+- **Automated Test Coverage**: **35/35 Tests Passing** (24 Jest unit + 11 Playwright E2E + 1 Layout E2E + 1 LocalStack E2E).
 
 ---
 

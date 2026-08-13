@@ -167,10 +167,12 @@ const RAW_SLOW_QUERIES_DATA = [
   }
 ];
 
+const STATIC_BASE_TIME = new Date("2026-08-13T06:00:00.000Z").getTime();
+
 export const MOCK_SLOW_QUERIES: SlowQuery[] = RAW_SLOW_QUERIES_DATA.map((q, idx) => ({
   id: `q-${idx}`,
   dbInstanceId: q.dbInstanceId,
-  timestamp: new Date(Date.now() - idx * 20 * 60 * 1000).toISOString(),
+  timestamp: new Date(STATIC_BASE_TIME - idx * 20 * 60 * 1000).toISOString(),
   durationMs: q.durationMs,
   rawSql: q.rawSql,
   maskedSql: maskSQLQuery(q.rawSql),

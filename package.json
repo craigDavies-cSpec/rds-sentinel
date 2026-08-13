@@ -9,14 +9,20 @@
     "lint": "next lint",
     "audit:cve": "npm audit",
     "test": "jest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test tests/dashboard.spec.ts tests/a11y.spec.ts",
+    "test:localstack": "playwright test tests/localstack.spec.ts"
   },
   "dependencies": {
     "next": "^14.2.16",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^6.0.1"
   },
   "devDependencies": {
+    "@aws-sdk/client-cloudwatch-logs": "^3.1107.0",
+    "@aws-sdk/client-kinesis": "^3.1107.0",
+    "@aws-sdk/client-lambda": "^3.1107.0",
     "@axe-core/playwright": "^4.12.1",
     "@playwright/test": "^1.62.1",
     "@types/jest": "^29.5.12",

@@ -21,6 +21,19 @@ describe("Log Sanitizer & Parameter Masking Utility", () => {
       expect(result).not.toContain("secret_hash_value");
       expect(result).not.toContain("active_token_123");
     });
+
+    test("should handle empty or whitespace query strings gracefully", () => {
+      expect(maskSQLQuery("")).toBe("");
+      expect(maskSQLQuery("   ")).toBe("   ");
+    });
+
+    test("should mask complex queries with double-quoted identifiers and inline comments", () => {
+      const sql = 'SELECT "user_id", "email" FROM "schema"."users" WHERE "role" = \'admin\' AND "status" = \'active\' -- filter admins';
+      const masked = maskSQLQuery(sql);
+      expect(masked).not.toContain("'admin'");
+      expect(masked).not.toContain("'active'");
+      expect(masked).toContain("SELECT");
+    });
   });
 
   describe("maskLogLine", () => {
@@ -34,6 +47,23 @@ describe("Log Sanitizer & Parameter Masking Utility", () => {
       const log = "Access denied for user 'app-user'@'10.0.1.20' (using password: YES)";
       const expected = "Access denied for user 'app-user'@'10.0.1.20' (using password: [PROTECTED])";
       expect(maskLogLine(log)).toBe(expected);
+    });
+
+    test("should redact multiple emails with complex domains and plus-aliases", () => {
+      const log = "Alert sent to dev+alert@subdomain.company.co.uk and ops.admin@corp.io";
+      const sanitized = maskLogLine(log);
+      expect(sanitized).not.toContain("dev+alert@subdomain.company.co.uk");
+      expect(sanitized).not.toContain("ops.admin@corp.io");
+      expect(sanitized).toContain("[REDACTED_EMAIL]");
+    });
+
+    test("should process large log strings efficiently without crashing", () => {
+      const largeLog = "LOG ITEM ".repeat(1000) + "admin.user@enterprise.org";
+      const start = Date.now();
+      const sanitized = maskLogLine(largeLog);
+      const duration = Date.now() - start;
+      expect(sanitized).toContain("[REDACTED_EMAIL]");
+      expect(duration).toBeLessThan(100); // Must process under 100ms
     });
   });
 });

@@ -44,6 +44,9 @@ node_modules/
 /infra/bin/**/*.d.ts
 /infra/lib/**/*.d.ts
 
+# local db
+*.db
+
 # playwright
 /playwright-report/
 /test-results/

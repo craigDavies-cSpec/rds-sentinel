@@ -31,9 +31,14 @@ describe("Telemetry Ingestion & Backpressure Queue", () => {
       const interval = calculateNextIntervalMs(40, 12, "medium");
       expect(interval).toBe(baseMediumMs);
     });
+
+    test("should calculate correct intervals across trial and small business tiers", () => {
+      expect(calculateNextIntervalMs(50, 10, "trial")).toBe(600000); // 10m base
+      expect(calculateNextIntervalMs(50, 10, "small")).toBe(300000); // 5m base
+    });
   });
 
-  describe("TelemetryOutboxQueue Circuit Breaker", () => {
+  describe("TelemetryOutboxQueue Circuit Breaker & Backpressure", () => {
     let outbox: TelemetryOutboxQueue;
 
     beforeEach(() => {
@@ -49,8 +54,19 @@ describe("Telemetry Ingestion & Backpressure Queue", () => {
       expect(outbox.size()).toBe(1);
     });
 
-    test("should trip circuit breaker to OPEN state after 3 failures and recover to HALF-OPEN after timeout", async () => {
-      // Enqueue 4 payloads
+    test("should cap maximum outbox queue capacity to prevent memory leaks", () => {
+      for (let i = 0; i < 600; i++) {
+        outbox.enqueue({
+          instanceId: `test-db-${i}`,
+          timestamp: new Date().toISOString(),
+          metrics: { cpu: 20, connections: 5, iops: 100, freeStorageBytes: 1024 }
+        });
+      }
+      expect(outbox.size()).toBeLessThanOrEqual(500);
+    });
+
+    test("should trip circuit breaker to OPEN state after 3 failures and recover to CLOSED after HALF-OPEN success", async () => {
+      // Enqueue payloads
       for (let i = 0; i < 4; i++) {
         outbox.enqueue({
           instanceId: "test-db",
@@ -62,23 +78,28 @@ describe("Telemetry Ingestion & Backpressure Queue", () => {
       // Process queue with failing mock target function
       const failingSubmit = jest.fn().mockResolvedValue(false);
       
-      // Run once (first failure)
+      // 1st failure
       await outbox.processQueue(failingSubmit);
       expect(outbox.getStatus().state).toBe("CLOSED");
 
-      // Run twice (second failure)
+      // 2nd failure
       await outbox.processQueue(failingSubmit);
       expect(outbox.getStatus().state).toBe("CLOSED");
 
-      // Run thrice (third failure - trips breaker)
+      // 3rd failure - trips breaker to OPEN
       await outbox.processQueue(failingSubmit);
       expect(outbox.getStatus().state).toBe("OPEN");
 
       // Fast forward the circuit recovery timeout (30 seconds)
       jest.advanceTimersByTime(30000);
 
-      // Verify circuit shifts to HALF-OPEN for retry verification
+      // Verify circuit shifts to HALF-OPEN
       expect(outbox.getStatus().state).toBe("HALF-OPEN");
+
+      // Process with successful submit to transition back to CLOSED
+      const successfulSubmit = jest.fn().mockResolvedValue(true);
+      await outbox.processQueue(successfulSubmit);
+      expect(outbox.getStatus().state).toBe("CLOSED");
       expect(outbox.getStatus().consecutiveFailures).toBe(0);
     });
   });

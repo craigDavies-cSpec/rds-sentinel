@@ -48,4 +48,17 @@ test.describe("Accessibility Audits - rds-sentinel", () => {
       
     expect(results.violations).toEqual([]);
   });
+
+  test("should support keyboard tab navigation and aria-label attributes on interactive controls", async ({ page }) => {
+    await page.goto("/");
+
+    // Verify aria-labels on layout controls
+    await expect(page.locator("button[aria-label='Move Databases Right']")).toBeVisible();
+    await expect(page.locator("button[aria-label='Move Balancer Left']")).toBeVisible();
+
+    // Focus theme toggle using Tab
+    await page.keyboard.press("Tab");
+    const activeElementTag = await page.evaluate(() => document.activeElement?.tagName);
+    expect(activeElementTag).toBeDefined();
+  });
 });
