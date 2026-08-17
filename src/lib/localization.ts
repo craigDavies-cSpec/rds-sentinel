@@ -275,6 +275,34 @@ export interface TranslationDictionary {
   signHipaaBaaBtn: string;
   resignHipaaBaaBtn: string;
   copyZeroDowntimeDdlBtn: string;
+
+  // Deep Meticulous Pass UI Keys
+  triggerTestFailoverBtn: string;
+  enterpriseWebhookSimulatorTitle: string;
+  triggerTestAnomalyAlertBtn: string;
+  instancesCount: string;
+  trialCostRecLimitTitle: string;
+  trialCostRecLimitDesc: string;
+  unlockSmallTierBtn: string;
+  graphqlResultPlaceholder: string;
+  trustServicesCriteriaSubtitle: string;
+  overviewTab: string;
+  tscControlsTab: string;
+  iamProofsTab: string;
+  downloadJsonPackageBtn: string;
+  skipTourBtn: string;
+  subscriptionMarketplaceTitle: string;
+  selectModeUpgrade: string;
+  awsAccountsLimit: string;
+  dbInstancesLimit: string;
+  includedEntitlements: string;
+  testSandboxModeBtn: string;
+  confirmMarketplaceBillingBtn: string;
+  crossRegionReplicaRole: string;
+  replicationLagLabel: string;
+  failoverPriorityLabel: string;
+  iopsThroughputLabel: string;
+  nodeInspectorTitle: string;
 }
 
 export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
@@ -511,6 +539,33 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     signHipaaBaaBtn: "Sign HIPAA BAA",
     resignHipaaBaaBtn: "Re-sign BAA",
     copyZeroDowntimeDdlBtn: "Copy Zero-Downtime DDL",
+
+    triggerTestFailoverBtn: "⚡ Trigger Test Failover Simulation",
+    enterpriseWebhookSimulatorTitle: "Enterprise Webhook Dispatch Simulator",
+    triggerTestAnomalyAlertBtn: "Trigger Test Anomaly Alert",
+    instancesCount: "Instances",
+    trialCostRecLimitTitle: "🔒 Cost recommendations are limited on the Trial tier.",
+    trialCostRecLimitDesc: "Upgrade to Small Business or higher to unlock multi-region latency modeling and Aurora Serverless optimization.",
+    unlockSmallTierBtn: "Unlock Small Business Tier",
+    graphqlResultPlaceholder: "// Execution result will appear here...",
+    trustServicesCriteriaSubtitle: "Trust Services Criteria Control Evidence",
+    overviewTab: "Overview",
+    tscControlsTab: "TSC Controls",
+    iamProofsTab: "IAM & Encryption Proofs",
+    downloadJsonPackageBtn: "Download JSON Package",
+    skipTourBtn: "✕ Skip",
+    subscriptionMarketplaceTitle: "Subscription Plan & AWS Marketplace Billing",
+    selectModeUpgrade: "Select mode to upgrade to",
+    awsAccountsLimit: "AWS Accounts Limit",
+    dbInstancesLimit: "DB Instances Limit",
+    includedEntitlements: "Included Entitlements:",
+    testSandboxModeBtn: "🧪 Test in Sandbox Mode (Instant & Free)",
+    confirmMarketplaceBillingBtn: "💳 Confirm AWS Marketplace Billing Subscription",
+    crossRegionReplicaRole: "CROSS-REGION REPLICA",
+    replicationLagLabel: "Replication Lag:",
+    failoverPriorityLabel: "Failover Priority:",
+    iopsThroughputLabel: "IOPS Throughput:",
+    nodeInspectorTitle: "🔍 Node Inspector:",
   },
   de: {
     dashboardTitle: "RDS Sentinel",
@@ -745,6 +800,33 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     signHipaaBaaBtn: "HIPAA BAA unterzeichnen",
     resignHipaaBaaBtn: "BAA erneut unterzeichnen",
     copyZeroDowntimeDdlBtn: "Ausfallfreie DDL kopieren",
+
+    triggerTestFailoverBtn: "⚡ Test-Failover-Simulation auslösen",
+    enterpriseWebhookSimulatorTitle: "Enterprise Webhook-Sende-Simulator",
+    triggerTestAnomalyAlertBtn: "Test-Anomalie-Warnung auslösen",
+    instancesCount: "Instanzen",
+    trialCostRecLimitTitle: "🔒 Kostenempfehlungen sind in der Testversion eingeschränkt.",
+    trialCostRecLimitDesc: "Upgraden Sie auf Small Business oder höher, um Multi-Regionen-Latenzmodellierung freizuschalten.",
+    unlockSmallTierBtn: "Small Business Tarif freischalten",
+    graphqlResultPlaceholder: "// Ausführungsergebnis erscheint hier...",
+    trustServicesCriteriaSubtitle: "Trust Services Criteria Kontrollnachweise",
+    overviewTab: "Übersicht",
+    tscControlsTab: "TSC-Kontrollen",
+    iamProofsTab: "IAM- & Verschlüsselungsnachweise",
+    downloadJsonPackageBtn: "JSON-Paket herunterladen",
+    skipTourBtn: "✕ Überspringen",
+    subscriptionMarketplaceTitle: "Abonnement-Tarif & AWS Marketplace-Abrechnung",
+    selectModeUpgrade: "Wählen Sie den Modus für das Upgrade auf",
+    awsAccountsLimit: "AWS-Konten-Limit",
+    dbInstancesLimit: "DB-Instanzen-Limit",
+    includedEntitlements: "Enthaltene Leistungen:",
+    testSandboxModeBtn: "🧪 Im Sandbox-Modus testen (Sofort & Kostenlos)",
+    confirmMarketplaceBillingBtn: "💳 AWS Marketplace-Abrechnungsabonnement bestätigen",
+    crossRegionReplicaRole: "REGIONENÜBERGREIFENDE REPLIK",
+    replicationLagLabel: "Replikationsverzögerung:",
+    failoverPriorityLabel: "Failover-Priorität:",
+    iopsThroughputLabel: "IOPS-Durchsatz:",
+    nodeInspectorTitle: "🔍 Knoten-Inspektor:",
   },
   fr: {
     dashboardTitle: "RDS Sentinel",
@@ -979,6 +1061,33 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     signHipaaBaaBtn: "Signer le BAA HIPAA",
     resignHipaaBaaBtn: "Resigner le BAA",
     copyZeroDowntimeDdlBtn: "Copier le DDL sans interruption",
+
+    triggerTestFailoverBtn: "⚡ Déclencher la simulation de basculement de test",
+    enterpriseWebhookSimulatorTitle: "Simulateur d'envoi de webhook d'entreprise",
+    triggerTestAnomalyAlertBtn: "Déclencher l'alerte d'anomalie de test",
+    instancesCount: "Instances",
+    trialCostRecLimitTitle: "🔒 Les recommandations de coûts sont limitées dans la version d'essai.",
+    trialCostRecLimitDesc: "Passez à Small Business ou supérieur pour déverrouiller la modélisation de latence multirégionale.",
+    unlockSmallTierBtn: "Débloquer le niveau Small Business",
+    graphqlResultPlaceholder: "// Le résultat de l'exécution apparaîtra ici...",
+    trustServicesCriteriaSubtitle: "Preuves de contrôle des critères de services de confiance",
+    overviewTab: "Aperçu",
+    tscControlsTab: "Contrôles TSC",
+    iamProofsTab: "Preuves IAM et de chiffrement",
+    downloadJsonPackageBtn: "Télécharger le paquet JSON",
+    skipTourBtn: "✕ Passer",
+    subscriptionMarketplaceTitle: "Plan d'abonnement et facturation AWS Marketplace",
+    selectModeUpgrade: "Sélectionnez le mode de mise à niveau vers",
+    awsAccountsLimit: "Limite de comptes AWS",
+    dbInstancesLimit: "Limite d'instances de BDD",
+    includedEntitlements: "Droits inclus :",
+    testSandboxModeBtn: "🧪 Tester en mode Sandbox (Instantanné & Gratuit)",
+    confirmMarketplaceBillingBtn: "💳 Confirmer l'abonnement à la facturation AWS Marketplace",
+    crossRegionReplicaRole: "RÉPLIQUE INTERRÉGIONALE",
+    replicationLagLabel: "Retard de réplication :",
+    failoverPriorityLabel: "Priorité de basculement :",
+    iopsThroughputLabel: "Débit IOPS :",
+    nodeInspectorTitle: "🔍 Inspecteur de nœud :",
   },
   ja: {
     dashboardTitle: "RDS Sentinel",
@@ -1213,6 +1322,33 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     signHipaaBaaBtn: "HIPAA BAAに署名",
     resignHipaaBaaBtn: "BAAに再署名",
     copyZeroDowntimeDdlBtn: "ゼロダウンタイムDDLをコピー",
+
+    triggerTestFailoverBtn: "⚡ テストフェイルオーバーシミュレーションを実行",
+    enterpriseWebhookSimulatorTitle: "エンタープライズ Webhook 送信シミュレーター",
+    triggerTestAnomalyAlertBtn: "テスト異常アラートをトリガー",
+    instancesCount: "インスタンス",
+    trialCostRecLimitTitle: "🔒 トライアルティアではコスト最適化提案が制限されています。",
+    trialCostRecLimitDesc: "マルチリージョン遅延モデリングを解放するには Small Business 以上にアップグレードしてください。",
+    unlockSmallTierBtn: "Small Business ティアを解放",
+    graphqlResultPlaceholder: "// 実行結果がここに表示されます...",
+    trustServicesCriteriaSubtitle: "信頼性サービス基準の統制証拠",
+    overviewTab: "概要",
+    tscControlsTab: "TSC統制",
+    iamProofsTab: "IAMおよび暗号化証明",
+    downloadJsonPackageBtn: "JSONパッケージをダウンロード",
+    skipTourBtn: "✕ スキップ",
+    subscriptionMarketplaceTitle: "サブスクリプション プランおよび AWS Marketplace 請求",
+    selectModeUpgrade: "アップグレードするモードを選択:",
+    awsAccountsLimit: "AWS アカウント上限",
+    dbInstancesLimit: "DB インスタンス上限",
+    includedEntitlements: "含まれる権利:",
+    testSandboxModeBtn: "🧪 サンドボックスモードでテスト（即時＆無料）",
+    confirmMarketplaceBillingBtn: "💳 AWS Marketplace 請求サブスクリプションを確定",
+    crossRegionReplicaRole: "クロスリージョン レプリカ",
+    replicationLagLabel: "レプリケーション遅延:",
+    failoverPriorityLabel: "フェイルオーバー優先度:",
+    iopsThroughputLabel: "IOPS スループット:",
+    nodeInspectorTitle: "🔍 ノード インスペクター:",
   },
 };
 

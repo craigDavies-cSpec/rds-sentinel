@@ -63,10 +63,10 @@ export function TopologyVisualizer({
                   <span className={`w-2 h-2 rounded-full ${isWriter ? "bg-aws-green animate-pulse" : "bg-aws-blue"}`} />
                   <span className="text-[9px] uppercase font-bold font-mono px-1 py-0.2 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-divider text-aws-lightTextSecondary dark:text-aws-textSecondary">
                     {node.role === "writer"
-                      ? "WRITER"
+                      ? t("writerRole", language)
                       : node.role === "cross-region-replica"
-                      ? "CROSS-REGION REPLICA"
-                      : "REPLICA"}
+                      ? t("crossRegionReplicaRole", language)
+                      : t("replicaRole", language)}
                   </span>
                 </div>
 
@@ -90,7 +90,7 @@ export function TopologyVisualizer({
           <div className="mt-2 p-2.5 bg-aws-lightBg dark:bg-aws-dark border border-aws-orange/40 rounded text-xs font-mono leading-relaxed animate-fade-in">
             <div className="flex justify-between items-center mb-1.5 pb-1 border-b border-aws-lightBorder dark:border-aws-divider">
               <span className="font-bold text-amber-800 dark:text-aws-orange text-[11px] uppercase">
-                🔍 Node Inspector: {selectedTopologyNode.name}
+                {t("nodeInspectorTitle", language)} {selectedTopologyNode.name}
               </span>
               <button
                 onClick={() => setSelectedTopologyNode(null)}
@@ -104,9 +104,9 @@ export function TopologyVisualizer({
               <div><span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">Engine:</span> <strong>{selectedTopologyNode.engine}</strong></div>
               <div><span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">{t("instanceClass", language)}:</span> <strong>{selectedTopologyNode.instanceClass}</strong></div>
               <div><span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">Region:</span> <strong>{selectedTopologyNode.region}</strong></div>
-              <div><span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">Failover Priority:</span> <strong>Tier-{selectedTopologyNode.failoverPriority}</strong></div>
-              <div><span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">Replication Lag:</span> <strong className="text-emerald-800 dark:text-emerald-400">{selectedTopologyNode.replicationLagMs}ms</strong></div>
-              <div><span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">IOPS Throughput:</span> <strong>{selectedTopologyNode.iops} IOPS</strong></div>
+              <div><span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">{t("failoverPriorityLabel", language)}</span> <strong>Tier-{selectedTopologyNode.failoverPriority}</strong></div>
+              <div><span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">{t("replicationLagLabel", language)}</span> <strong className="text-emerald-800 dark:text-emerald-400">{selectedTopologyNode.replicationLagMs}ms</strong></div>
+              <div><span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">{t("iopsThroughputLabel", language)}</span> <strong>{selectedTopologyNode.iops} IOPS</strong></div>
             </div>
           </div>
         )}

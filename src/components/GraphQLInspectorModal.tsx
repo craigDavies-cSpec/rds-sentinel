@@ -77,7 +77,7 @@ export function GraphQLInspectorModal({
               {t("jsonResultTitle", language)}
             </label>
             <pre className="w-full p-3 font-mono text-[11px] bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border rounded-lg text-emerald-600 dark:text-emerald-400 overflow-auto h-[290px]">
-              {graphQLResult || "// Execution result will appear here..."}
+              {graphQLResult || t("graphqlResultPlaceholder", language)}
             </pre>
           </div>
         </div>

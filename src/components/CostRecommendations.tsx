@@ -206,7 +206,7 @@ export function CostRecommendations({
               }}
               className="mt-2 w-full py-1 rounded bg-teal-800 hover:bg-teal-900 text-white text-[10px] font-bold cursor-pointer transition-all"
             >
-              ⚡ Trigger Test Failover Simulation
+              {t("triggerTestFailoverBtn", language)}
             </button>
           </div>
         )}
@@ -220,7 +220,7 @@ export function CostRecommendations({
                   Enterprise
                 </span>
                 <strong className="text-aws-lightTextPrimary dark:text-aws-textPrimary">
-                  Enterprise Webhook Dispatch Simulator
+                  {t("enterpriseWebhookSimulatorTitle", language)}
                 </strong>
               </div>
               <div className="flex gap-1">
@@ -261,7 +261,7 @@ export function CostRecommendations({
                 }}
                 className="px-3 py-1.5 rounded bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs cursor-pointer transition-all"
               >
-                Trigger Test Anomaly Alert
+                {t("triggerTestAnomalyAlertBtn", language)}
               </button>
               {webhookResult && (
                 <div id="webhook-dispatch-response" className="p-2 rounded bg-aws-lightBg dark:bg-aws-dark border border-purple-500/30 text-[10px] font-mono flex flex-col gap-1">
@@ -311,7 +311,7 @@ export function CostRecommendations({
               <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">
                 {t("dbInstancesManaged", language)}
               </span>
-              <span className="font-mono font-bold text-amber-800 dark:text-aws-orange">{roiDbCount} Instances</span>
+              <span className="font-mono font-bold text-amber-800 dark:text-aws-orange">{roiDbCount} {t("instancesCount", language)}</span>
             </div>
 
             <input
@@ -363,16 +363,16 @@ export function CostRecommendations({
         {tier === "trial" && (
           <div className="p-4 bg-aws-orange/10 border border-dashed border-aws-orange/30 rounded text-center">
             <p className="text-xs font-bold text-aws-lightTextPrimary dark:text-aws-textPrimary mb-1">
-              🔒 Cost recommendations are limited on the Trial tier.
+              {t("trialCostRecLimitTitle", language)}
             </p>
             <p className="text-[11px] text-aws-textSecondary mb-3">
-              Upgrade to Small Business or higher to unlock multi-region latency modeling and Aurora Serverless optimization.
+              {t("trialCostRecLimitDesc", language)}
             </p>
             <button
               onClick={() => handleTierClick("small")}
               className="px-4 py-1.5 bg-aws-orange hover:bg-aws-orangeHover text-aws-lightTextPrimary dark:text-aws-lightTextPrimary text-xs font-bold rounded shadow transition-all active:scale-95"
             >
-              Unlock Small Business Tier
+              {t("unlockSmallTierBtn", language)}
             </button>
           </div>
         )}

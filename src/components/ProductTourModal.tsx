@@ -77,7 +77,7 @@ export function ProductTourModal({
             }}
             className="text-xs font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary hover:text-aws-orange cursor-pointer px-1.5 py-0.5"
           >
-            ✕ Skip
+            {t("skipTourBtn", language)}
           </button>
         </div>
 

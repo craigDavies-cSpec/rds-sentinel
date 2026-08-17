@@ -36,7 +36,7 @@ export function EvidenceInspectorDrawer({
                 {t("evidenceDrawerTitle", language)}
               </h3>
               <p className="text-xs font-semibold text-purple-700 dark:text-purple-400">
-                Trust Services Criteria Control Evidence
+                {t("trustServicesCriteriaSubtitle", language)}
               </p>
               <span className="text-[10px] font-mono text-aws-lightTextSecondary dark:text-aws-textSecondary">
                 Package ID: {evidencePackage.auditId}
@@ -62,7 +62,7 @@ export function EvidenceInspectorDrawer({
                 : "text-aws-lightTextSecondary dark:text-aws-textSecondary hover:text-aws-orange"
             }`}
           >
-            Overview
+            {t("overviewTab", language)}
           </button>
           <button
             onClick={() => setActiveTab("controls")}
@@ -72,7 +72,7 @@ export function EvidenceInspectorDrawer({
                 : "text-aws-lightTextSecondary dark:text-aws-textSecondary hover:text-aws-orange"
             }`}
           >
-            TSC Controls ({evidencePackage.trustServicesCriteria.length})
+            {t("tscControlsTab", language)} ({evidencePackage.trustServicesCriteria.length})
           </button>
           <button
             onClick={() => setActiveTab("proofs")}
@@ -82,7 +82,7 @@ export function EvidenceInspectorDrawer({
                 : "text-aws-lightTextSecondary dark:text-aws-textSecondary hover:text-aws-orange"
             }`}
           >
-            IAM & Encryption Proofs
+            {t("iamProofsTab", language)}
           </button>
         </div>
 
@@ -155,7 +155,7 @@ export function EvidenceInspectorDrawer({
             onClick={() => downloadAuditEvidencePackageFile(evidencePackage)}
             className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-lg shadow cursor-pointer transition-all active:scale-95"
           >
-            Download JSON Package
+            {t("downloadJsonPackageBtn", language)}
           </button>
         </div>
       </div>

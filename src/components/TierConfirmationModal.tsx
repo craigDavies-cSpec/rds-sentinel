@@ -2,6 +2,7 @@
 
 import React from "react";
 import { TierType, TIER_PRICING_PLANS, calculateTierProration } from "@/lib/accountSettings";
+import { t, LanguageCode } from "@/lib/localization";
 
 interface TierConfirmationModalProps {
   isOpen: boolean;
@@ -9,6 +10,7 @@ interface TierConfirmationModalProps {
   currentTier: TierType;
   pendingTier: TierType;
   onConfirmTier: (tier: TierType, mode: "sandbox" | "marketplace") => void;
+  language: LanguageCode;
 }
 
 export function TierConfirmationModal({
@@ -17,6 +19,7 @@ export function TierConfirmationModal({
   currentTier,
   pendingTier,
   onConfirmTier,
+  language,
 }: TierConfirmationModalProps) {
   if (!isOpen) return null;
 
@@ -32,10 +35,10 @@ export function TierConfirmationModal({
             <span className="text-xl">💳</span>
             <div>
               <h3 className="font-bold text-sm text-aws-lightTextPrimary dark:text-aws-textPrimary">
-                Subscription Plan & AWS Marketplace Billing
+                {t("subscriptionMarketplaceTitle", language)}
               </h3>
               <span className="text-xs text-aws-lightTextSecondary dark:text-aws-textSecondary">
-                Select mode to upgrade to {targetPlan.name} (${targetPlan.monthlyPrice}/mo)
+                {t("selectModeUpgrade", language)} {targetPlan.name} (${targetPlan.monthlyPrice}/mo)
               </span>
             </div>
           </div>
@@ -69,13 +72,13 @@ export function TierConfirmationModal({
           {/* Multi-Account & Instance Capacity Limits */}
           <div className="grid grid-cols-2 gap-2 text-xs font-mono">
             <div className="p-2 bg-aws-lightContainer dark:bg-aws-container rounded border border-aws-lightBorder dark:border-aws-border">
-              <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary block uppercase font-bold">AWS Accounts Limit</span>
+              <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary block uppercase font-bold">{t("awsAccountsLimit", language)}</span>
               <strong className="text-sky-800 dark:text-sky-400">
                 {pendingTier === "enterprise" ? "Unlimited (AWS Orgs)" : pendingTier === "medium" ? "Up to 3 Accounts" : "1 Account"}
               </strong>
             </div>
             <div className="p-2 bg-aws-lightContainer dark:bg-aws-container rounded border border-aws-lightBorder dark:border-aws-border">
-              <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary block uppercase font-bold">DB Instances Limit</span>
+              <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary block uppercase font-bold">{t("dbInstancesLimit", language)}</span>
               <strong className="text-emerald-800 dark:text-emerald-400">
                 {pendingTier === "enterprise" ? "50 DBs Included (+ Metered)" : `Max ${targetPlan.maxInstances} DBs`}
               </strong>
@@ -84,7 +87,7 @@ export function TierConfirmationModal({
 
           {/* Features List */}
           <div className="flex flex-col gap-1 pt-1 text-xs">
-            <span className="text-[10px] font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary uppercase">Included Entitlements:</span>
+            <span className="text-[10px] font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary uppercase">{t("includedEntitlements", language)}</span>
             {targetPlan.features.map((feat, idx) => (
               <div key={idx} className="flex items-center gap-2 text-[11px]">
                 <span className="text-emerald-800 dark:text-emerald-400 font-bold">✓</span>
@@ -101,7 +104,7 @@ export function TierConfirmationModal({
             onClick={() => onConfirmTier(pendingTier, "sandbox")}
             className="w-full py-2.5 rounded bg-aws-orange hover:bg-aws-orangeHover text-aws-lightTextPrimary font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
-            🧪 Test in Sandbox Mode (Instant & Free)
+            {t("testSandboxModeBtn", language)}
           </button>
 
           <button
@@ -109,7 +112,7 @@ export function TierConfirmationModal({
             onClick={() => onConfirmTier(pendingTier, "marketplace")}
             className="w-full py-2.5 rounded bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
-            💳 Confirm AWS Marketplace Billing Subscription (${targetPlan.monthlyPrice}/mo)
+            {t("confirmMarketplaceBillingBtn", language)} (${targetPlan.monthlyPrice}/mo)
           </button>
         </div>
       </div>

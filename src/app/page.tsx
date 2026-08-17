@@ -481,6 +481,7 @@ export default function Dashboard() {
         onClose={() => setIsTierModalOpen(false)}
         currentTier={tier}
         pendingTier={pendingTier}
+        language={language}
         onConfirmTier={(tierCode, mode) => {
           setTier(tierCode);
           setIsTierModalOpen(false);
