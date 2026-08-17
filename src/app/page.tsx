@@ -468,13 +468,39 @@ export default function Dashboard() {
     runQueueSimulation();
   }, [tickCount, isDbEndpointOnline, selectedDb, customIngestionUrl]);
 
-  // Compute total monthly database cost & savings recommendations
-  const totalCost = 1420; // Simulated current AWS base cost
-  const activeRecommendations = MOCK_RECOMMENDATIONS.filter(rec => {
-    if (tier === "trial") return rec.type === "downsize";
-    if (tier === "small") return rec.type === "downsize" || rec.type === "serverless";
-    return true; // Medium/Enterprise get all recommendations
-  });
+  // Account-dynamic filtering for recommendations, slow queries, logs, and base DB cost
+  const filteredRecommendations = useMemo(() => {
+    const activeDbIds = new Set(filteredInstances.map((d) => d.id));
+    return MOCK_RECOMMENDATIONS.filter((rec) => activeDbIds.has(rec.dbInstanceId));
+  }, [filteredInstances]);
+
+  const activeRecommendations = useMemo(() => {
+    return filteredRecommendations.filter((rec) => {
+      if (tier === "trial") return rec.type === "downsize";
+      if (tier === "small") return rec.type === "downsize" || rec.type === "serverless";
+      return true;
+    });
+  }, [filteredRecommendations, tier]);
+
+  const totalCost = useMemo(() => {
+    return filteredInstances.reduce((sum, inst) => {
+      if (inst.class.includes("2xlarge")) return sum + 540;
+      if (inst.class.includes("xlarge")) return sum + 270;
+      if (inst.class.includes("medium")) return sum + 70;
+      if (inst.class.includes("micro")) return sum + 14;
+      return sum + 100;
+    }, 0);
+  }, [filteredInstances]);
+
+  const filteredSlowQueries = useMemo(() => {
+    const activeDbIds = new Set(filteredInstances.map((d) => d.id));
+    return MOCK_SLOW_QUERIES.filter((q) => activeDbIds.has(q.dbInstanceId));
+  }, [filteredInstances]);
+
+  const filteredLogs = useMemo(() => {
+    const activeDbIds = new Set(filteredInstances.map((d) => d.id));
+    return MOCK_LOGS.filter((l) => activeDbIds.has(l.dbInstanceId));
+  }, [filteredInstances]);
 
   const potentialSavings = activeRecommendations
     .filter(rec => rec.costDelta < 0)
@@ -1241,7 +1267,7 @@ export default function Dashboard() {
             </p>
 
             <div className="flex flex-col gap-3">
-              {MOCK_SLOW_QUERIES.map((q) => {
+              {filteredSlowQueries.map((q) => {
                 const rec = analyzeSlowQuery(q);
                 const isExpanded = activeAdvisorQueryId === q.id;
                 const isCopied = copiedDdlQueryId === q.id;
@@ -1346,7 +1372,7 @@ export default function Dashboard() {
               </div>
             ) : (
               <div className="flex flex-col gap-3">
-                {MOCK_LOGS.map((log) => (
+                {filteredLogs.map((log) => (
                   <div key={log.id} className="p-2.5 bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border rounded text-[11px] font-mono leading-relaxed">
                     <div className="flex justify-between items-center mb-1">
                       <span className={`px-1 rounded text-[9px] font-bold ${

@@ -113,6 +113,21 @@ export function getClusterTopology(accountId: string = "all"): ClusterTopologyDa
       cpuLoad: 12,
       accountId: "987654321098",
     },
+    {
+      id: "node-cspec-live",
+      name: "free-tier-sandbox-db (Primary)",
+      role: "writer",
+      engine: "RDS PostgreSQL 16.1",
+      region: "eu-west-1 (Ireland)",
+      instanceClass: "db.t4g.micro",
+      status: "healthy",
+      replicationLagMs: 0,
+      failoverPriority: 0,
+      iops: 300,
+      connections: 6,
+      cpuLoad: 18,
+      accountId: "616399034957",
+    },
   ];
 
   const filteredNodes = accountId === "all" 

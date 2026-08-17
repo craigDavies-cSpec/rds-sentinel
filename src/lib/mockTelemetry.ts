@@ -20,6 +20,7 @@ export interface DBInstance {
 export interface CostRecommendation {
   id: string;
   dbInstanceId: string;
+  accountId?: string;
   type: "downsize" | "upsize" | "serverless" | "replica";
   title: string;
   impact: string;
@@ -30,6 +31,7 @@ export interface CostRecommendation {
 export interface SlowQuery {
   id: string;
   dbInstanceId: string;
+  accountId?: string;
   timestamp: string;
   durationMs: number;
   rawSql: string;
@@ -40,6 +42,7 @@ export interface SlowQuery {
 export interface DatabaseLog {
   id: string;
   dbInstanceId: string;
+  accountId?: string;
   timestamp: string;
   level: "INFO" | "WARNING" | "ERROR";
   message: string;
@@ -135,6 +138,7 @@ export const MOCK_RECOMMENDATIONS: CostRecommendation[] = [
   {
     id: "rec-1",
     dbInstanceId: "db-billing-rds",
+    accountId: "123456789012",
     type: "downsize",
     title: "Downsize Over-provisioned DB Instance",
     impact: "Highly Recommended",
@@ -144,6 +148,7 @@ export const MOCK_RECOMMENDATIONS: CostRecommendation[] = [
   {
     id: "rec-2",
     dbInstanceId: "db-dev-sandbox",
+    accountId: "987654321098",
     type: "serverless",
     title: "Migrate Dev Sandbox to Aurora Serverless v2",
     impact: "Medium Impact",
@@ -153,6 +158,7 @@ export const MOCK_RECOMMENDATIONS: CostRecommendation[] = [
   {
     id: "rec-3",
     dbInstanceId: "db-prod-aurora",
+    accountId: "123456789012",
     type: "replica",
     title: "Add Aurora Read Replica in us-west-2 (Oregon)",
     impact: "Performance Booster",
@@ -162,11 +168,22 @@ export const MOCK_RECOMMENDATIONS: CostRecommendation[] = [
   {
     id: "rec-4",
     dbInstanceId: "db-prod-aurora",
+    accountId: "123456789012",
     type: "upsize",
     title: "Enable Multi-AZ Standby Deployment",
     impact: "Reliability Focus",
     costDelta: 240.00, // Costs +$240/mo
     reason: "sales-db-prod is a single-node setup containing production data. Enabling Multi-AZ Standby provides automatic failover, SLA backup, and zero downtime for maintenance windows.",
+  },
+  {
+    id: "rec-5",
+    dbInstanceId: "db-cspec-live",
+    accountId: "616399034957",
+    type: "downsize",
+    title: "AWS Free Tier Optimization Verified",
+    impact: "Optimal Baseline",
+    costDelta: 0,
+    reason: "free-tier-sandbox-db is running on db.t4g.micro under AWS Free Tier ($0/mo). CPU load is healthy (18%) and storage utilization is optimal.",
   }
 ];
 
@@ -174,27 +191,38 @@ export const MOCK_RECOMMENDATIONS: CostRecommendation[] = [
 const RAW_SLOW_QUERIES_DATA = [
   {
     dbInstanceId: "db-prod-aurora",
+    accountId: "123456789012",
     durationMs: 3420,
     rawSql: "SELECT * FROM users WHERE email = 'craig.davies@example.com' AND password_hash = '$2b$12$LhO2n19.c3k54yG.g41mReK7z2u'",
     waitEvent: "io:BufFileWrite",
   },
   {
     dbInstanceId: "db-billing-rds",
+    accountId: "123456789012",
     durationMs: 5120,
     rawSql: "INSERT INTO credit_cards (user_id, card_number, cvc, billing_zip) VALUES (88412, '1111-2222-3333-4444', '312', '90210')",
     waitEvent: "lock:TransactionLock",
   },
   {
     dbInstanceId: "db-prod-aurora",
+    accountId: "123456789012",
     durationMs: 2890,
     rawSql: "SELECT order_id, card_token FROM orders JOIN payments ON orders.id = payments.order_id WHERE card_token = 'tok_secure_99f2a481' LIMIT 50",
     waitEvent: "cpu:ExecuteQuery",
   },
   {
     dbInstanceId: "db-dev-sandbox",
+    accountId: "987654321098",
     durationMs: 1450,
     rawSql: "SELECT * FROM test_accounts WHERE dev_flag = 1 AND access_key = 'AKIAIOSFODNN7EXAMPLE'",
     waitEvent: "io:TableScan",
+  },
+  {
+    dbInstanceId: "db-cspec-live",
+    accountId: "616399034957",
+    durationMs: 1120,
+    rawSql: "SELECT instance_id, cpu_utilization FROM live_telemetry WHERE account_id = '616399034957' ORDER BY timestamp DESC LIMIT 10",
+    waitEvent: "io:BufFileRead",
   }
 ];
 
@@ -203,6 +231,7 @@ const STATIC_BASE_TIME = new Date("2026-08-13T06:00:00.000Z").getTime();
 export const MOCK_SLOW_QUERIES: SlowQuery[] = RAW_SLOW_QUERIES_DATA.map((q, idx) => ({
   id: `q-${idx}`,
   dbInstanceId: q.dbInstanceId,
+  accountId: q.accountId,
   timestamp: new Date(STATIC_BASE_TIME - idx * 20 * 60 * 1000).toISOString(),
   durationMs: q.durationMs,
   rawSql: q.rawSql,
@@ -214,33 +243,42 @@ export const MOCK_SLOW_QUERIES: SlowQuery[] = RAW_SLOW_QUERIES_DATA.map((q, idx)
 const RAW_LOGS_DATA = [
   {
     dbInstanceId: "db-billing-rds",
+    accountId: "123456789012",
     level: "ERROR" as const,
     message: "2026-08-11 10:15:32 [ERROR] Too many connections open. Max connections limit (150) reached for database connection client 'billing-service-user' at 192.168.1.42",
   },
   {
     dbInstanceId: "db-prod-aurora",
+    accountId: "123456789012",
     level: "WARNING" as const,
     message: "2026-08-11 10:20:12 [WARNING] Long-running transaction detected. PostgreSQL backend PID 2381 holding lock on table 'orders' for 180 seconds. Client email: admin@cspec.uk",
   },
   {
     dbInstanceId: "db-prod-aurora",
+    accountId: "123456789012",
     level: "ERROR" as const,
     message: "2026-08-11 10:22:45 [ERROR] Deadlock detected. Process 14822 waiting for ShareLock on transaction 8812; blocked by process 14890. SQL: UPDATE balances SET amount = 145.00 WHERE user_id = 99812",
   },
   {
     dbInstanceId: "db-dev-sandbox",
+    accountId: "987654321098",
     level: "INFO" as const,
     message: "2026-08-11 10:24:00 [INFO] Vacuum process cleaned 184 dead tuples in database 'dev_sandbox'",
+  },
+  {
+    dbInstanceId: "db-cspec-live",
+    accountId: "616399034957",
+    level: "INFO" as const,
+    message: "2026-08-17 07:00:00 [INFO] STS AssumeRole monitoring session active for account 616399034957 (eu-west-1). Live telemetry pulse healthy.",
   }
 ];
 
 export const MOCK_LOGS: DatabaseLog[] = RAW_LOGS_DATA.map((l, idx) => ({
   id: `log-${idx}`,
   dbInstanceId: l.dbInstanceId,
+  accountId: l.accountId,
   timestamp: new Date(Date.now() - idx * 15 * 60 * 1000).toISOString(),
   level: l.level,
   message: l.message,
-  maskedMessage: l.message.replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, "[REDACTED_EMAIL]")
-    .replace(/(?<=user_id\s*=\s*)\d+/i, "?")
-    .replace(/(?<=balances\s*SET\s*amount\s*=\s*)\d+\.\d+/i, "?")
+  maskedMessage: l.message.replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, "[REDACTED_EMAIL]"),
 }));

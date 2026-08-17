@@ -3,7 +3,7 @@ import { getClusterTopology } from "../clusterTopology";
 describe("clusterTopology module", () => {
   it("should return all nodes when accountId is 'all'", () => {
     const topology = getClusterTopology("all");
-    expect(topology.nodes.length).toBe(5);
+    expect(topology.nodes.length).toBe(6);
     expect(topology.primaryClusterId).toBe("aurora-prod-cluster-01");
     expect(topology.failoverReadinessPct).toBeGreaterThan(80);
   });
@@ -16,6 +16,10 @@ describe("clusterTopology module", () => {
     const stagingTopology = getClusterTopology("987654321098");
     expect(stagingTopology.nodes.length).toBe(2);
     expect(stagingTopology.nodes.every((n) => n.accountId === "987654321098")).toBe(true);
+
+    const liveTopology = getClusterTopology("616399034957");
+    expect(liveTopology.nodes.length).toBe(1);
+    expect(liveTopology.nodes[0].name).toContain("free-tier-sandbox-db");
   });
 
   it("should return valid replication links connecting writer and reader nodes", () => {
