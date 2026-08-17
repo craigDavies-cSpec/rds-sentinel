@@ -1,6 +1,7 @@
 import {
   scanAwsOrganizationsForDatabases,
   generateHipaaBaaAgreement,
+  discoverAwsOrganizationsAccountsAndDatabases,
 } from "../agentBacklogEnhancements";
 
 describe("agentBacklogEnhancements module", () => {
@@ -9,6 +10,16 @@ describe("agentBacklogEnhancements module", () => {
     expect(discovered.length).toBe(2);
     expect(discovered[0].name).toBe("fintech-payment-vault-db");
     expect(discovered[0].status).toBe("discovered");
+  });
+
+  it("should execute full AWS Organizations tree scan and SCP policy verification", () => {
+    const orgResult = discoverAwsOrganizationsAccountsAndDatabases("arn:aws:organizations::616399034957:organization/o-cspec2026org");
+    expect(orgResult.scpsEnforced).toBe(true);
+    expect(orgResult.discoveredAccountsCount).toBe(3);
+    expect(orgResult.scpPolicies.length).toBe(3);
+    expect(orgResult.scpPolicies[0].name).toBe("SCP-DenyUnencryptedRDSStorage");
+    expect(orgResult.discoveredDatabases.length).toBe(3);
+    expect(orgResult.discoveredDatabases[0].name).toBe("fintech-vault-aurora");
   });
 
   it("should generate executed HIPAA BAA agreement package", () => {

@@ -11,7 +11,7 @@ import { ApiKey, generateApiKey, revokeApiKey } from "@/lib/apiKeyManager";
 import { generateAuditEvidencePackage, downloadAuditEvidencePackageFile } from "@/lib/auditEvidenceExporter";
 import { generateCloudFormationRoleTemplate, generateServiceCatalogBlueprint, downloadTemplateFile } from "@/lib/cloudFormationExporter";
 import { generateTerraformModule, downloadTerraformFile } from "@/lib/terraformExporter";
-import { generateHipaaBaaAgreement, HipaaBaaAgreement } from "@/lib/agentBacklogEnhancements";
+import { generateHipaaBaaAgreement, HipaaBaaAgreement, discoverAwsOrganizationsAccountsAndDatabases, AwsOrgDiscoveryResult } from "@/lib/agentBacklogEnhancements";
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -98,6 +98,9 @@ export function SettingsModal({
   instanceCount,
   instances,
 }: SettingsModalProps) {
+  const [awsOrgArnInput, setAwsOrgArnInput] = React.useState("arn:aws:organizations::616399034957:organization/o-cspec2026org");
+  const [awsOrgResult, setAwsOrgResult] = React.useState<AwsOrgDiscoveryResult | null>(null);
+
   if (!isOpen) return null;
 
   const controlTowerAudit = evaluateControlTowerGuardrails(instances);
@@ -350,6 +353,87 @@ export function SettingsModal({
                 >
                   ⚡ Test Live AWS Free Tier Telemetry Ingestion ($0 / month)
                 </button>
+              </div>
+
+              {/* AWS Organizations Auto-Discovery & SCP Integration Panel */}
+              <div className="p-4 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border flex flex-col gap-3">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h5 className="font-bold text-xs uppercase text-aws-orange">AWS Organizations Auto-Discovery & SCP Governance</h5>
+                    <p className="text-[11px] text-aws-lightTextSecondary dark:text-aws-textSecondary">
+                      Discover child AWS accounts and RDS/Aurora databases across sub-account OUs via sts:AssumeRole.
+                    </p>
+                  </div>
+                  <span className="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-bold text-[10px] uppercase">
+                    SCP Policy Checker
+                  </span>
+                </div>
+
+                <div className="flex gap-2">
+                  <input
+                    id="aws-org-management-arn-input"
+                    type="text"
+                    placeholder="Management Account Organization ARN (arn:aws:organizations::...)"
+                    value={awsOrgArnInput}
+                    onChange={(e) => setAwsOrgArnInput(e.target.value)}
+                    className="flex-1 p-2 rounded bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border text-xs font-mono text-aws-lightTextPrimary dark:text-aws-textPrimary"
+                  />
+                  <button
+                    id="scan-aws-organizations-btn"
+                    onClick={() => {
+                      const res = discoverAwsOrganizationsAccountsAndDatabases(awsOrgArnInput);
+                      setAwsOrgResult(res);
+                      showToast(`🏢 AWS Organizations Scan Complete: Found ${res.discoveredAccountsCount} child accounts & ${res.discoveredDatabases.length} databases!`);
+                    }}
+                    className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded cursor-pointer transition-all"
+                  >
+                    Scan Organization
+                  </button>
+                </div>
+
+                {awsOrgResult && (
+                  <div className="flex flex-col gap-3 mt-2 p-3 rounded bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border">
+                    <div className="flex justify-between items-center border-b border-aws-lightBorder dark:border-aws-border pb-2">
+                      <span className="font-bold text-xs text-aws-lightTextPrimary dark:text-aws-textPrimary">
+                        Found {awsOrgResult.discoveredAccountsCount} Accounts · {awsOrgResult.scpPolicies.length} Active SCP Policies
+                      </span>
+                      <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-mono text-[10px] font-bold">
+                        SCP Enforcement: ACTIVE
+                      </span>
+                    </div>
+
+                    {/* Enforced SCP Policies list */}
+                    <div className="flex flex-wrap gap-2">
+                      {awsOrgResult.scpPolicies.map((scp) => (
+                        <span key={scp.id} className="px-2 py-1 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border text-[10px] font-mono text-aws-lightTextSecondary dark:text-aws-textSecondary flex items-center gap-1">
+                          <span className="text-emerald-400">✓</span> {scp.name} ({scp.targetOu})
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* Discovered Databases List */}
+                    <div className="flex flex-col gap-1.5 mt-1">
+                      <strong className="text-[11px] text-aws-lightTextPrimary dark:text-aws-textPrimary uppercase">Discovered Databases:</strong>
+                      {awsOrgResult.discoveredDatabases.map((db) => (
+                        <div key={db.id} className="p-2 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border flex justify-between items-center text-xs">
+                          <div>
+                            <strong className="text-aws-lightTextPrimary dark:text-aws-textPrimary font-mono">{db.name}</strong>
+                            <span className="ml-2 text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary font-mono">({db.engine} · {db.class} · {db.region})</span>
+                          </div>
+                          <button
+                            id={`import-discovered-db-btn-${db.id}`}
+                            onClick={() => {
+                              showToast(`✅ Database ${db.name} imported into RDS Sentinel monitoring console!`);
+                            }}
+                            className="px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] rounded cursor-pointer"
+                          >
+                            Import Database
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}

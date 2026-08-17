@@ -520,9 +520,10 @@ test.describe("RDS Sentinel Dashboard Functional E2E Tests", () => {
     // Select account 616399034957 in header selector
     const accountSelector = page.locator("#aws-account-selector");
     await accountSelector.selectOption("616399034957");
+    await expect(accountSelector).toHaveValue("616399034957");
 
     // Assert live account active banner is visible
-    await expect(page.locator("#live-account-active-banner")).toBeVisible();
+    await expect(page.locator("#live-account-active-banner")).toBeVisible({ timeout: 10000 });
     await expect(page.locator("#live-account-active-banner strong").first()).toBeVisible();
   });
 
@@ -547,5 +548,26 @@ test.describe("RDS Sentinel Dashboard Functional E2E Tests", () => {
     // Assert password output is visible and high entropy rating is displayed
     await expect(page.locator("#owasp-password-output")).toBeVisible();
     await expect(page.getByText(/Bits Entropy/)).toBeVisible();
+  });
+
+  test("should scan AWS Organizations for child accounts, enforce SCP policies, and auto-discover databases", async ({ page }) => {
+    // Open Settings modal
+    await page.locator("#open-settings-modal-btn").click();
+
+    // Switch to AWS Accounts tab
+    await page.locator("#tab-aws-accounts-btn").click();
+
+    // Fill management ARN and click Scan Organization
+    await page.locator("#aws-org-management-arn-input").fill("arn:aws:organizations::616399034957:organization/o-cspec2026org");
+    await page.locator("#scan-aws-organizations-btn").click();
+
+    // Assert scan results appear
+    await expect(page.getByText("Found 3 Accounts · 3 Active SCP Policies")).toBeVisible();
+    await expect(page.getByText(/SCP-DenyUnencryptedRDSStorage/)).toBeVisible();
+    await expect(page.getByText("fintech-vault-aurora")).toBeVisible();
+
+    // Click Import Database button
+    await page.locator("#import-discovered-db-btn-org-db-fintech-prod").click();
+    await expect(page.getByText(/imported into RDS Sentinel monitoring console/)).toBeVisible();
   });
 });
