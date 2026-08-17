@@ -99,7 +99,7 @@ export function HeaderToolbar({
             <span className="text-aws-lightTextPrimary dark:text-aws-textPrimary font-semibold text-lg">Sentinel</span>
           </div>
           <span className="text-[10px] px-2 py-0.5 rounded bg-aws-orange/15 text-amber-800 dark:text-aws-orange border border-aws-orange/20 font-bold uppercase tracking-wider hidden sm:inline-block">
-            AWS Marketplace Partner
+            {t("partnerBadge", language)}
           </span>
 
           {/* Phase 7: Dual Mode Switcher Toggle */}
@@ -109,7 +109,7 @@ export function HeaderToolbar({
             className="px-2 py-0.5 rounded bg-aws-orange/10 hover:bg-aws-orange/20 border border-aws-orange/30 text-amber-900 dark:text-aws-orange text-[10px] font-bold transition-all cursor-pointer flex items-center gap-1"
             title="Toggle between Mode A (Standalone SaaS Console) and Mode B (AWS Management Console Extension)"
           >
-            {appMode === "mode_a" ? "🌐 Mode A: SaaS" : "⚡ Mode B: AWS Extension"}
+            {appMode === "mode_a" ? t("modeA", language) : t("modeB", language)}
           </button>
         </div>
 
@@ -224,7 +224,7 @@ export function HeaderToolbar({
             className="px-2.5 py-1.5 rounded bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/10 border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs font-bold transition-all shadow-sm cursor-pointer"
             title="Toggle Theme"
           >
-            {isDarkMode ? "☀️ Light" : "🌙 Dark"}
+            {isDarkMode ? "☀️ " + t("lightTheme", language) : "🌙 " + t("darkTheme", language)}
           </button>
         </div>
       </div>
@@ -244,7 +244,7 @@ export function HeaderToolbar({
                 onChange={(e) => setSelectedAccountId(e.target.value)}
                 className="px-2 py-1 rounded bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs font-bold transition-all shadow-sm cursor-pointer hover:border-aws-orange"
               >
-                <option value="ALL_ACCOUNTS">All AWS Accounts ({instances.length} DBs)</option>
+                <option value="ALL_ACCOUNTS">{t("allAccounts", language)} ({instances.length} DBs)</option>
                 {linkedAccounts.map((acc) => (
                   <option key={acc.id} value={acc.id}>
                     {acc.accountName} ({acc.id})

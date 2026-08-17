@@ -118,7 +118,7 @@ export function SettingsModal({
                 {t("settingsModalTitle", language)}
               </h3>
               <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary">
-                Manage AWS Sub-Accounts, Notification Preferences & Tier Billing
+                {t("settingsSubtitle", language)}
               </span>
             </div>
           </div>
@@ -186,10 +186,10 @@ export function SettingsModal({
             <div className="flex flex-col gap-6">
               <div className="flex flex-col gap-1 border-b border-aws-lightBorder dark:border-aws-border pb-3">
                 <h4 className="font-bold text-sm text-aws-lightTextPrimary dark:text-aws-textPrimary">
-                  Dashboard Display & Notification Preferences
+                  {t("displayNotificationPref", language)}
                 </h4>
                 <p className="text-[11px] text-aws-lightTextSecondary dark:text-aws-textSecondary">
-                  Customize theme colors, polling refresh intervals, and alert frequencies.
+                  {t("displayPreferencesSubtitle", language)}
                 </p>
               </div>
 
@@ -216,7 +216,7 @@ export function SettingsModal({
                 {/* Accent Theme Picker */}
                 <div className="flex flex-col gap-1.5 p-3 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border">
                   <label className="font-bold text-aws-lightTextPrimary dark:text-aws-textPrimary">
-                    Accent Color Theme
+                    {t("accentColorTheme", language)}
                   </label>
                   <div className="flex gap-2">
                     {ACCENT_THEMES.map((th) => (
@@ -244,10 +244,10 @@ export function SettingsModal({
             <div className="flex flex-col gap-6">
               <div className="flex flex-col gap-1 border-b border-aws-lightBorder dark:border-aws-border pb-3">
                 <h4 className="font-bold text-sm text-aws-lightTextPrimary dark:text-aws-textPrimary">
-                  Linked AWS Sub-Accounts & Monitored Databases
+                  {t("linkedSubAccounts", language)}
                 </h4>
                 <p className="text-[11px] text-aws-lightTextSecondary dark:text-aws-textSecondary">
-                  Manage cross-account IAM monitoring roles and test STS AssumeRole connectivity.
+                  {t("linkedAccountsSubtitle", language)}
                 </p>
               </div>
 
@@ -268,7 +268,7 @@ export function SettingsModal({
 
               {/* IAM Connection Tester Form */}
               <div className="p-4 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border flex flex-col gap-3">
-                <h5 className="font-bold text-xs uppercase text-aws-orange">Test AWS STS AssumeRole Connection</h5>
+                <h5 className="font-bold text-xs uppercase text-aws-orange">{t("testStsConnection", language)}</h5>
                 <div className="grid grid-cols-2 gap-3">
                   <input
                     type="text"
@@ -296,7 +296,7 @@ export function SettingsModal({
                   }}
                   className="py-2 bg-aws-orange hover:bg-aws-orangeHover text-white font-bold text-xs rounded cursor-pointer transition-all"
                 >
-                  Test STS Connection
+                  {t("testStsBtn", language)}
                 </button>
 
                 {iamTestStatus && (
@@ -309,7 +309,7 @@ export function SettingsModal({
               {/* IaC Template Exporters */}
               <div className="p-4 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border flex flex-col gap-2">
                 <h5 className="font-bold text-xs uppercase text-aws-lightTextPrimary dark:text-aws-textPrimary">
-                  CloudFormation & AWS Service Catalog IaC Infrastructure Exports
+                  {t("iacExportsTitle", language)}
                 </h5>
                 <div className="flex gap-2">
                   <button
@@ -351,7 +351,7 @@ export function SettingsModal({
                   }}
                   className="w-full py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded cursor-pointer transition-all flex items-center justify-center gap-2 mt-2"
                 >
-                  ⚡ Test Live AWS Free Tier Telemetry Ingestion ($0 / month)
+                  {t("testLiveIngestionBtn", language)}
                 </button>
               </div>
 
@@ -359,9 +359,9 @@ export function SettingsModal({
               <div className="p-4 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border flex flex-col gap-3">
                 <div className="flex justify-between items-center">
                   <div>
-                    <h5 className="font-bold text-xs uppercase text-aws-orange">AWS Organizations Auto-Discovery & SCP Governance</h5>
+                    <h5 className="font-bold text-xs uppercase text-aws-orange">{t("awsOrgTitle", language)}</h5>
                     <p className="text-[11px] text-aws-lightTextSecondary dark:text-aws-textSecondary">
-                      Discover child AWS accounts and RDS/Aurora databases across sub-account OUs via sts:AssumeRole.
+                      {t("awsOrgSubtitle", language)}
                     </p>
                   </div>
                   <span className="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-bold text-[10px] uppercase">
@@ -387,7 +387,7 @@ export function SettingsModal({
                     }}
                     className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded cursor-pointer transition-all"
                   >
-                    Scan Organization
+                    {t("scanOrgBtn", language)}
                   </button>
                 </div>
 
@@ -413,7 +413,7 @@ export function SettingsModal({
 
                     {/* Discovered Databases List */}
                     <div className="flex flex-col gap-1.5 mt-1">
-                      <strong className="text-[11px] text-aws-lightTextPrimary dark:text-aws-textPrimary uppercase">Discovered Databases:</strong>
+                      <strong className="text-[11px] text-aws-lightTextPrimary dark:text-aws-textPrimary uppercase">{t("discoveredDbsTitle", language)}</strong>
                       {awsOrgResult.discoveredDatabases.map((db) => (
                         <div key={db.id} className="p-2 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border flex justify-between items-center text-xs">
                           <div>
@@ -427,7 +427,7 @@ export function SettingsModal({
                             }}
                             className="px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] rounded cursor-pointer"
                           >
-                            Import Database
+                            {t("importDbBtn", language)}
                           </button>
                         </div>
                       ))}
@@ -443,10 +443,10 @@ export function SettingsModal({
             <div className="flex flex-col gap-6">
               <div className="flex flex-col gap-1 border-b border-aws-lightBorder dark:border-aws-border pb-3">
                 <h4 className="font-bold text-sm text-aws-lightTextPrimary dark:text-aws-textPrimary">
-                  RDS Sentinel SaaS Subscription & Billing Portal
+                  {t("subscriptionBillingPortal", language)}
                 </h4>
                 <p className="text-[11px] text-aws-lightTextSecondary dark:text-aws-textSecondary">
-                  Select tier pricing plan matching your monitored database capacity needs.
+                  {t("billingPortalSubtitle", language)}
                 </p>
               </div>
 
@@ -470,7 +470,7 @@ export function SettingsModal({
                           <strong className="text-sm font-bold text-aws-lightTextPrimary dark:text-aws-textPrimary">{plan.name}</strong>
                           {isCurrent && (
                             <span className="px-2 py-0.5 rounded bg-aws-orange text-white text-[10px] font-bold">
-                              Active Plan
+                              {t("activePlan", language)}
                             </span>
                           )}
                         </div>
@@ -500,7 +500,7 @@ export function SettingsModal({
                             : "bg-rose-900/30 text-rose-400 border border-rose-500/30 cursor-not-allowed"
                         }`}
                       >
-                        {isCurrent ? "Current Plan" : capCheck.allowed ? `Select Plan ${plan.name}` : "Cap Exceeded"}
+                        {isCurrent ? t("currentPlan", language) : capCheck.allowed ? t("selectPlan", language) + " " + plan.name : t("capExceeded", language)}
                       </button>
                     </div>
                   );
@@ -514,17 +514,17 @@ export function SettingsModal({
             <div className="flex flex-col gap-6">
               <div className="flex flex-col gap-1 border-b border-aws-lightBorder dark:border-aws-border pb-3">
                 <h4 className="font-bold text-sm text-aws-lightTextPrimary dark:text-aws-textPrimary">
-                  Security, Cryptography & Compliance Vault
+                  {t("securityVaultTitle", language)}
                 </h4>
                 <p className="text-[11px] text-aws-lightTextSecondary dark:text-aws-textSecondary">
-                  Cryptographic password generators, MFA validation, Control Tower guardrails, and SOC2 evidence exports.
+                  {t("securityVaultSubtitle", language)}
                 </p>
               </div>
 
               {/* API Keys Vault */}
               <div className="p-4 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border flex flex-col gap-3">
                 <h5 className="font-bold text-xs uppercase text-aws-orange">
-                  API Keys & Rate-Limiting Control Panel
+                  {t("apiKeyControlPanel", language)}
                 </h5>
                 <div className="flex gap-2">
                   <input
@@ -546,7 +546,7 @@ export function SettingsModal({
                     }}
                     className="px-3 py-2 bg-aws-orange hover:bg-aws-orangeHover text-white font-bold text-xs rounded cursor-pointer"
                   >
-                    Generate Key
+                    {t("generateKeyBtn", language)}
                   </button>
                 </div>
 
@@ -565,7 +565,7 @@ export function SettingsModal({
                         }}
                         className="px-2 py-1 bg-red-600 hover:bg-red-700 text-white text-[10px] font-bold rounded cursor-pointer"
                       >
-                        Revoke
+                        {t("revokeBtn", language)}
                       </button>
                     </div>
                   ))}
@@ -575,7 +575,7 @@ export function SettingsModal({
               {/* OWASP Password Generator */}
               <div className="p-4 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border flex flex-col gap-3">
                 <h5 className="font-bold text-xs uppercase text-aws-orange">
-                  Cryptographic Password Generator (OWASP Standard)
+                  {t("owaspPwdGenTitle", language)}
                 </h5>
                 <div className="flex items-center gap-3">
                   <input
@@ -596,7 +596,7 @@ export function SettingsModal({
                     }}
                     className="px-3 py-1.5 bg-aws-orange text-white font-bold text-xs rounded cursor-pointer"
                   >
-                    Generate Password
+                    {t("generatePwdBtn", language)}
                   </button>
                 </div>
 
@@ -611,7 +611,7 @@ export function SettingsModal({
                         }}
                         className="px-2 py-0.5 bg-aws-orange text-white text-[10px] font-bold rounded cursor-pointer"
                       >
-                        Copy
+                        {t("copyBtn", language)}
                       </button>
                     </div>
                     {passwordAnalysis && (
@@ -626,7 +626,7 @@ export function SettingsModal({
               {/* AWS Control Tower Guardrail Compliance */}
               <div className="p-4 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border flex flex-col gap-2">
                 <h5 className="font-bold text-xs uppercase text-aws-lightTextPrimary dark:text-aws-textPrimary">
-                  AWS Control Tower Guardrails & MFA Verification
+                  {t("controlTowerTitle", language)}
                 </h5>
                 <div className="flex flex-col gap-1.5">
                   {controlTowerResults.map((r) => (
@@ -643,7 +643,7 @@ export function SettingsModal({
               {/* SOC2 Package & Evidence Inspector */}
               <div className="p-4 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border flex justify-between items-center">
                 <div>
-                  <strong className="block text-xs text-aws-lightTextPrimary dark:text-aws-textPrimary">Automated SOC2 Type II Compliance Evidence Package</strong>
+                  <strong className="block text-xs text-aws-lightTextPrimary dark:text-aws-textPrimary">{t("soc2PackageTitle", language)}</strong>
                   <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary">Download certified audit proofs or open interactive drawer inspector.</span>
                 </div>
                 <div className="flex gap-2">
@@ -652,7 +652,7 @@ export function SettingsModal({
                     onClick={onOpenEvidenceDrawer}
                     className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded cursor-pointer"
                   >
-                    Inspect Controls
+                    {t("inspectControlsBtn", language)}
                   </button>
                   <button
                     id="download-soc2-evidence-btn"
@@ -662,7 +662,7 @@ export function SettingsModal({
                     }}
                     className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded cursor-pointer"
                   >
-                    Download SOC2 Package
+                    {t("downloadSoc2Btn", language)}
                   </button>
                 </div>
               </div>
@@ -670,7 +670,7 @@ export function SettingsModal({
               {/* HIPAA BAA Agreement */}
               <div className="p-4 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border flex justify-between items-center">
                 <div>
-                  <strong className="block text-xs text-aws-lightTextPrimary dark:text-aws-textPrimary">HIPAA Business Associate Agreement (BAA)</strong>
+                  <strong className="block text-xs text-aws-lightTextPrimary dark:text-aws-textPrimary">{t("hipaaBaaTitle", language)}</strong>
                   <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary">
                     {activeBaa ? `BAA Active: ${activeBaa.agreementId}` : "Execute automated HIPAA BAA agreement for HIPAA compliance."}
                   </span>
@@ -684,7 +684,7 @@ export function SettingsModal({
                   }}
                   className="px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded cursor-pointer"
                 >
-                  {activeBaa ? "Re-sign BAA" : "Sign HIPAA BAA"}
+                  {activeBaa ? t("resignHipaaBaaBtn", language) : t("signHipaaBaaBtn", language)}
                 </button>
               </div>
             </div>

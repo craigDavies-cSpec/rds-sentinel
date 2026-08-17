@@ -233,6 +233,48 @@ export interface TranslationDictionary {
   tourNextBtn: string;
   tourBackBtn: string;
   tourFinishBtn: string;
+
+  // Complete UI Polish Keys
+  modeA: string;
+  modeB: string;
+  lightTheme: string;
+  darkTheme: string;
+  allAccounts: string;
+  lockedTrialCap: string;
+  connectionState: string;
+  offline: string;
+  chaosToggle: string;
+  settingsSubtitle: string;
+  displayPreferencesSubtitle: string;
+  accentColorTheme: string;
+  linkedAccountsSubtitle: string;
+  testStsConnection: string;
+  testStsBtn: string;
+  iacExportsTitle: string;
+  testLiveIngestionBtn: string;
+  awsOrgTitle: string;
+  awsOrgSubtitle: string;
+  scanOrgBtn: string;
+  discoveredDbsTitle: string;
+  importDbBtn: string;
+  billingPortalSubtitle: string;
+  activePlan: string;
+  currentPlan: string;
+  selectPlan: string;
+  capExceeded: string;
+  securityVaultSubtitle: string;
+  apiKeyControlPanel: string;
+  generateKeyBtn: string;
+  revokeBtn: string;
+  copyBtn: string;
+  controlTowerTitle: string;
+  soc2PackageTitle: string;
+  inspectControlsBtn: string;
+  downloadSoc2Btn: string;
+  hipaaBaaTitle: string;
+  signHipaaBaaBtn: string;
+  resignHipaaBaaBtn: string;
+  copyZeroDowntimeDdlBtn: string;
 }
 
 export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
@@ -428,6 +470,47 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     tourNextBtn: "Next Step ➔",
     tourBackBtn: "⬅ Back",
     tourFinishBtn: "Finish Tour",
+
+    modeA: "🌐 Mode A: SaaS",
+    modeB: "⚡ Mode B: AWS Extension",
+    lightTheme: "Light",
+    darkTheme: "Dark",
+    allAccounts: "All AWS Accounts",
+    lockedTrialCap: "🔒 Locked (Trial Cap: 2 DBs)",
+    connectionState: "Connection State:",
+    offline: "Connection offline",
+    chaosToggle: "Chaos Toggle",
+    settingsSubtitle: "Manage AWS Sub-Accounts, Notification Preferences & Tier Billing",
+    displayPreferencesSubtitle: "Customize theme colors, polling refresh intervals, and alert frequencies.",
+    accentColorTheme: "Accent Color Theme",
+    linkedAccountsSubtitle: "Manage cross-account IAM monitoring roles and test STS AssumeRole connectivity.",
+    testStsConnection: "Test AWS STS AssumeRole Connection",
+    testStsBtn: "Test STS Connection",
+    iacExportsTitle: "CloudFormation & AWS Service Catalog IaC Infrastructure Exports",
+    testLiveIngestionBtn: "⚡ Test Live AWS Free Tier Telemetry Ingestion ($0 / month)",
+    awsOrgTitle: "AWS Organizations Auto-Discovery & SCP Governance",
+    awsOrgSubtitle: "Discover child AWS accounts and RDS/Aurora databases across sub-account OUs via sts:AssumeRole.",
+    scanOrgBtn: "Scan Organization",
+    discoveredDbsTitle: "Discovered Databases:",
+    importDbBtn: "Import Database",
+    billingPortalSubtitle: "Select tier pricing plan matching your monitored database capacity needs.",
+    activePlan: "Active Plan",
+    currentPlan: "Current Plan",
+    selectPlan: "Select Plan",
+    capExceeded: "Cap Exceeded",
+    securityVaultSubtitle: "Cryptographic password generators, MFA validation, Control Tower guardrails, and SOC2 evidence exports.",
+    apiKeyControlPanel: "API Keys & Rate-Limiting Control Panel",
+    generateKeyBtn: "Generate Key",
+    revokeBtn: "Revoke",
+    copyBtn: "Copy",
+    controlTowerTitle: "AWS Control Tower Guardrails & MFA Verification",
+    soc2PackageTitle: "Automated SOC2 Type II Compliance Evidence Package",
+    inspectControlsBtn: "Inspect Controls",
+    downloadSoc2Btn: "Download SOC2 Package",
+    hipaaBaaTitle: "HIPAA Business Associate Agreement (BAA)",
+    signHipaaBaaBtn: "Sign HIPAA BAA",
+    resignHipaaBaaBtn: "Re-sign BAA",
+    copyZeroDowntimeDdlBtn: "Copy Zero-Downtime DDL",
   },
   de: {
     dashboardTitle: "RDS Sentinel",
@@ -621,6 +704,47 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     tourNextBtn: "Nächster Schritt ➔",
     tourBackBtn: "⬅ Zurück",
     tourFinishBtn: "Tour Beenden",
+
+    modeA: "🌐 Modus A: SaaS",
+    modeB: "⚡ Modus B: AWS-Erweiterung",
+    lightTheme: "Hell",
+    darkTheme: "Dunkel",
+    allAccounts: "Alle AWS-Konten",
+    lockedTrialCap: "🔒 Gesperrt (Testversion-Limit: 2 DBs)",
+    connectionState: "Verbindungsstatus:",
+    offline: "Verbindung offline",
+    chaosToggle: "Chaos-Umschalter",
+    settingsSubtitle: "Verwalten Sie AWS-Unterkonten, Benachrichtigungseinstellungen und Tarife",
+    displayPreferencesSubtitle: "Anpassen von Themenfarben, Aktualisierungsintervallen und Warnfrequenzen.",
+    accentColorTheme: "Akzentfarbenthema",
+    linkedAccountsSubtitle: "Verwalten Sie kontoübergreifende IAM-Überwachungsrollen und testen Sie die STS-Konnektivität.",
+    testStsConnection: "AWS STS AssumeRole-Verbindung testen",
+    testStsBtn: "STS-Verbindung testen",
+    iacExportsTitle: "CloudFormation & AWS Service Catalog IaC-Infrastrukturexporte",
+    testLiveIngestionBtn: "⚡ Kostenlose AWS Free Tier Telemetrie-Einbindung testen (0 € / Monat)",
+    awsOrgTitle: "AWS Organizations Automatische Erkennung & SCP-Governance",
+    awsOrgSubtitle: "Erkennen Sie untergeordneten AWS-Konten und RDS/Aurora-Datenbanken über sts:AssumeRole.",
+    scanOrgBtn: "Organisation scannen",
+    discoveredDbsTitle: "Erkannte Datenbanken:",
+    importDbBtn: "Datenbank importieren",
+    billingPortalSubtitle: "Wählen Sie den Preisplan aus, der Ihren Datenbankkapazitätsanforderungen entspricht.",
+    activePlan: "Aktiver Plan",
+    currentPlan: "Aktueller Plan",
+    selectPlan: "Plan auswählen",
+    capExceeded: "Kapazität überschritten",
+    securityVaultSubtitle: "Kryptografische Passwortgeneratoren, MFA-Validierung, Control Tower Guardrails und SOC2-Nachweise.",
+    apiKeyControlPanel: "API-Schlüssel & Ratenbegrenzung-Bedienfeld",
+    generateKeyBtn: "Schlüssel generieren",
+    revokeBtn: "Widerrufen",
+    copyBtn: "Kopieren",
+    controlTowerTitle: "AWS Control Tower Guardrails & MFA-Überprüfung",
+    soc2PackageTitle: "Automatisierte SOC2 Type II Konformitätsnachweise",
+    inspectControlsBtn: "Kontrollen prüfen",
+    downloadSoc2Btn: "SOC2-Paket herunterladen",
+    hipaaBaaTitle: "HIPAA Business Associate Agreement (BAA)",
+    signHipaaBaaBtn: "HIPAA BAA unterzeichnen",
+    resignHipaaBaaBtn: "BAA erneut unterzeichnen",
+    copyZeroDowntimeDdlBtn: "Ausfallfreie DDL kopieren",
   },
   fr: {
     dashboardTitle: "RDS Sentinel",
@@ -814,6 +938,47 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     tourNextBtn: "Étape Suivante ➔",
     tourBackBtn: "⬅ Retour",
     tourFinishBtn: "Terminer la Visite",
+
+    modeA: "🌐 Mode A : SaaS",
+    modeB: "⚡ Mode B : Extension AWS",
+    lightTheme: "Clair",
+    darkTheme: "Sombre",
+    allAccounts: "Tous les comptes AWS",
+    lockedTrialCap: "🔒 Verrouillé (Limite d'essai : 2 BDD)",
+    connectionState: "État de la connexion :",
+    offline: "Connexion hors ligne",
+    chaosToggle: "Bascule Chaos",
+    settingsSubtitle: "Gérez les sous-comptes AWS, les préférences de notification et la facturation.",
+    displayPreferencesSubtitle: "Personnalisez les couleurs du thème, les intervalles de rafraîchissement et la fréquence des alertes.",
+    accentColorTheme: "Thème de couleur d'accentuation",
+    linkedAccountsSubtitle: "Gérez les rôles de surveillance IAM intercomptes et testez la connectivité STS.",
+    testStsConnection: "Tester la connexion AWS STS AssumeRole",
+    testStsBtn: "Tester la connexion STS",
+    iacExportsTitle: "Exportations d'infrastructure IaC CloudFormation et AWS Service Catalog",
+    testLiveIngestionBtn: "⚡ Tester l'ingestion de télémétrie AWS Free Tier en direct (0 € / mois)",
+    awsOrgTitle: "Découverte automatique AWS Organizations & Gouvernance SCP",
+    awsOrgSubtitle: "Découvrez les comptes AWS enfants et les bases de données RDS/Aurora via sts:AssumeRole.",
+    scanOrgBtn: "Analyser l'organisation",
+    discoveredDbsTitle: "Bases de données découvertes :",
+    importDbBtn: "Importer la base de données",
+    billingPortalSubtitle: "Sélectionnez le forfait tarifaire correspondant à vos besoins en capacité de base de données.",
+    activePlan: "Plan actif",
+    currentPlan: "Plan actuel",
+    selectPlan: "Sélectionner le plan",
+    capExceeded: "Capacité dépassée",
+    securityVaultSubtitle: "Générateurs de mots de passe cryptographiques, validation MFA, garde-fous Control Tower et preuves SOC2.",
+    apiKeyControlPanel: "Panneau de configuration des clés API et de la limitation de débit",
+    generateKeyBtn: "Générer la clé",
+    revokeBtn: "Révoquer",
+    copyBtn: "Copier",
+    controlTowerTitle: "Garde-fous AWS Control Tower et vérification MFA",
+    soc2PackageTitle: "Paquet de preuves de conformité SOC2 Type II automatisé",
+    inspectControlsBtn: "Inspecter les contrôles",
+    downloadSoc2Btn: "Télécharger le paquet SOC2",
+    hipaaBaaTitle: "Accord d'associé commercial HIPAA (BAA)",
+    signHipaaBaaBtn: "Signer le BAA HIPAA",
+    resignHipaaBaaBtn: "Resigner le BAA",
+    copyZeroDowntimeDdlBtn: "Copier le DDL sans interruption",
   },
   ja: {
     dashboardTitle: "RDS Sentinel",
@@ -1007,6 +1172,47 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     tourNextBtn: "次のステップ ➔",
     tourBackBtn: "⬅ 戻る",
     tourFinishBtn: "ツアーを終了",
+
+    modeA: "🌐 モードA: SaaS",
+    modeB: "⚡ モードB: AWS拡張",
+    lightTheme: "ライト",
+    darkTheme: "ダーク",
+    allAccounts: "すべてのAWSアカウント",
+    lockedTrialCap: "🔒 ロック済み（トライアル上限: 2DB）",
+    connectionState: "接続状態:",
+    offline: "接続オフライン",
+    chaosToggle: "カオス切替",
+    settingsSubtitle: "AWSサブアカウント、通知設定、およびティア課金を管理します",
+    displayPreferencesSubtitle: "テーマの色、更新間隔、アラートの頻度をカスタマイズします。",
+    accentColorTheme: "アクセントカラーテーマ",
+    linkedAccountsSubtitle: "クロスアカウントIAM監視ロールを管理し、STS接続をテストします。",
+    testStsConnection: "AWS STS AssumeRole接続のテスト",
+    testStsBtn: "STS接続テスト",
+    iacExportsTitle: "CloudFormationおよびAWS Service Catalog IaCインフラストラクチャのエクスポート",
+    testLiveIngestionBtn: "⚡ ライブAWS無料枠テレメトリ取り込みをテスト（月額$0）",
+    awsOrgTitle: "AWS Organizations自動検出およびSCPガバナンス",
+    awsOrgSubtitle: "sts:AssumeRoleを介してサブアカウントOU全体の配下AWSアカウントとRDS/Auroraデータベースを検出します。",
+    scanOrgBtn: "組織をスキャン",
+    discoveredDbsTitle: "検出されたデータベース:",
+    importDbBtn: "データベースをインポート",
+    billingPortalSubtitle: "監視対象のデータベース容量要件に一致する料金プランを選択します。",
+    activePlan: "アクティブなプラン",
+    currentPlan: "現在のプラン",
+    selectPlan: "プランを選択",
+    capExceeded: "容量上限超過",
+    securityVaultSubtitle: "暗号化パスワード生成、MFA検証、Control Towerガードレール、SOC2監査証跡。",
+    apiKeyControlPanel: "APIキーおよびレート制限管理パネル",
+    generateKeyBtn: "キーを生成",
+    revokeBtn: "無効化",
+    copyBtn: "コピー",
+    controlTowerTitle: "AWS Control TowerガードレールおよびMFA検証",
+    soc2PackageTitle: "自動SOC2 Type IIコンプライアンス証跡パッケージ",
+    inspectControlsBtn: "統制の検査",
+    downloadSoc2Btn: "SOC2パッケージのダウンロード",
+    hipaaBaaTitle: "HIPAAビジネスアソシエイト契約（BAA）",
+    signHipaaBaaBtn: "HIPAA BAAに署名",
+    resignHipaaBaaBtn: "BAAに再署名",
+    copyZeroDowntimeDdlBtn: "ゼロダウンタイムDDLをコピー",
   },
 };
 

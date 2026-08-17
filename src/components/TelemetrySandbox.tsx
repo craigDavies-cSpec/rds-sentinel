@@ -120,7 +120,7 @@ export function TelemetrySandbox({
               </div>
               {isTrialRestricted && (
                 <span className="text-[9px] text-aws-red font-semibold mt-1">
-                  🔒 Locked (Trial Cap: 2 DBs)
+                  {t("lockedTrialCap", language)}
                 </span>
               )}
             </button>
@@ -212,7 +212,7 @@ export function TelemetrySandbox({
             {/* Calculated Interval Info */}
             <div className="text-[11px] p-2 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border">
               <div className="flex justify-between items-center font-bold">
-                <span>Calculated Interval:</span>
+                <span>{t("calculatedInterval", language)}</span>
                 <span className="font-mono text-amber-950 dark:text-aws-orange">{(calculatedIntervalMs / 1000).toFixed(0)}s</span>
               </div>
             </div>
@@ -220,19 +220,19 @@ export function TelemetrySandbox({
             {/* Outbox & Circuit Breaker Status */}
             <div className="border-t border-aws-lightBorder dark:border-aws-border pt-3 flex flex-col gap-2 text-xs">
               <div className="flex justify-between items-center">
-                <span className="font-bold">Connection State:</span>
+                <span className="font-bold">{t("connectionState", language)}</span>
                 <span className={`font-mono font-bold ${isOnline ? "text-emerald-800 dark:text-emerald-400" : "text-rose-800 dark:text-rose-400"}`}>
-                  {isOnline ? "🟢 ONLINE" : "🔴 Connection offline"}
+                  {isOnline ? "🟢 " + t("online", language) : "🔴 " + t("offline", language)}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="font-bold">Circuit Breaker:</span>
+                <span className="font-bold">{t("circuitBreakerLabel", language)}</span>
                 <span className={`font-mono font-bold ${circuitBreakerState === "OPEN" ? "text-rose-800 dark:text-rose-400" : "text-amber-900 dark:text-amber-400"}`}>
                   {circuitBreakerState}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="font-bold">Outbox Queue Count:</span>
+                <span className="font-bold">{t("outboxCount", language)}</span>
                 <span className="font-mono font-bold">{outboxCount}</span>
               </div>
               <div className="flex gap-2 mt-1">
@@ -245,21 +245,21 @@ export function TelemetrySandbox({
                   }}
                   className="flex-1 py-1 rounded bg-emerald-800 hover:bg-emerald-900 text-white text-[10px] font-bold cursor-pointer transition-all"
                 >
-                  Online
+                  {t("online", language)}
                 </button>
                 <button
                   id="simulate-offline-btn"
                   onClick={() => setIsOnline(false)}
                   className="flex-1 py-1 rounded bg-rose-800 hover:bg-rose-900 text-white text-[10px] font-bold cursor-pointer transition-all"
                 >
-                  Disconnect
+                  {t("disconnect", language)}
                 </button>
                 <button
                   id="chaos-circuit-breaker-toggle"
                   onClick={() => setCircuitBreakerState(circuitBreakerState === "OPEN" ? "CLOSED" : "OPEN")}
                   className="flex-1 py-1 rounded bg-amber-800 hover:bg-amber-900 text-white text-[10px] font-bold cursor-pointer transition-all"
                 >
-                  Chaos Toggle
+                  {t("chaosToggle", language)}
                 </button>
               </div>
             </div>

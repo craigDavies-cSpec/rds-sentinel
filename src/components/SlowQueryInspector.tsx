@@ -198,7 +198,7 @@ export function SlowQueryInspector({
                       }}
                       className="px-2 py-0.5 rounded bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold cursor-pointer transition-all"
                     >
-                      {copiedDdlQueryId === `zero-${q.id}` ? "Copied!" : "Copy Zero-Downtime DDL"}
+                      {copiedDdlQueryId === `zero-${q.id}` ? t("ddlCopied", language) : t("copyZeroDowntimeDdlBtn", language)}
                     </button>
                   </div>
 
