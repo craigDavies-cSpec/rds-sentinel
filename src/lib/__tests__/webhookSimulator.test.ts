@@ -28,7 +28,7 @@ describe("Webhook Simulator Utility Unit Tests", () => {
     expect(res.responseMessage).toContain("Invalid webhook URL format");
   });
 
-  test("should simulate successful webhook dispatch with status 200", async () => {
+  test("should simulate successful webhook dispatch with status 200 and HMAC SHA-256 signature header", async () => {
     const res = await dispatchWebhookAlert(
       "slack",
       "https://hooks.slack.com/services/T00000000/B00000000/XXXXX",
@@ -39,5 +39,6 @@ describe("Webhook Simulator Utility Unit Tests", () => {
     expect(res.success).toBe(true);
     expect(res.statusCode).toBe(200);
     expect(res.responseMessage).toContain("HTTP 200 OK");
+    expect(res.signatureHeader).toContain("sha256=");
   });
 });

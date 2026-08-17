@@ -170,6 +170,7 @@ export function SlowQueryInspector({
                     <code>{rec.suggestedDdl}</code>
                     <button
                       id={`copy-ddl-btn-${q.id}`}
+                      aria-label="Copy standard DDL index SQL statement"
                       onClick={() => {
                         navigator.clipboard.writeText(rec.suggestedDdl);
                         setCopiedDdlQueryId(q.id);
@@ -189,6 +190,7 @@ export function SlowQueryInspector({
                     </div>
                     <button
                       id={`copy-zero-downtime-ddl-btn-${q.id}`}
+                      aria-label="Copy zero-downtime production DDL index SQL statement"
                       onClick={() => {
                         navigator.clipboard.writeText(rec.zeroDowntimeDdl);
                         setCopiedDdlQueryId(`zero-${q.id}`);

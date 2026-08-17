@@ -1,6 +1,4 @@
-/**
- * Enterprise Webhook Dispatch Simulator for Slack and PagerDuty alert channels.
- */
+import crypto from "crypto";
 
 export interface WebhookDispatchResult {
   success: boolean;
@@ -9,6 +7,14 @@ export interface WebhookDispatchResult {
   deliveredAt: string;
   responseMessage: string;
   payloadJson: string;
+  signatureHeader?: string;
+}
+
+/**
+ * Computes an HMAC SHA-256 signature for outgoing webhook payload authentication.
+ */
+export function generateWebhookHmacSignature(payloadJson: string, secret: string = "sentinel_webhook_secret_key"): string {
+  return "sha256=" + crypto.createHmac("sha256", secret).update(payloadJson).digest("hex");
 }
 
 /**
@@ -170,6 +176,7 @@ export async function dispatchWebhookAlert(
       : formatPagerDutyPayload(dbName, alertType, message);
 
   const payloadJson = JSON.stringify(payload, null, 2);
+  const signatureHeader = generateWebhookHmacSignature(payloadJson);
 
   // Simulate network delivery latency (250ms)
   await new Promise((resolve) => setTimeout(resolve, 250));
@@ -181,5 +188,6 @@ export async function dispatchWebhookAlert(
     deliveredAt: new Date().toISOString(),
     responseMessage: `HTTP 200 OK — Alert payload successfully delivered to ${target.toUpperCase()} webhook endpoint.`,
     payloadJson,
+    signatureHeader,
   };
 }
