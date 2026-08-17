@@ -268,6 +268,7 @@ export default function Dashboard() {
   const [isGraphQLModalOpen, setIsGraphQLModalOpen] = useState<boolean>(false);
   const [graphQLQuery, setGraphQLQuery] = useState<string>("query {\n  getInstances {\n    id\n    name\n    cpuLoad\n  }\n}");
   const [graphQLResult, setGraphQLResult] = useState<string>("");
+  const [isDevToolsOpen, setIsDevToolsOpen] = useState<boolean>(false);
 
   // Phase 10B: API Key & Rate-Limiting Control Panel state
   const [apiKeys, setApiKeys] = useState<ApiKey[]>(INITIAL_API_KEYS);
@@ -607,39 +608,57 @@ export default function Dashboard() {
               {t("soc2Btn", language)}
             </button>
 
-            {/* Phase 9C: GraphQL Telemetry API Inspector Trigger Button */}
-            <button
-              id="open-graphql-modal-btn"
-              onClick={() => {
-                const res = queryGraphQLTelemetry(graphQLQuery);
-                setGraphQLResult(JSON.stringify(res, null, 2));
-                setIsGraphQLModalOpen(true);
-              }}
-              className="px-2.5 py-1.5 rounded bg-indigo-700 hover:bg-indigo-800 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1 cursor-pointer"
-              title="Open GraphQL Telemetry Developer API Inspector"
-            >
-              ⚡ GraphQL API
-            </button>
-
             {/* Phase 6: Account Settings & Subscription Billing Portal Trigger Button */}
             <button
               id="open-settings-modal-btn"
               onClick={() => setIsSettingsModalOpen(true)}
-              className="px-2.5 py-1.5 rounded bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/10 border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs font-bold transition-all shadow-sm flex items-center gap-1 cursor-pointer"
+              className="px-2.5 py-1.5 rounded bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/10 border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs font-bold transition-all shadow-sm flex items-center gap-1 cursor-pointer whitespace-nowrap shrink-0"
               title="Open Account Settings & Subscription Billing Portal"
             >
               {t("settingsBtn", language)}
             </button>
 
-            {/* Global Reset All Simulators Button */}
-            <button
-              id="global-reset-simulators-btn"
-              onClick={handleResetAllSimulators}
-              className="px-2.5 py-1.5 rounded bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-800 dark:text-aws-orange text-xs font-bold transition-all shadow-sm flex items-center gap-1 cursor-pointer"
-              title="Reset all CPU load spikes, circuit breakers, and sliders back to live baseline"
-            >
-              🔄 Reset All Simulators
-            </button>
+            {/* Consolidated Developer Tools Dropdown (UX Review Header Refinement) */}
+            <div className="relative">
+              <button
+                id="dev-tools-dropdown-btn"
+                onClick={() => setIsDevToolsOpen(!isDevToolsOpen)}
+                className="px-2.5 py-1.5 rounded bg-purple-700 hover:bg-purple-800 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1 cursor-pointer whitespace-nowrap shrink-0"
+                title="Open Developer & Simulation Tools"
+              >
+                <span>{t("devTools", language)}</span>
+                <span className="text-[10px]">▼</span>
+              </button>
+
+              {isDevToolsOpen && (
+                <div className="absolute right-0 mt-1 w-56 bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border rounded-md shadow-2xl z-50 p-1.5 flex flex-col gap-1 font-sans text-xs animate-in fade-in zoom-in-95 duration-150">
+                  <button
+                    id="open-graphql-modal-btn"
+                    onClick={() => {
+                      const res = queryGraphQLTelemetry(graphQLQuery);
+                      setGraphQLResult(JSON.stringify(res, null, 2));
+                      setIsGraphQLModalOpen(true);
+                      setIsDevToolsOpen(false);
+                    }}
+                    className="w-full text-left p-2 rounded hover:bg-aws-orange/10 text-aws-lightTextPrimary dark:text-aws-textPrimary font-bold flex items-center gap-2 cursor-pointer"
+                  >
+                    <span>⚡</span>
+                    <span>{t("graphqlApi", language)}</span>
+                  </button>
+                  <button
+                    id="global-reset-simulators-btn"
+                    onClick={() => {
+                      handleResetAllSimulators();
+                      setIsDevToolsOpen(false);
+                    }}
+                    className="w-full text-left p-2 rounded hover:bg-amber-500/10 text-amber-800 dark:text-aws-orange font-bold flex items-center gap-2 cursor-pointer"
+                  >
+                    <span>🔄</span>
+                    <span>{t("resetSimulators", language)}</span>
+                  </button>
+                </div>
+              )}
+            </div>
 
             {/* Global Language Selection Dropdown (Visible on Header Toolbar for Non-English Users) */}
             <div className="relative flex items-center">
@@ -837,7 +856,7 @@ export default function Dashboard() {
           {/* Active Database Telemetry Gauges */}
           <div className="bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border rounded-lg p-4 flex flex-col gap-4">
             <div className="border-b border-aws-lightBorder dark:border-aws-divider pb-2">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-aws-lightTextSecondary dark:text-aws-textSecondary">Instance Telemetry</h3>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-aws-lightTextSecondary dark:text-aws-textSecondary">{t("instanceTelemetry", language)}</h3>
               <span className="text-lg font-bold text-aws-lightTextPrimary dark:text-aws-textPrimary font-mono">{selectedDb.name}</span>
             </div>
 
@@ -857,7 +876,7 @@ export default function Dashboard() {
                 {/* CPU Load bar */}
                 <div>
                   <div className="flex justify-between text-xs font-bold mb-1">
-                    <span>CPU Utilization</span>
+                    <span>{t("cpuUtilization", language)}</span>
                     <span className="font-mono">{selectedDb.cpuLoad}%</span>
                   </div>
                   <div className="w-full h-2.5 bg-aws-lightBg dark:bg-aws-dark rounded-full overflow-hidden border border-aws-lightBorder dark:border-aws-border">
@@ -1003,7 +1022,7 @@ export default function Dashboard() {
           <div className="bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border rounded-lg p-4">
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center gap-3">
-                <h2 className="text-sm font-bold text-aws-lightTextPrimary dark:text-aws-orange uppercase tracking-wider">Cost-Performance Balancer</h2>
+                <h2 className="text-sm font-bold text-aws-lightTextPrimary dark:text-aws-orange uppercase tracking-wider">{t("costBalancer", language)}</h2>
                 <div className="flex gap-1" data-testid="layout-controls-balancer">
                   <button
                     onClick={() => moveLeft("balancer")}
@@ -1293,7 +1312,7 @@ export default function Dashboard() {
             <div className="flex justify-between items-center mb-3">
               <div>
                 <h2 className="text-sm font-bold text-aws-lightTextPrimary dark:text-aws-orange uppercase tracking-wider flex items-center gap-2">
-                  Slow Query Inspector
+                  {t("slowQueries", language)}
                   <span className="text-[9px] bg-aws-red/10 text-red-800 dark:text-red-400 border border-aws-red/20 px-1.5 py-0.5 rounded font-mono">
                     PII Redacted
                   </span>
@@ -1389,7 +1408,7 @@ export default function Dashboard() {
         <section className="lg:col-span-1 flex flex-col gap-6" style={{ order: layoutOrder.indexOf("logs") }}>
           <div className="bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border rounded-lg p-4">
             <div className="flex justify-between items-center mb-3">
-              <h2 className="text-sm font-bold text-aws-lightTextPrimary dark:text-aws-orange uppercase tracking-wider">Anomaly Log Watcher</h2>
+              <h2 className="text-sm font-bold text-aws-lightTextPrimary dark:text-aws-orange uppercase tracking-wider">{t("logWatcher", language)}</h2>
               <div className="flex gap-1" data-testid="layout-controls-logs">
                 <button
                   onClick={() => moveLeft("logs")}

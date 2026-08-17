@@ -344,7 +344,8 @@ test.describe("RDS Sentinel Dashboard Functional E2E Tests", () => {
   });
 
   test("should open GraphQL Developer API Inspector modal and execute GraphQL query", async ({ page }) => {
-    // Click GraphQL API button in header
+    // Open Dev Tools dropdown then click GraphQL API button
+    await page.locator("#dev-tools-dropdown-btn").click();
     await page.locator("#open-graphql-modal-btn").click();
 
     // Verify GraphQL modal title visible
@@ -487,7 +488,8 @@ test.describe("RDS Sentinel Dashboard Functional E2E Tests", () => {
     // Click Reset CPU button
     await page.locator("#reset-cpu-load-btn").click();
 
-    // 2. Click Reset All Simulators button in header
+    // 2. Click Reset All Simulators button inside Dev Tools dropdown
+    await page.locator("#dev-tools-dropdown-btn").click();
     await page.locator("#global-reset-simulators-btn").click();
     await expect(page.getByText(/All telemetry load spikes, circuit breakers, and sliders reset/)).toBeVisible();
   });
