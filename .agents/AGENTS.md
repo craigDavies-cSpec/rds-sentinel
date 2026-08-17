@@ -117,4 +117,5 @@ Whenever performing a codebase review or post-implementation audit, agents must 
 6. **Implementation & Architectural Sanity**: Ensure proper separation of concerns, lightweight component boundaries (minimizing client components), and correct routing.
 7. **Performance & Footprint Optimization**: Audit database/network overhead, render loops, outbox buffering, CPU utilization benchmarks, and client bundle size.
 8. **Token-Saving Efficiency**: Prioritize running local scripts/commands (such as build compiles, linter checks, and unit tests) to diagnose problems on disk, avoiding raw file content dumps into the LLM context.
+9. **State Reactivity & Cross-Account Data Isolation Audit**: Verify that EVERY component, metric card, cost recommendation, slow query, log watcher, and topology graph dynamically filters by active account and reactive state. Explicitly reject any hardcoded fallback numbers (e.g. 1420, 145) or un-isolated global arrays in UI render blocks.
 
