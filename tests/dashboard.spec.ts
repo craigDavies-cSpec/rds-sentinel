@@ -494,4 +494,19 @@ test.describe("RDS Sentinel Dashboard Functional E2E Tests", () => {
     // Assert success toast appears
     await expect(page.getByText(/AWS Pricing API Synchronized Successfully/)).toBeVisible();
   });
+
+  test("should open Security Vault in Settings and generate OWASP cryptographic password", async ({ page }) => {
+    // Open Settings modal
+    await page.locator("#open-settings-modal-btn").click();
+
+    // Switch to Security tab
+    await page.locator("#tab-security-btn").click();
+
+    // Click Generate Password button
+    await page.locator("#generate-owasp-password-btn").click();
+
+    // Assert password output is visible and high entropy rating is displayed
+    await expect(page.locator("#owasp-password-output")).toBeVisible();
+    await expect(page.getByText(/Bits Entropy/)).toBeVisible();
+  });
 });

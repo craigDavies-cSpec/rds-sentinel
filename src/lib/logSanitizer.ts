@@ -4,6 +4,8 @@
  * sensitive fields, secrets, and raw PII parameters before shipping logs to the monitor.
  */
 
+import { sanitizeDeepCredentials } from "./enterpriseSecurityVault";
+
 // Regex patterns for sensitive identifiers
 const EMAIL_REGEX = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
 const SECRET_KEYWORDS = /(password|passwd|secret|token|api_key|apikey|private_key|credit_card|card_num)/i;
@@ -22,17 +24,17 @@ export function maskSQLQuery(query: string): string {
   masked = masked.replace(/"[^"]*"/g, '"?"');
 
   // 2. Redact numerical literals that are assignments or values
-  // Handles patterns like: = 123, IN (1, 2, 3), VALUES (12, 34)
-  // Ensure we don't accidentally corrupt column names containing numbers (e.g. col_1)
   masked = masked.replace(/(?<=\s|=|>|<|>=|<=)\b\d+\b/g, "?");
 
-  // 3. If query contains sensitive security keywords, completely redact the target assignment
-  // e.g. "SET password = '?'" or "WHERE api_token = '?'"
+  // 3. Deep credential and PII sanitization
+  const deepSanitized = sanitizeDeepCredentials(masked);
+  masked = deepSanitized.sanitizedText;
+
+  // 4. If query contains sensitive security keywords, completely redact the target assignment
   if (SECRET_KEYWORDS.test(masked)) {
     const lines = masked.split("\n");
     const sanitizedLines = lines.map(line => {
       if (SECRET_KEYWORDS.test(line)) {
-        // Redact any assignment on this line after '=' or 'LIKE'
         return line.replace(/(?<=\b(password|secret|token|key|pwd)\b\s*(=|like)\s*)\S+/i, "'[REDACTED_SECRET]'");
       }
       return line;
@@ -49,13 +51,12 @@ export function maskSQLQuery(query: string): string {
 export function maskLogLine(logLine: string): string {
   if (!logLine) return "";
 
-  let sanitized = logLine;
+  let sanitized = sanitizeDeepCredentials(logLine).sanitizedText;
 
   // 1. Redact email addresses
   sanitized = sanitized.replace(EMAIL_REGEX, "[REDACTED_EMAIL]");
 
   // 2. Redact obvious SQL credentials or key values in logs
-  // e.g. "Access denied for user 'admin'@'localhost' (using password: YES)"
   if (/password:\s*yes/i.test(sanitized)) {
     sanitized = sanitized.replace(/password:\s*yes/i, "password: [PROTECTED]");
   }

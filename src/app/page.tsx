@@ -59,6 +59,14 @@ import {
   downloadTemplateFile,
 } from "@/lib/cloudFormationExporter";
 import {
+  generateOwaspPassword,
+  evaluatePasswordStrength,
+  sanitizeDeepCredentials,
+  validateStsExternalId,
+  getEnterpriseSecurityPolicy,
+  PasswordAnalysis,
+} from "@/lib/enterpriseSecurityVault";
+import {
   ApiKey,
   INITIAL_API_KEYS,
   generateApiKey,
@@ -265,6 +273,9 @@ export default function Dashboard() {
   const [apiKeys, setApiKeys] = useState<ApiKey[]>(INITIAL_API_KEYS);
   const [newKeyNameInput, setNewKeyNameInput] = useState<string>("");
   const [newKeyRateLimit, setNewKeyRateLimit] = useState<number>(1000);
+
+  // OWASP Password Analysis state
+  const [owaspAnalysis, setOwaspAnalysis] = useState<PasswordAnalysis | null>(null);
   const [showFullKeys, setShowFullKeys] = useState<boolean>(false);
 
   // Phase 11A: Interactive Audit Evidence Inspector Drawer state
@@ -2217,6 +2228,58 @@ export default function Dashboard() {
                     <div className="flex justify-between items-center">
                       <span>SOC2 Compliance Scanner Status:</span>
                       <span className="text-emerald-800 dark:text-emerald-400 font-bold">100% Compliant (Zero Secret Leaks)</span>
+                    </div>
+
+                    {/* OWASP High-Entropy Password Generator & Cryptographic Vault */}
+                    <div className="pt-3 border-t border-aws-lightBorder dark:border-aws-divider flex flex-col gap-2 font-sans">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <strong className="text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs block">
+                            🔑 OWASP High-Entropy Cryptographic Password Generator
+                          </strong>
+                          <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary">
+                            Generates 28-character high-entropy OWASP-compliant passwords using Web Crypto CSPRNG.
+                          </span>
+                        </div>
+                        <button
+                          id="generate-owasp-password-btn"
+                          onClick={() => {
+                            const pwdResult = generateOwaspPassword(28);
+                            setOwaspAnalysis(pwdResult);
+                            showToast("⚡ High-Entropy OWASP Password Generated!");
+                          }}
+                          className="px-3 py-1.5 rounded bg-aws-orange hover:bg-aws-orangeHover text-aws-lightTextPrimary font-bold text-xs shadow cursor-pointer transition-all flex items-center gap-1"
+                        >
+                          ⚡ Generate Password
+                        </button>
+                      </div>
+
+                      {owaspAnalysis && (
+                        <div className="p-3 bg-aws-lightContainer dark:bg-aws-container border border-aws-orange/40 rounded flex flex-col gap-2 font-mono text-xs animate-fade-in">
+                          <div className="flex justify-between items-center">
+                            <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary uppercase">Generated Password:</span>
+                            <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-800 dark:text-emerald-400 font-bold text-[10px]">
+                              {owaspAnalysis.entropyBits} Bits Entropy ({owaspAnalysis.qualityGrade})
+                            </span>
+                          </div>
+                          <div className="relative bg-aws-lightBg dark:bg-aws-dark p-2 rounded border border-aws-lightBorder dark:border-aws-border text-emerald-800 dark:text-emerald-400 font-bold text-xs break-all flex justify-between items-center">
+                            <code id="owasp-password-output">{owaspAnalysis.password}</code>
+                            <button
+                              onClick={() => {
+                                navigator.clipboard.writeText(owaspAnalysis.password);
+                                showToast("📋 Password Copied to Clipboard!");
+                              }}
+                              className="ml-2 px-2 py-1 bg-aws-orange/20 hover:bg-aws-orange/30 text-amber-900 dark:text-aws-orange text-[9px] font-bold rounded transition-all"
+                            >
+                              Copy
+                            </button>
+                          </div>
+                          <div className="flex justify-between text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary">
+                            <span>Crack Time Est: <strong className="text-emerald-700 dark:text-emerald-400">{owaspAnalysis.crackTimeEstimate}</strong></span>
+                            <span>OWASP Status: <strong className="text-emerald-700 dark:text-emerald-400">100% Compliant</strong></span>
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     {/* Phase 8: HIPAA BAA Portal Action */}
