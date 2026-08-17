@@ -487,7 +487,7 @@ export default function Dashboard() {
       if (inst.class.includes("2xlarge")) return sum + 540;
       if (inst.class.includes("xlarge")) return sum + 270;
       if (inst.class.includes("medium")) return sum + 70;
-      if (inst.class.includes("micro")) return sum + 14;
+      if (inst.class.includes("micro")) return sum + 0; // AWS Free Tier 100% covered ($0/mo)
       return sum + 100;
     }, 0);
   }, [filteredInstances]);
@@ -979,7 +979,9 @@ export default function Dashboard() {
             <div className="grid grid-cols-3 gap-4 mb-4">
               <div className="p-3 bg-aws-lightBg dark:bg-aws-dark rounded border border-aws-lightBorder dark:border-aws-border text-center">
                 <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary uppercase block">Base DB Cost</span>
-                <span className="text-lg font-bold font-mono text-aws-lightTextPrimary dark:text-aws-textPrimary">${totalCost}/mo</span>
+                <span className="text-lg font-bold font-mono text-aws-lightTextPrimary dark:text-aws-textPrimary">
+                  {totalCost === 0 ? "$0/mo (Free Tier)" : `$${totalCost}/mo`}
+                </span>
               </div>
               <div className="p-3 bg-aws-lightBg dark:bg-aws-dark rounded border border-aws-lightBorder dark:border-aws-border text-center">
                 <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary uppercase block">Optimized Savings</span>
