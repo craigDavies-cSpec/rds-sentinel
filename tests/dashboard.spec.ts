@@ -486,4 +486,12 @@ test.describe("RDS Sentinel Dashboard Functional E2E Tests", () => {
     await expect(page.locator("#live-account-active-banner")).toBeVisible();
     await expect(page.locator("#live-account-active-banner strong").first()).toBeVisible();
   });
+
+  test("should trigger live AWS Pricing API synchronization when clicking AWS Rates badge", async ({ page }) => {
+    // Click AWS Rates badge in header
+    await page.locator("#sync-aws-pricing-badge-btn").click();
+
+    // Assert success toast appears
+    await expect(page.getByText(/AWS Pricing API Synchronized Successfully/)).toBeVisible();
+  });
 });

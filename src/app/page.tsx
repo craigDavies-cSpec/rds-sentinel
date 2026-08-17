@@ -43,6 +43,12 @@ import {
 import { t, LanguageCode, SUPPORTED_LANGUAGES } from "@/lib/localization";
 import { AccentTheme, ACCENT_THEMES } from "@/lib/themeAccent";
 import { evaluateControlTowerGuardrails } from "@/lib/controlTower";
+import {
+  calculateAccountMonthlyCost,
+  syncLiveAWSPricings,
+  getPricingSyncMetadata,
+  PricingSyncMetadata,
+} from "@/lib/awsPricingEngine";
 import { validateMfaToken } from "@/lib/securityControlMonitor";
 import { WebSocketStreamListener, WebSocketTelemetryPacket } from "@/lib/webSocketStream";
 import { queryGraphQLTelemetry } from "@/lib/graphQLResolver";
@@ -468,6 +474,15 @@ export default function Dashboard() {
     runQueueSimulation();
   }, [tickCount, isDbEndpointOnline, selectedDb, customIngestionUrl]);
 
+  // AWS Pricing Sync Engine state
+  const [pricingSync, setPricingSync] = useState<PricingSyncMetadata>(getPricingSyncMetadata);
+
+  const handleSyncAWSPricings = async () => {
+    const meta = await syncLiveAWSPricings();
+    setPricingSync(meta);
+    showToast("⚡ AWS Pricing API Synchronized Successfully!");
+  };
+
   // Account-dynamic filtering for recommendations, slow queries, logs, and base DB cost
   const filteredRecommendations = useMemo(() => {
     const activeDbIds = new Set(filteredInstances.map((d) => d.id));
@@ -483,13 +498,7 @@ export default function Dashboard() {
   }, [filteredRecommendations, tier]);
 
   const totalCost = useMemo(() => {
-    return filteredInstances.reduce((sum, inst) => {
-      if (inst.class.includes("2xlarge")) return sum + 540;
-      if (inst.class.includes("xlarge")) return sum + 270;
-      if (inst.class.includes("medium")) return sum + 70;
-      if (inst.class.includes("micro")) return sum + 0; // AWS Free Tier 100% covered ($0/mo)
-      return sum + 100;
-    }, 0);
+    return calculateAccountMonthlyCost(filteredInstances);
   }, [filteredInstances]);
 
   const filteredSlowQueries = useMemo(() => {
@@ -687,6 +696,17 @@ export default function Dashboard() {
                 <span>💰 Savings:</span>
                 <span className="text-slate-950 dark:text-emerald-300 font-extrabold">${potentialSavings.toFixed(2)}/mo</span>
               </div>
+
+              {/* AWS Pricing API Live Status Badge */}
+              <button
+                id="sync-aws-pricing-badge-btn"
+                onClick={handleSyncAWSPricings}
+                className="flex items-center gap-1 px-2.5 py-0.5 rounded bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-900 dark:text-amber-300 font-mono font-bold text-[11px] cursor-pointer transition-all"
+                title="Click to trigger live sync with AWS Price List API"
+              >
+                <span>⚡ AWS Rates:</span>
+                <span className="font-extrabold">{pricingSync.isLiveSynced ? "Live API Synced" : "Synced"}</span>
+              </button>
 
               {/* Quick Gating Tier Controller */}
               <div id="header-tier-selector" className="flex items-center gap-1 bg-aws-lightContainer dark:bg-aws-container p-0.5 rounded border border-aws-lightBorder dark:border-aws-border">

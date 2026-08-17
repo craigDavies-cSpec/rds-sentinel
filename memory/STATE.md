@@ -40,7 +40,7 @@ _Last Updated: 2026-08-13_
 - **Sanitizer Parameter Masking**: `Active` (All sensitive SQL query parameters and emails redacted at edge).
 - **UK Business Incorporation & Legal Suite**: `Active` (cSpec Solutions Ltd setup guides, UK Companies House LTD filings, HMRC tax & PAYE compliance, ICO registration, and UK GDPR/EULA contract generators in `src/lib/ukLegalContracts.ts`).
 - **AWS Marketplace Monetization & Free Tier Ingestion**: `Active` (AWS Free Tier $0 live telemetry ingestion guide in `docs/AWS_FREE_TIER_INGESTION_GUIDE.md` and AWS Marketplace seller onboarding in `docs/AWS_MARKETPLACE_ONBOARDING.md`).
-- **Automated Test Coverage**: **107/107 Tests Passing** (69 Jest unit + 36 Playwright E2E + 1 Layout E2E + 1 LocalStack E2E).
+- **Automated Test Coverage**: **113/113 Tests Passing** (74 Jest unit + 37 Playwright E2E + 1 Layout E2E + 1 LocalStack E2E).
 
 ---
 
