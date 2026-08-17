@@ -12,9 +12,9 @@
   - *Problem*: `crypto.subtle` is available in modern browsers and Node v18 (`require("crypto").webcrypto`). Base64 conversion using spread operators (`String.fromCharCode(...arr)`) throws TypeScript `TS2802` downlevel iteration errors under standard target settings.
   - *Learning*: Use safe array-from loop iteration `for (let i = 0; i < arr.length; i++) binary += String.fromCharCode(arr[i])` for cross-platform Uint8Array base64 encoding.
 
-* **Git Security Pre-Commit Hook Plaintext Key Protection**
-  - *Problem*: Pre-commit security hooks block git commits if any file contains plaintext AWS Access Key regex patterns (`AKIA...`), including unit test files.
-  - *Learning*: Obfuscate mock test key strings using string concatenation (e.g. `"AKIA" + "IOSFODNN7EXAMPLE"`) so unit test suites can verify parameter redaction without triggering git hook blocks.
+* **Monolithic Page Decomposition into Leaf Components (`src/components/`)**
+  - *Problem*: `src/app/page.tsx` expanded to over 2,800 lines containing all inline modal structures, toolbar controls, circuit breaker UI, and topology graphs, making maintenance difficult and prone to state prop mismatches.
+  - *Learning*: Extract self-contained UI blocks into 10 modular leaf components (`src/components/`). Pass reactive state down as typed interface props. Ensure elements keep unique DOM IDs (`#confirm-sandbox-tier-btn`, `#chaos-circuit-breaker-toggle`, `#revoke-key-btn-${id}`, `#live-account-active-banner`) to maintain 100% E2E Playwright test coverage.
 
 ---
 

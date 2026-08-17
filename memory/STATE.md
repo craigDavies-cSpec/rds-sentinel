@@ -48,7 +48,8 @@ _Last Updated: 2026-08-17_
 - **Centralized AWS Pricing & Live Sync Engine**: `Active` (`awsPricingEngine.ts` polling AWS Price List API with $0.00/mo Free Tier math for `db.t4g.micro`).
 - **UK Business Incorporation & Legal Suite**: `Active` (cSpec Solutions Ltd setup guides, UK Companies House LTD filings, HMRC tax & PAYE compliance, ICO registration, and UK GDPR/EULA contract generators in `src/lib/ukLegalContracts.ts`).
 - **AWS Marketplace Monetization & Free Tier Ingestion**: `Active` (AWS Free Tier $0 live telemetry ingestion guide in `docs/AWS_FREE_TIER_INGESTION_GUIDE.md` and AWS Marketplace seller onboarding in `docs/AWS_MARKETPLACE_ONBOARDING.md`).
-- **Automated Test Coverage**: **137/137 Tests Passing** (98 Jest unit + 39 Playwright E2E + 1 Layout E2E + 1 LocalStack E2E).
+- **Automated Test Coverage**: **140/140 Tests Passing** (101 Jest unit + 39 Playwright E2E across 4 languages `en`, `de`, `fr`, `ja`).
+- **Page Component Architecture**: `page.tsx` refactored from 2,861 lines to ~450 lines using 10 leaf components in `src/components/` (`HeaderToolbar`, `TelemetrySandbox`, `CostRecommendations`, `SlowQueryInspector`, `TopologyVisualizer`, `SettingsModal`, `TierConfirmationModal`, `GraphQLInspectorModal`, `EvidenceInspectorDrawer`, `ProductTourModal`). Complete TypeScript strict type safety (`npx tsc --noEmit` 0 errors).
 
 ---
 

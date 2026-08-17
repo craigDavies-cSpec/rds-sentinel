@@ -325,7 +325,7 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     copyDdl: "Copy DDL",
     ddlCopied: "Copied!",
 
-    logWatcher: "Anomaly Log Watcher",
+    logWatcher: "Real-Time Logs Watcher",
     logScanningLocked: "Real-Time Log Scanning Locked",
     telemetrySandbox: "Telemetry Ingest Sandbox",
     ingestionOverride: "INGESTION ENDPOINT OVERRIDE",
