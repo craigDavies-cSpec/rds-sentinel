@@ -12,6 +12,10 @@
   - *Problem*: `crypto.subtle` is available in modern browsers and Node v18 (`require("crypto").webcrypto`). Base64 conversion using spread operators (`String.fromCharCode(...arr)`) throws TypeScript `TS2802` downlevel iteration errors under standard target settings.
   - *Learning*: Use safe array-from loop iteration `for (let i = 0; i < arr.length; i++) binary += String.fromCharCode(arr[i])` for cross-platform Uint8Array base64 encoding.
 
+* **GitHub Actions CI/CD Pipeline & Automated Playwright E2E Matrix**
+  - *Problem*: Manual local test runs risk uncommitted regression bugs reaching main deployment branches.
+  - *Learning*: Configure `.github/workflows/ci.yml` running Node.js 18 matrix with `--workers=1` on Playwright E2E tests and `actions/upload-artifact@v3` to preserve Playwright trace reports on build failure.
+
 * **AI Natural Language SQL EXPLAIN & Zero-Downtime DDL Optimizer Engine**
   - *Problem*: Raw SQL EXPLAIN output (e.g. `Seq Scan on users (cost=0.00..4250.00)`) is cryptic for non-DBA developers, and naive `CREATE INDEX` statements can lock enterprise production tables during execution.
   - *Learning*: Parse query AST patterns to output plain-English diagnostic advice alongside non-blocking zero-downtime DDL (`CREATE INDEX CONCURRENTLY` for PostgreSQL / `ALGORITHM=INPLACE, LOCK=NONE` for MySQL) and optimized SQL query rewrites inside `SlowQueryInspector.tsx`.

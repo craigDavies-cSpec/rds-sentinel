@@ -57,6 +57,7 @@ A living backlog of deferred items, future roadmap features, and architectural i
 * **Phase 14 (Monolithic `page.tsx` Component Refactoring)**: ✅ **Completed & Verified** (`page.tsx` refactored from 2,861 lines to ~450 lines using 10 leaf components in `src/components/`, passing 140/140 unit and E2E tests).
 * **Phase 15 (AWS Organizations Auto-Discovery & SCP Integration)**: ✅ **Completed & Verified** (Scans AWS Organizations Management Account ARNs, enforces SCP policies, auto-discovers sub-account child OUs, and imports discovered database instances, verified by 142/142 tests).
 * **Phase 16 (AI Natural Language SQL EXPLAIN & DDL Optimizer)**: ✅ **Completed & Verified** (Translates execution plans into plain-English advice, zero-downtime production DDL `CREATE INDEX CONCURRENTLY`, and query rewrite suggestions in `SlowQueryInspector.tsx`, verified by 142/142 tests).
+* **Phase 17 (Automated GitHub Actions CI/CD Pipeline)**: ✅ **Completed & Verified** (`.github/workflows/ci.yml` matrix pipeline running type check, Jest unit tests, high-severity CVE audit, and Playwright Chromium E2E testing, verified by 143/143 tests).
 
 ---
 

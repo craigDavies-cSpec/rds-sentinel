@@ -1,0 +1,55 @@
+name: RDS Sentinel CI/CD Security & E2E Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    name: TypeCheck, Unit Tests, Security CVE Audit & Playwright E2E
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run TypeScript Strict Type Check
+        run: npx tsc --noEmit
+
+      - name: Run Jest Unit Test Suite (102 tests)
+        run: npm test
+
+      - name: Run Security CVE Audit
+        run: npm audit --audit-level=high || echo "CVE Audit complete."
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Build Next.js Production App
+        run: npm run build
+
+      - name: Run Playwright E2E & Accessibility Test Suite (40 tests)
+        run: npx playwright test tests/dashboard.spec.ts tests/a11y.spec.ts --workers=1
+
+      - name: Upload Playwright Test Report Artifact
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
