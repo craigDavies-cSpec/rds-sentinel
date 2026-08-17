@@ -1849,10 +1849,10 @@ export default function Dashboard() {
               <button
                 id="tab-preferences-btn"
                 onClick={() => setSettingsTab("preferences")}
-                className={`px-4 py-2 font-bold border-b-2 transition-all ${
+                className={`px-4 py-2 font-bold text-xs rounded-t transition-all cursor-pointer ${
                   settingsTab === "preferences"
-                    ? "border-aws-orange text-aws-orange"
-                    : "border-transparent text-aws-lightTextSecondary dark:text-aws-textSecondary hover:text-aws-lightTextPrimary dark:hover:text-aws-textPrimary"
+                    ? "bg-aws-orange text-aws-lightTextPrimary shadow-sm"
+                    : "text-aws-lightTextSecondary dark:text-aws-textSecondary hover:text-aws-orange hover:bg-aws-orange/10"
                 }`}
               >
                 🎨 App Preferences
@@ -1860,10 +1860,10 @@ export default function Dashboard() {
               <button
                 id="tab-aws-accounts-btn"
                 onClick={() => setSettingsTab("aws_accounts")}
-                className={`px-4 py-2 font-bold border-b-2 transition-all ${
+                className={`px-4 py-2 font-bold text-xs rounded-t transition-all cursor-pointer ${
                   settingsTab === "aws_accounts"
-                    ? "border-aws-orange text-aws-orange"
-                    : "border-transparent text-aws-lightTextSecondary dark:text-aws-textSecondary hover:text-aws-lightTextPrimary dark:hover:text-aws-textPrimary"
+                    ? "bg-aws-orange text-aws-lightTextPrimary shadow-sm"
+                    : "text-aws-lightTextSecondary dark:text-aws-textSecondary hover:text-aws-orange hover:bg-aws-orange/10"
                 }`}
               >
                 ☁️ AWS Accounts & Services
@@ -1871,10 +1871,10 @@ export default function Dashboard() {
               <button
                 id="tab-billing-btn"
                 onClick={() => setSettingsTab("billing")}
-                className={`px-4 py-2 font-bold border-b-2 transition-all ${
+                className={`px-4 py-2 font-bold text-xs rounded-t transition-all cursor-pointer ${
                   settingsTab === "billing"
-                    ? "border-aws-orange text-aws-orange"
-                    : "border-transparent text-aws-lightTextSecondary dark:text-aws-textSecondary hover:text-aws-lightTextPrimary dark:hover:text-aws-textPrimary"
+                    ? "bg-aws-orange text-aws-lightTextPrimary shadow-sm"
+                    : "text-aws-lightTextSecondary dark:text-aws-textSecondary hover:text-aws-orange hover:bg-aws-orange/10"
                 }`}
               >
                 💳 Subscription & Billing
@@ -1882,10 +1882,10 @@ export default function Dashboard() {
               <button
                 id="tab-security-btn"
                 onClick={() => setSettingsTab("security")}
-                className={`px-4 py-2 font-bold border-b-2 transition-all ${
+                className={`px-4 py-2 font-bold text-xs rounded-t transition-all cursor-pointer ${
                   settingsTab === "security"
-                    ? "border-aws-orange text-aws-orange"
-                    : "border-transparent text-aws-lightTextSecondary dark:text-aws-textSecondary hover:text-aws-lightTextPrimary dark:hover:text-aws-textPrimary"
+                    ? "bg-aws-orange text-aws-lightTextPrimary shadow-sm"
+                    : "text-aws-lightTextSecondary dark:text-aws-textSecondary hover:text-aws-orange hover:bg-aws-orange/10"
                 }`}
               >
                 🛡️ Security & Vault
