@@ -294,29 +294,29 @@ test.describe("RDS Sentinel Dashboard Functional E2E Tests", () => {
 
     // 1. Switch language to German (de)
     await headerLangSelect.selectOption("de");
-    await expect(page.getByText("Ziel-Datenbanken")).toBeVisible();
-    await expect(page.getByText("Instanz-Telemetrie")).toBeVisible();
-    await expect(page.getByText("Kosten-Leistungs-Optimierer")).toBeVisible();
-    await expect(page.getByText("Langsame Abfragen Inspektor")).toBeVisible();
+    await expect(page.getByText(/Ziel-Datenbanken/i)).toBeVisible();
+    await expect(page.getByText(/Instanz-Telemetrie/i)).toBeVisible();
+    await expect(page.getByText(/Kosten-Leistungs-Optimierer/i)).toBeVisible();
+    await expect(page.getByText(/Langsame Abfragen Inspektor/i)).toBeVisible();
 
     // 2. Switch language to French (fr)
     await headerLangSelect.selectOption("fr");
-    await expect(page.getByText("Bases de Données Cibles")).toBeVisible();
-    await expect(page.getByText("Télémétrie d'instance")).toBeVisible();
-    await expect(page.getByText("Équilibreur Coût-Performance")).toBeVisible();
-    await expect(page.getByText("Inspecteur de Requêtes Lentes")).toBeVisible();
+    await expect(page.getByText(/Bases de Données Cibles/i)).toBeVisible();
+    await expect(page.getByText(/Télémétrie d'instance/i)).toBeVisible();
+    await expect(page.getByText(/Équilibreur Coût-Performance/i)).toBeVisible();
+    await expect(page.getByText(/Inspecteur de Requêtes Lentes/i)).toBeVisible();
 
     // 3. Switch language to Japanese (ja)
     await headerLangSelect.selectOption("ja");
-    await expect(page.getByText("ターゲット データベース")).toBeVisible();
-    await expect(page.getByText("インスタンス テレメトリ")).toBeVisible();
-    await expect(page.getByText("コスト パフォーマンス バランサー")).toBeVisible();
-    await expect(page.getByText("スロー クエリ インスペクター")).toBeVisible();
+    await expect(page.getByText(/ターゲット データベース/i)).toBeVisible();
+    await expect(page.getByText(/インスタンス テレメトリ/i)).toBeVisible();
+    await expect(page.getByText(/コスト パフォーマンス バランサー/i)).toBeVisible();
+    await expect(page.getByText(/スロー クエリ インスペクター/i)).toBeVisible();
 
     // 4. Switch back to English (en)
     await headerLangSelect.selectOption("en");
-    await expect(page.getByText("Target Databases")).toBeVisible();
-    await expect(page.getByText("Instance Telemetry")).toBeVisible();
+    await expect(page.getByText(/Target Databases/i)).toBeVisible();
+    await expect(page.getByText(/Instance Telemetry/i)).toBeVisible();
   });
 
   test("should switch display language and custom accent color palette in Settings App Preferences tab", async ({ page }) => {

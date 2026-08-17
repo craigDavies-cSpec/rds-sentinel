@@ -12,57 +12,109 @@ export interface WebhookDispatchResult {
 }
 
 /**
- * Formats Slack Block Kit incoming webhook payload JSON.
+ * Formats Slack Block Kit incoming webhook payload JSON with interactive 1-Click action buttons.
  */
-export function formatSlackPayload(dbName: string, alertType: string, message: string): object {
-  return {
-    text: `⚠️ [RDS Sentinel Alert] ${alertType} on ${dbName}`,
-    blocks: [
+export function formatSlackPayload(dbName: string, alertType: string, message: string, ddlAction?: string): object {
+  const blocks: any[] = [
+    {
+      type: "header",
+      text: {
+        type: "plain_text",
+        text: `🚨 RDS Sentinel Anomaly Alert: ${alertType}`,
+        emoji: true,
+      },
+    },
+    {
+      type: "section",
+      fields: [
+        {
+          type: "mrkdwn",
+          text: `*Target Database:*\n\`${dbName}\``,
+        },
+        {
+          type: "mrkdwn",
+          text: `*Severity:*\n*HIGH (Action Required)*`,
+        },
+      ],
+    },
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `*Details:*\n${message}`,
+      },
+    },
+  ];
+
+  if (ddlAction) {
+    blocks.push({
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `*Suggested Zero-Downtime DDL Fix:*\n\`\`\`${ddlAction}\`\`\``,
+      },
+    });
+  }
+
+  // Interactive 1-Click Action Buttons
+  blocks.push({
+    type: "actions",
+    block_id: "sentinel_ddl_actions",
+    elements: [
       {
-        type: "header",
+        type: "button",
         text: {
           type: "plain_text",
-          text: `🚨 RDS Sentinel Anomaly Alert: ${alertType}`,
+          text: "⚡ 1-Click Apply DDL Index",
           emoji: true,
         },
+        style: "primary",
+        value: ddlAction || "CREATE INDEX CONCURRENTLY idx_sentinel_auto ON users(email);",
+        action_id: "apply_zero_downtime_ddl",
       },
       {
-        type: "section",
-        fields: [
-          {
-            type: "mrkdwn",
-            text: `*Target Database:*\n\`${dbName}\``,
-          },
-          {
-            type: "mrkdwn",
-            text: `*Severity:*\n*HIGH (Action Required)*`,
-          },
-        ],
-      },
-      {
-        type: "section",
+        type: "button",
         text: {
-          type: "mrkdwn",
-          text: `*Details:*\n${message}`,
+          type: "plain_text",
+          text: "🔕 Mute Alert (1 hr)",
+          emoji: true,
         },
+        value: "mute_1h",
+        action_id: "mute_sentinel_alert",
       },
       {
-        type: "context",
-        elements: [
-          {
-            type: "mrkdwn",
-            text: `Timestamp: ${new Date().toISOString()} | Environment: Production`,
-          },
-        ],
+        type: "button",
+        text: {
+          type: "plain_text",
+          text: "📊 Open Console",
+          emoji: true,
+        },
+        url: "https://sentinel.cspec.uk/dashboard",
+        action_id: "open_sentinel_console",
       },
     ],
+  });
+
+  blocks.push({
+    type: "context",
+    elements: [
+      {
+        type: "mrkdwn",
+        text: `Timestamp: ${new Date().toISOString()} | Environment: Production | AWS Account: 616399034957`,
+      },
+    ],
+  });
+
+  return {
+    text: `⚠️ [RDS Sentinel Alert] ${alertType} on ${dbName}`,
+    blocks,
   };
 }
 
 /**
- * Formats PagerDuty Events API v2 payload JSON.
+ * Formats PagerDuty Events API v2 payload JSON with custom action links.
  */
-export function formatPagerDutyPayload(dbName: string, alertType: string, message: string): object {
+export function formatPagerDutyPayload(dbName: string, alertType: string, message: string, ddlAction?: string): object {
   return {
     routing_key: "pd-rds-sentinel-integration-key",
     event_action: "trigger",
@@ -77,8 +129,16 @@ export function formatPagerDutyPayload(dbName: string, alertType: string, messag
       custom_details: {
         alert_type: alertType,
         message: message,
+        suggested_ddl: ddlAction || "CREATE INDEX CONCURRENTLY idx_sentinel_auto ON users(email);",
+        one_click_remediation_url: "https://sentinel.cspec.uk/api/v1/remediate",
       },
     },
+    links: [
+      {
+        href: "https://sentinel.cspec.uk/dashboard?tab=slow-queries",
+        text: "⚡ 1-Click Zero-Downtime DDL Remediation Console",
+      },
+    ],
   };
 }
 
