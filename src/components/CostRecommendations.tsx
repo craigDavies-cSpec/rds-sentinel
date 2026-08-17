@@ -43,6 +43,7 @@ export function CostRecommendations({
   moveRight,
 }: CostRecommendationsProps) {
   const [webhookUrl, setWebhookUrl] = useState("https://hooks.slack.com/services/T0000/B0000/XXXXX");
+  const [webhookTarget, setWebhookTarget] = useState<"slack" | "teams" | "pagerduty">("slack");
   const [webhookResult, setWebhookResult] = useState<WebhookDispatchResult | null>(null);
   return (
     <div className="bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border rounded-lg p-4 flex flex-col gap-4">
@@ -222,19 +223,40 @@ export function CostRecommendations({
                   Enterprise Webhook Dispatch Simulator
                 </strong>
               </div>
+              <div className="flex gap-1">
+                {(["slack", "teams", "pagerduty"] as const).map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => {
+                      setWebhookTarget(t);
+                      if (t === "slack") setWebhookUrl("https://hooks.slack.com/services/T0000/B0000/XXXXX");
+                      else if (t === "teams") setWebhookUrl("https://outlook.office.com/webhook/XXXXX/IncomingWebhook/YYYYY");
+                      else setWebhookUrl("https://events.pagerduty.com/v2/enqueue");
+                    }}
+                    className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase transition-all ${
+                      webhookTarget === t
+                        ? "bg-purple-600 text-white shadow"
+                        : "bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border text-aws-lightTextSecondary dark:text-aws-textSecondary"
+                    }`}
+                  >
+                    {t === "slack" ? "💬 Slack" : t === "teams" ? "🟦 MS Teams" : "📟 PagerDuty"}
+                  </button>
+                ))}
+              </div>
             </div>
             <div className="flex flex-col gap-2">
               <input
                 id="webhook-url-input"
                 type="text"
                 value={webhookUrl}
+                aria-label="Webhook Endpoint URL"
                 onChange={(e) => setWebhookUrl(e.target.value)}
                 className="w-full px-2 py-1 text-[11px] font-mono rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary"
               />
               <button
                 id="dispatch-webhook-btn"
                 onClick={async () => {
-                  const res = await dispatchWebhookAlert("slack", webhookUrl, "db-sales-prod", "High CPU Load", "High CPU anomaly detected on db-sales-prod (88%)");
+                  const res = await dispatchWebhookAlert(webhookTarget, webhookUrl, "db-sales-prod", "High CPU Load", "High CPU anomaly detected on db-sales-prod (88%)");
                   setWebhookResult(res);
                 }}
                 className="px-3 py-1.5 rounded bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs cursor-pointer transition-all"
@@ -243,7 +265,12 @@ export function CostRecommendations({
               </button>
               {webhookResult && (
                 <div id="webhook-dispatch-response" className="p-2 rounded bg-aws-lightBg dark:bg-aws-dark border border-purple-500/30 text-[10px] font-mono flex flex-col gap-1">
-                  <span className="text-emerald-400 font-bold">HTTP {webhookResult.statusCode} OK</span>
+                  <div className="flex justify-between items-center">
+                    <span className="text-emerald-400 font-bold">HTTP {webhookResult.statusCode} OK</span>
+                    {webhookResult.signatureHeader && (
+                      <span className="text-[9px] text-purple-300">Header: {webhookResult.signatureHeader.slice(0, 18)}...</span>
+                    )}
+                  </div>
                   <span>RDS Sentinel Anomaly Alert delivered to {webhookResult.target}!</span>
                 </div>
               )}

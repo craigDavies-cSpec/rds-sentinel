@@ -3,7 +3,7 @@ import crypto from "crypto";
 export interface WebhookDispatchResult {
   success: boolean;
   statusCode: number;
-  target: "slack" | "pagerduty";
+  target: "slack" | "pagerduty" | "teams";
   deliveredAt: string;
   responseMessage: string;
   payloadJson: string;
@@ -117,6 +117,70 @@ export function formatSlackPayload(dbName: string, alertType: string, message: s
   };
 }
 
+
+/**
+ * Formats Microsoft Teams Adaptive Cards webhook payload JSON.
+ */
+export function formatTeamsPayload(dbName: string, alertType: string, message: string, ddlAction?: string): object {
+  return {
+    type: "message",
+    attachments: [
+      {
+        contentType: "application/vnd.microsoft.card.adaptive",
+        contentUrl: null,
+        content: {
+          $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
+          type: "AdaptiveCard",
+          version: "1.4",
+          body: [
+            {
+              type: "TextBlock",
+              text: `🚨 RDS Sentinel Alert: ${alertType}`,
+              weight: "Bolder",
+              size: "Medium",
+              color: "Attention",
+            },
+            {
+              type: "FactSet",
+              facts: [
+                { title: "Target Database:", value: dbName },
+                { title: "Severity:", value: "HIGH (Action Required)" },
+                { title: "Environment:", value: "Production" },
+                { title: "AWS Account:", value: "616399034957" },
+              ],
+            },
+            {
+              type: "TextBlock",
+              text: message,
+              wrap: true,
+            },
+            ...(ddlAction ? [
+              {
+                type: "TextBlock",
+                text: `Suggested Zero-Downtime DDL:\n${ddlAction}`,
+                fontType: "Monospace",
+                wrap: true,
+              }
+            ] : []),
+          ],
+          actions: [
+            {
+              type: "Action.OpenUrl",
+              title: "⚡ 1-Click Remediation Console",
+              url: "https://sentinel.cspec.uk/dashboard?tab=slow-queries",
+            },
+            {
+              type: "Action.OpenUrl",
+              title: "📊 Open Console",
+              url: "https://sentinel.cspec.uk/dashboard",
+            },
+          ],
+        },
+      },
+    ],
+  };
+}
+
 /**
  * Formats PagerDuty Events API v2 payload JSON with custom action links.
  */
@@ -152,7 +216,7 @@ export function formatPagerDutyPayload(dbName: string, alertType: string, messag
  * Dispatches simulated webhook alert to target endpoint.
  */
 export async function dispatchWebhookAlert(
-  target: "slack" | "pagerduty",
+  target: "slack" | "pagerduty" | "teams",
   webhookUrl: string,
   dbName: string,
   alertType: string,
@@ -173,6 +237,8 @@ export async function dispatchWebhookAlert(
   const payload =
     target === "slack"
       ? formatSlackPayload(dbName, alertType, message)
+      : target === "teams"
+      ? formatTeamsPayload(dbName, alertType, message)
       : formatPagerDutyPayload(dbName, alertType, message);
 
   const payloadJson = JSON.stringify(payload, null, 2);

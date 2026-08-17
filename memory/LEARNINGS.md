@@ -12,6 +12,10 @@
   - *Problem*: `crypto.subtle` is available in modern browsers and Node v18 (`require("crypto").webcrypto`). Base64 conversion using spread operators (`String.fromCharCode(...arr)`) throws TypeScript `TS2802` downlevel iteration errors under standard target settings.
   - *Learning*: Use safe array-from loop iteration `for (let i = 0; i < arr.length; i++) binary += String.fromCharCode(arr[i])` for cross-platform Uint8Array base64 encoding.
 
+* **Microsoft Teams Adaptive Cards & Multi-Channel Alert Engine**
+  - *Problem*: Enterprise SRE teams use diverse chat tools (Slack, Microsoft Teams, PagerDuty) requiring standardized alert JSON formatting.
+  - *Learning*: Build `formatTeamsPayload` utilizing Microsoft Adaptive Cards schema `v1.4` with `FactSet` blocks and `Action.OpenUrl` remediation links alongside Slack Block Kit and PagerDuty Events v2 API payloads.
+
 * **Interactive Slack Block Kit & PagerDuty 1-Click DDL Action Payload Generator**
   - *Problem*: Traditional alert notifications require SREs to log into multiple consoles manually when database anomalies occur.
   - *Learning*: Format Slack Block Kit action blocks (`sentinel_ddl_actions`) with 1-click `apply_zero_downtime_ddl` buttons carrying pre-formatted `CREATE INDEX CONCURRENTLY` payloads and PagerDuty remediation links for instant incident resolution directly from chat channels.

@@ -51,9 +51,9 @@ _Last Updated: 2026-08-17_
 - **AWS Organizations Auto-Discovery Engine**: `Active` (Scans child AWS account OUs via `sts:AssumeRole`, enforces Service Control Policies `SCP-DenyUnencryptedRDSStorage`, and auto-imports discovered Aurora/RDS databases into monitoring console).
 - **AI-Powered Natural Language SQL EXPLAIN & DDL Optimizer**: `Active` (Translates `Seq Scan`, `Hash Join`, and `Nested Loop` query execution plans into plain-English diagnostic advice, 1-click zero-downtime production DDL `CREATE INDEX CONCURRENTLY`, and query rewrite suggestions).
 - **Automated GitHub Actions CI/CD Pipeline**: `Active` (`.github/workflows/ci.yml` defining automated Node.js v18 build matrix, `npx tsc --noEmit`, 103 Jest unit tests, high-severity CVE audit, and Playwright Chromium E2E testing).
-- **Interactive Slack Block Kit & PagerDuty 1-Click DDL Action Buttons**: `Active` (Generates Slack Block Kit button payloads for 1-click zero-downtime DDL execution, alert muting, and HMAC SHA-256 webhook signatures in `webhookSimulator.ts`).
-- **Multidisciplinary Agent Audit & Security/A11y Gap Resolution**: `Active` (Full 8-persona agent review complete, HMAC SHA-256 payload signing implemented, explicit WCAG AA `aria-label` tags added to DDL action controls).
-- **Automated Test Coverage**: **143/143 Tests Passing** (103 Jest unit + 40 Playwright E2E across 4 languages `en`, `de`, `fr`, `ja`).
+- **Interactive Webhook Alert Engine (Slack, MS Teams & PagerDuty)**: `Active` (Generates Slack Block Kit payloads, Microsoft Teams Adaptive Cards, PagerDuty Events v2 API, and HMAC SHA-256 signatures in `webhookSimulator.ts`).
+- **AWS Organizations Tag Propagation & MMS Contract Metering**: `Active` (Propagates sub-account OU tags into cost center pills and meters hourly contract usage via `agentBacklogEnhancements.ts`).
+- **Automated Test Coverage**: **145/145 Tests Passing** (105 Jest unit + 40 Playwright E2E across 4 languages `en`, `de`, `fr`, `ja`).
 - **Page Component Architecture**: `page.tsx` refactored from 2,861 lines to ~450 lines using 10 leaf components in `src/components/` (`HeaderToolbar`, `TelemetrySandbox`, `CostRecommendations`, `SlowQueryInspector`, `TopologyVisualizer`, `SettingsModal`, `TierConfirmationModal`, `GraphQLInspectorModal`, `EvidenceInspectorDrawer`, `ProductTourModal`). Complete TypeScript strict type safety (`npx tsc --noEmit` 0 errors).
 
 ---

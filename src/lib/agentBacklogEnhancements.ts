@@ -10,6 +10,7 @@ export interface DiscoveredAwsInstance {
   accountId: string;
   accountName: string;
   status: "discovered" | "imported";
+  inheritedTags?: string[];
 }
 
 export interface HipaaBaaAgreement {
@@ -36,6 +37,33 @@ export interface AwsOrgDiscoveryResult {
   scpPolicies: AwsOrgScpPolicy[];
 }
 
+export interface MarketplaceMeteringResult {
+  productCode: string;
+  meteredDbInstances: number;
+  hourlyRate: number;
+  totalHourlyCharge: number;
+  timestamp: string;
+  status: "RECORDED_SUCCESS";
+}
+
+/**
+ * Simulates AWS Marketplace Metering API Service (MMS) contract usage reporting
+ */
+export function meterMarketplaceContractUsage(
+  dbInstanceCount: number,
+  tier: string = "enterprise"
+): MarketplaceMeteringResult {
+  const hourlyRate = tier === "enterprise" ? 0.15 : tier === "medium" ? 0.08 : tier === "small" ? 0.03 : 0.00;
+  return {
+    productCode: "prod-rds-sentinel-aws-mp",
+    meteredDbInstances: dbInstanceCount,
+    hourlyRate,
+    totalHourlyCharge: Math.round(dbInstanceCount * hourlyRate * 100) / 100,
+    timestamp: new Date().toISOString(),
+    status: "RECORDED_SUCCESS",
+  };
+}
+
 /**
  * Simulates AWS Organizations Auto-Discovery Scanner across sub-account OUs & SCP policies
  */
@@ -52,6 +80,7 @@ export function scanAwsOrganizationsForDatabases(
       accountId: linkedAccountIds[0] || "123456789012",
       accountName: "Production Primary",
       status: "discovered",
+      inheritedTags: ["Payment Services", "E-Commerce Platform"],
     },
     {
       id: "discovered-rds-inventory",
@@ -62,6 +91,7 @@ export function scanAwsOrganizationsForDatabases(
       accountId: linkedAccountIds[1] || "987654321098",
       accountName: "Staging & Dev",
       status: "discovered",
+      inheritedTags: ["Analytics Platform"],
     },
   ];
 }
@@ -94,6 +124,7 @@ export function discoverAwsOrganizationsAccountsAndDatabases(
       accountId: mgmtAccountId,
       accountName: "Org Management Account",
       status: "discovered",
+      inheritedTags: ["Payment Services", "Core Infrastructure"],
     },
     {
       id: "org-db-analytics-stg",
@@ -104,6 +135,7 @@ export function discoverAwsOrganizationsAccountsAndDatabases(
       accountId: "987654321098",
       accountName: "OU-Staging-Child",
       status: "discovered",
+      inheritedTags: ["Analytics Platform"],
     },
     {
       id: "org-db-sandbox-dev",
@@ -114,6 +146,7 @@ export function discoverAwsOrganizationsAccountsAndDatabases(
       accountId: "123456789012",
       accountName: "OU-Sandbox-Child",
       status: "discovered",
+      inheritedTags: ["E-Commerce Platform"],
     },
   ];
 
