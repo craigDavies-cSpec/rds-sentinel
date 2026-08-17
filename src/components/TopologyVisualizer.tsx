@@ -101,9 +101,9 @@ export function TopologyVisualizer({
             </div>
 
             <div className="grid grid-cols-2 gap-2 text-[10px]">
-              <div><span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">Engine:</span> <strong>{selectedTopologyNode.engine}</strong></div>
+              <div><span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">{t("engineLabel", language)}</span> <strong>{selectedTopologyNode.engine}</strong></div>
               <div><span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">{t("instanceClass", language)}:</span> <strong>{selectedTopologyNode.instanceClass}</strong></div>
-              <div><span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">Region:</span> <strong>{selectedTopologyNode.region}</strong></div>
+              <div><span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">{t("regionLabel", language)}</span> <strong>{selectedTopologyNode.region}</strong></div>
               <div><span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">{t("failoverPriorityLabel", language)}</span> <strong>Tier-{selectedTopologyNode.failoverPriority}</strong></div>
               <div><span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">{t("replicationLagLabel", language)}</span> <strong className="text-emerald-800 dark:text-emerald-400">{selectedTopologyNode.replicationLagMs}ms</strong></div>
               <div><span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">{t("iopsThroughputLabel", language)}</span> <strong>{selectedTopologyNode.iops} IOPS</strong></div>

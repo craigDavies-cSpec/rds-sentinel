@@ -51,13 +51,13 @@ export function SlowQueryInspector({
           /* Billing Upgrade CTA inside Log Watcher */
           <div className="text-center py-6 text-xs text-aws-textSecondary">
             <span className="block text-2xl mb-2">🔒</span>
-            <p className="font-semibold text-aws-lightTextPrimary dark:text-aws-textPrimary">Real-Time Log Scanning Locked</p>
-            <p className="mt-1 mb-4 text-[11px]">Real-time log scanning is a premium feature available in the **Medium** and **Enterprise** tiers.</p>
+            <p className="font-semibold text-aws-lightTextPrimary dark:text-aws-textPrimary">{t("realTimeLogsLockedTitle", language)}</p>
+            <p className="mt-1 mb-4 text-[11px]">{t("realTimeLogsLockedDesc", language)}</p>
             <button 
               onClick={() => handleTierClick && handleTierClick("medium")}
               className="px-4 py-2 bg-aws-orange hover:bg-aws-orangeHover text-aws-lightTextPrimary dark:text-aws-lightTextPrimary text-xs font-bold rounded shadow transition-all active:scale-95 cursor-pointer"
             >
-              Unlock Medium Tier
+              {t("unlockMediumTierBtn", language)}
             </button>
           </div>
         ) : (
@@ -89,7 +89,7 @@ export function SlowQueryInspector({
           <h2 className="text-sm font-bold text-aws-lightTextPrimary dark:text-aws-orange uppercase tracking-wider flex items-center gap-2">
             {t("slowQueries", language)}
             <span className="text-[9px] bg-aws-red/10 text-red-800 dark:text-red-400 border border-aws-red/20 px-1.5 py-0.5 rounded font-mono">
-              PII Redacted
+              {t("piiRedactedLabel", language)}
             </span>
           </h2>
         </div>
@@ -120,9 +120,9 @@ export function SlowQueryInspector({
           return (
             <div key={q.id} className="p-3 bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border rounded font-mono text-xs">
               <div className="flex justify-between text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary mb-1.5 pb-1 border-b border-aws-lightBorder dark:border-aws-divider">
-                <span>DB: {instances.find((db) => db.id === q.dbInstanceId)?.name}</span>
+                <span>{t("dbLabel", language)} {instances.find((db) => db.id === q.dbInstanceId)?.name}</span>
                 <span>
-                  Wait Event: <span className="text-amber-800 dark:text-aws-yellow">{q.waitEvent}</span>
+                  {t("waitEventLabel", language)} <span className="text-amber-800 dark:text-aws-yellow">{q.waitEvent}</span>
                 </span>
                 <span className="text-red-800 dark:text-red-400 font-bold">{q.durationMs}ms</span>
               </div>
@@ -134,7 +134,7 @@ export function SlowQueryInspector({
               <div className="flex justify-between items-center pt-2 border-t border-aws-lightBorder dark:border-aws-divider text-[10px]">
                 <button
                   onClick={() => setActiveAdvisorQueryId(isExpanded ? null : q.id)}
-                  className="px-2 py-1 rounded bg-aws-orange/10 hover:bg-aws-orange/20 text-amber-800 dark:text-aws-orange border border-aws-orange/20 font-bold transition-all flex items-center gap-1 cursor-pointer"
+                  className="px-2 py-0.5 rounded bg-aws-orange/10 hover:bg-aws-orange/20 text-amber-800 dark:text-aws-orange border border-aws-orange/20 font-bold transition-all flex items-center gap-1 cursor-pointer"
                 >
                   {isExpanded ? "▲ Hide Index Advisor" : `⚡ ${t("analyzeIndex", language)}`}
                 </button>
@@ -148,7 +148,7 @@ export function SlowQueryInspector({
                 <div className="mt-2.5 p-2.5 bg-aws-lightContainer dark:bg-aws-container border border-aws-orange/30 rounded text-xs font-sans leading-relaxed animate-fade-in">
                   <div className="flex justify-between items-center mb-1.5 pb-1 border-b border-aws-lightBorder dark:border-aws-divider font-mono">
                     <span className="font-bold text-amber-800 dark:text-aws-orange text-[10px] uppercase">
-                      💡 Automated Index Advisor DDL
+                      {t("automatedIndexAdvisorTitle", language)}
                     </span>
                     <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-800 dark:text-emerald-400 font-bold text-[10px]">
                       {rec.originalDurationMs}ms ➔ {rec.optimizedDurationMs}ms (-{rec.estimatedSpeedupPct}% Faster)
@@ -161,7 +161,7 @@ export function SlowQueryInspector({
 
                   {/* AI Natural Language Diagnostic Card */}
                   <div className="p-2.5 rounded bg-amber-500/10 border border-amber-500/20 text-[11px] font-sans text-amber-900 dark:text-amber-300 mb-2 leading-relaxed">
-                    <strong className="block font-bold mb-1 text-aws-orange">🤖 AI EXPLAIN Natural Language Diagnostic Advice:</strong>
+                    <strong className="block font-bold mb-1 text-aws-orange">{t("aiExplainTitle", language)}</strong>
                     <p>{rec.aiNaturalLanguageAdvice}</p>
                   </div>
 
@@ -170,7 +170,7 @@ export function SlowQueryInspector({
                     <code>{rec.suggestedDdl}</code>
                     <button
                       id={`copy-ddl-btn-${q.id}`}
-                      aria-label="Copy standard DDL index SQL statement"
+                      aria-label={t("copyStandardDdlAria", language)}
                       onClick={() => {
                         navigator.clipboard.writeText(rec.suggestedDdl);
                         setCopiedDdlQueryId(q.id);
@@ -185,12 +185,12 @@ export function SlowQueryInspector({
                   {/* Zero-Downtime DDL Block */}
                   <div className="relative bg-aws-lightBg dark:bg-aws-dark p-2 rounded border border-aws-lightBorder dark:border-aws-border font-mono text-[11px] text-blue-800 dark:text-blue-400 font-bold flex justify-between items-center mb-2">
                     <div>
-                      <span className="block text-[9px] uppercase text-blue-500 font-sans font-bold">⚡ Zero-Downtime Production DDL:</span>
+                      <span className="block text-[9px] uppercase text-blue-500 font-sans font-bold">{t("zeroDowntimeProductionDdlTitle", language)}</span>
                       <code>{rec.zeroDowntimeDdl}</code>
                     </div>
                     <button
                       id={`copy-zero-downtime-ddl-btn-${q.id}`}
-                      aria-label="Copy zero-downtime production DDL index SQL statement"
+                      aria-label={t("copyZeroDowntimeDdlAria", language)}
                       onClick={() => {
                         navigator.clipboard.writeText(rec.zeroDowntimeDdl);
                         setCopiedDdlQueryId(`zero-${q.id}`);
@@ -204,7 +204,7 @@ export function SlowQueryInspector({
 
                   {/* Query Rewrite Suggestion */}
                   <div className="p-2 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border font-mono text-[10px] text-aws-lightTextPrimary dark:text-aws-textPrimary">
-                    <strong className="block text-[9px] uppercase text-purple-400 font-sans font-bold mb-1">Optimized Query Rewrite:</strong>
+                    <strong className="block text-[9px] uppercase text-purple-400 font-sans font-bold mb-1">{t("optimizedQueryRewriteTitle", language)}</strong>
                     <code>{rec.queryRewriteSuggestion}</code>
                   </div>
                 </div>

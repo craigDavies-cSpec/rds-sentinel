@@ -21,9 +21,9 @@ test.describe("RDS Sentinel Dashboard Layout State Persistence", () => {
     await page.goto("/");
 
     // 2. Identify the three sections
-    const databasesSection = page.locator("section").filter({ hasText: "Target Databases" });
-    const balancerSection = page.locator("section").filter({ hasText: "Cost-Performance Balancer" });
-    const logsSection = page.locator("section").filter({ hasText: "Anomaly Log Watcher" });
+    const databasesSection = page.locator("main > section").filter({ hasText: /Target Databases/i });
+    const balancerSection = page.locator("main > section").filter({ hasText: /Cost & Performance|Cost-Performance/i });
+    const logsSection = page.locator("main > section").filter({ hasText: /Log Watcher|Real-Time Logs/i });
 
     await expect(databasesSection).toBeVisible();
     await expect(balancerSection).toBeVisible();
@@ -35,7 +35,7 @@ test.describe("RDS Sentinel Dashboard Layout State Persistence", () => {
     await expect(logsSection).toHaveCSS("order", "2");
 
     // 4. Click to shift the "Databases" panel to the right (databases = 1, balancer = 0)
-    const moveRightBtn = page.locator("[data-testid='layout-controls-databases'] button[aria-label='Move Databases Right']");
+    const moveRightBtn = page.locator("[data-testid='layout-controls-databases'] button").nth(1);
     await expect(moveRightBtn).toBeVisible();
     await moveRightBtn.click();
 
@@ -51,9 +51,9 @@ test.describe("RDS Sentinel Dashboard Layout State Persistence", () => {
     await page.reload();
 
     // 7. Verify the custom swapped layout is correctly persisted and loaded
-    const databasesSectionReloaded = page.locator("section").filter({ hasText: "Target Databases" });
-    const balancerSectionReloaded = page.locator("section").filter({ hasText: "Cost-Performance Balancer" });
-    const logsSectionReloaded = page.locator("section").filter({ hasText: "Anomaly Log Watcher" });
+    const databasesSectionReloaded = page.locator("main > section").filter({ hasText: /Target Databases/i });
+    const balancerSectionReloaded = page.locator("main > section").filter({ hasText: /Cost & Performance|Cost-Performance/i });
+    const logsSectionReloaded = page.locator("main > section").filter({ hasText: /Log Watcher|Real-Time Logs/i });
 
     await expect(databasesSectionReloaded).toHaveCSS("order", "1");
     await expect(balancerSectionReloaded).toHaveCSS("order", "0");

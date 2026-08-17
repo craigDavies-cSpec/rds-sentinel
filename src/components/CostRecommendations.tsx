@@ -55,14 +55,14 @@ export function CostRecommendations({
         <div className="flex gap-1" data-testid="layout-controls-recommendations">
           <button
             onClick={() => moveLeft("recommendations")}
-            aria-label="Move Balancer Left"
+            aria-label={t("moveBalancerLeftAria", language)}
             className="px-1.5 py-0.5 bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/20 border border-aws-lightBorder dark:border-aws-border rounded text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary transition-colors"
           >
             ◀
           </button>
           <button
             onClick={() => moveRight("recommendations")}
-            aria-label="Move Balancer Right"
+            aria-label={t("moveBalancerRightAria", language)}
             className="px-1.5 py-0.5 bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/20 border border-aws-lightBorder dark:border-aws-border rounded text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary transition-colors"
           >
             ▶
@@ -193,10 +193,10 @@ export function CostRecommendations({
             </p>
             <div className="flex justify-between items-center text-[10px] font-mono pt-1.5 border-t border-aws-teal/10">
               <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">
-                Cross-Region Replication Lag: <strong className="text-emerald-800 dark:text-emerald-400">120ms</strong>
+                {t("crossRegionLagLabel", language)} <strong className="text-emerald-800 dark:text-emerald-400">120ms</strong>
               </span>
               <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">
-                Failover RTO: <strong className="text-teal-800 dark:text-teal-400">&lt; 30s</strong>
+                {t("failoverRtoLabel", language)} <strong className="text-teal-800 dark:text-teal-400">{"< 30s"}</strong>
               </span>
             </div>
             <button
@@ -249,7 +249,7 @@ export function CostRecommendations({
                 id="webhook-url-input"
                 type="text"
                 value={webhookUrl}
-                aria-label="Webhook Endpoint URL"
+                aria-label={t("webhookUrlAria", language)}
                 onChange={(e) => setWebhookUrl(e.target.value)}
                 className="w-full px-2 py-1 text-[11px] font-mono rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary"
               />
@@ -271,7 +271,7 @@ export function CostRecommendations({
                       <span className="text-[9px] text-purple-300">Header: {webhookResult.signatureHeader.slice(0, 18)}...</span>
                     )}
                   </div>
-                  <span>RDS Sentinel Anomaly Alert delivered to {webhookResult.target}!</span>
+                  <span>{t("alertDeliveredTo", language)} {webhookResult.target}!</span>
                 </div>
               )}
             </div>
@@ -299,7 +299,7 @@ export function CostRecommendations({
                   showToast("🔄 ROI Calculator slider reset to baseline (10 DBs)");
                 }}
                 className="px-2 py-0.5 rounded bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/20 border border-aws-lightBorder dark:border-aws-border text-[9px] font-bold text-aws-lightTextPrimary dark:text-aws-textPrimary cursor-pointer transition-all flex items-center gap-1"
-                title="Reset ROI DB slider count to default 10 DBs"
+                title={t("resetRoiSliderTitle", language)}
               >
                 🔄 {t("resetSlider", language)}
               </button>
@@ -317,7 +317,7 @@ export function CostRecommendations({
             <input
               type="range"
               id="roi-db-slider"
-              aria-label="Database Instances Count for ROI Calculation"
+              aria-label={t("roiDbSliderAria", language)}
               min="1"
               max="50"
               value={roiDbCount}

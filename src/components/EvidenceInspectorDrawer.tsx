@@ -39,7 +39,7 @@ export function EvidenceInspectorDrawer({
                 {t("trustServicesCriteriaSubtitle", language)}
               </p>
               <span className="text-[10px] font-mono text-aws-lightTextSecondary dark:text-aws-textSecondary">
-                Package ID: {evidencePackage.auditId}
+                {t("packageIdLabel", language)} {evidencePackage.auditId}
               </span>
             </div>
           </div>
@@ -91,19 +91,19 @@ export function EvidenceInspectorDrawer({
           {activeTab === "summary" && (
             <div className="flex flex-col gap-4">
               <div className="p-3 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 dark:text-emerald-300">
-                <span className="font-bold block mb-1">Status: {evidencePackage.overallStatus}</span>
+                <span className="font-bold block mb-1">{t("statusLabel", language)} {evidencePackage.overallStatus}</span>
                 <p className="text-[11px] text-aws-lightTextSecondary dark:text-aws-textSecondary">
-                  Evaluated standard: {evidencePackage.complianceStandard}. Generated for {evidencePackage.companyName} ({evidencePackage.auditorEmail}).
+                  {t("evaluatedStandardLabel", language)} {evidencePackage.complianceStandard}. {t("generatedForLabel", language)} {evidencePackage.companyName} ({evidencePackage.auditorEmail}).
                 </p>
               </div>
 
               <div className="grid grid-cols-1 gap-2 font-mono text-[11px]">
                 <div className="p-2 bg-aws-lightBg dark:bg-aws-dark rounded border border-aws-lightBorder dark:border-aws-border">
-                  <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary block">KMS Master Key</span>
+                  <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary block">{t("kmsMasterKeyLabel", language)}</span>
                   <strong>{evidencePackage.encryptionProof.kmsKeyArn}</strong>
                 </div>
                 <div className="p-2 bg-aws-lightBg dark:bg-aws-dark rounded border border-aws-lightBorder dark:border-aws-border">
-                  <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary block">TLS Transport Enforcement</span>
+                  <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary block">{t("tlsEnforcementLabel", language)}</span>
                   <strong>{evidencePackage.encryptionProof.tlsVersion}</strong>
                 </div>
               </div>
@@ -125,7 +125,7 @@ export function EvidenceInspectorDrawer({
                     {ctrl.description}
                   </p>
                   <span className="text-[10px] font-mono text-emerald-400 block bg-emerald-950/40 p-1.5 rounded">
-                    Proof: {ctrl.evidenceSnippet}
+                    {t("proofLabel", language)} {ctrl.evidenceSnippet}
                   </span>
                 </div>
               ))}
@@ -135,11 +135,11 @@ export function EvidenceInspectorDrawer({
           {activeTab === "proofs" && (
             <div className="flex flex-col gap-3 font-mono text-[11px]">
               <div className="p-3 bg-aws-lightBg dark:bg-aws-dark rounded border border-aws-lightBorder dark:border-aws-border">
-                <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary block mb-1">IAM AssumeRole Policy</span>
+                <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary block mb-1">{t("iamAssumeRolePolicyLabel", language)}</span>
                 <strong>{evidencePackage.iamIsolationProof.assumeRolePolicy}</strong>
               </div>
               <div className="p-3 bg-aws-lightBg dark:bg-aws-dark rounded border border-aws-lightBorder dark:border-aws-border">
-                <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary block mb-1">ExternalId Condition</span>
+                <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary block mb-1">{t("externalIdConditionLabel", language)}</span>
                 <strong>{evidencePackage.iamIsolationProof.externalIdCondition}</strong>
               </div>
             </div>
@@ -149,7 +149,7 @@ export function EvidenceInspectorDrawer({
         {/* Drawer Footer */}
         <div className="p-4 border-t border-aws-lightBorder dark:border-aws-border bg-aws-lightBg dark:bg-aws-dark flex justify-between items-center">
           <span className="text-xs font-mono text-aws-lightTextSecondary dark:text-aws-textSecondary">
-            Format: SOC2 Audit JSON Package
+            {t("formatSoc2JsonPackageLabel", language)}
           </span>
           <button
             onClick={() => downloadAuditEvidencePackageFile(evidencePackage)}

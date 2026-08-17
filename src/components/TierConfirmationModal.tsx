@@ -38,7 +38,7 @@ export function TierConfirmationModal({
                 {t("subscriptionMarketplaceTitle", language)}
               </h3>
               <span className="text-xs text-aws-lightTextSecondary dark:text-aws-textSecondary">
-                {t("selectModeUpgrade", language)} {targetPlan.name} (${targetPlan.monthlyPrice}/mo)
+                {t("selectModeUpgrade", language)} {targetPlan.name} (${targetPlan.monthlyPrice}/{t("moLabel", language)})
               </span>
             </div>
           </div>
@@ -55,7 +55,7 @@ export function TierConfirmationModal({
           <div className="flex justify-between items-center border-b border-aws-lightBorder dark:border-aws-divider pb-2">
             <div>
               <span className="text-xs font-bold text-amber-800 dark:text-aws-orange uppercase tracking-wider block">
-                Target Tier: {targetPlan.name}
+                {t("targetTierLabel", language)} {targetPlan.name}
               </span>
               <span className="text-xs text-aws-lightTextSecondary dark:text-aws-textSecondary">
                 {proration.textSummary}
@@ -65,7 +65,7 @@ export function TierConfirmationModal({
               <span className="text-xl font-mono font-extrabold text-aws-lightTextPrimary dark:text-aws-textPrimary">
                 ${targetPlan.monthlyPrice}
               </span>
-              <span className="text-xs text-aws-lightTextSecondary dark:text-aws-textSecondary block">/ month</span>
+              <span className="text-xs text-aws-lightTextSecondary dark:text-aws-textSecondary block">/{t("monthLabel", language)}</span>
             </div>
           </div>
 
@@ -112,7 +112,7 @@ export function TierConfirmationModal({
             onClick={() => onConfirmTier(pendingTier, "marketplace")}
             className="w-full py-2.5 rounded bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
-            {t("confirmMarketplaceBillingBtn", language)} (${targetPlan.monthlyPrice}/mo)
+            {t("confirmMarketplaceBillingBtn", language)} (${targetPlan.monthlyPrice}/{t("moLabel", language)})
           </button>
         </div>
       </div>

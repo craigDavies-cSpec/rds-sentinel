@@ -67,14 +67,14 @@ export function TelemetrySandbox({
         <div className="flex gap-1" data-testid="layout-controls-databases">
           <button
             onClick={() => moveLeft("databases")}
-            aria-label="Move Databases Left"
+            aria-label={t("moveDbsLeftAria", language)}
             className="px-1.5 py-0.5 bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/20 border border-aws-lightBorder dark:border-aws-border rounded text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary transition-colors"
           >
             ◀
           </button>
           <button
             onClick={() => moveRight("databases")}
-            aria-label="Move Databases Right"
+            aria-label={t("moveDbsRightAria", language)}
             className="px-1.5 py-0.5 bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/20 border border-aws-lightBorder dark:border-aws-border rounded text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary transition-colors"
           >
             ▶
@@ -115,7 +115,7 @@ export function TelemetrySandbox({
                       db.cpuLoad > 80 ? "bg-aws-red animate-pulse" : "bg-aws-green"
                     }`}
                   />
-                  CPU: {db.cpuLoad}%
+                  {t("cpuLabel", language)} {db.cpuLoad}%
                 </span>
               </div>
               {isTrialRestricted && (
@@ -190,7 +190,7 @@ export function TelemetrySandbox({
                       id="reset-cpu-load-btn"
                       onClick={() => handleResetCpuToBaseline(selectedDb.id)}
                       className="px-2 py-0.5 rounded bg-aws-lightContainer dark:bg-aws-container hover:bg-aws-orange/20 border border-aws-lightBorder dark:border-aws-border text-[9px] font-bold text-aws-lightTextPrimary dark:text-aws-textPrimary cursor-pointer transition-all flex items-center gap-1"
-                      title="Reset CPU load to baseline performing state"
+                      title={t("resetCpuTitle", language)}
                     >
                       🔄 {t("resetCpu", language)}
                     </button>
@@ -199,7 +199,7 @@ export function TelemetrySandbox({
                 <input
                   type="range"
                   id="cpu-simulator-slider"
-                  aria-label="Simulate CPU Utilization Load"
+                  aria-label={t("simulateCpuLoadAria", language)}
                   min="0"
                   max="100"
                   value={selectedDb.cpuLoad}

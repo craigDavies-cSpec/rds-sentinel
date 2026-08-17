@@ -161,7 +161,7 @@ export default function Dashboard() {
   const [pricingSyncMetadata, setPricingSyncMetadata] = useState<PricingSyncMetadata>(getPricingSyncMetadata());
 
   // Layout order
-  const [layoutOrder, setLayoutOrder] = useState<string[]>(["databases", "recommendations", "logs"]);
+  const [layoutOrder, setLayoutOrder] = useState<string[]>(["databases", "balancer", "logs"]);
 
   // Toast Notification helper
   const showToast = (msg: string) => {
@@ -388,7 +388,7 @@ export default function Dashboard() {
         <div id="live-account-active-banner" className="bg-emerald-950/90 border-b border-emerald-500/40 px-4 py-2 flex flex-wrap items-center justify-between text-xs font-mono text-emerald-300">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
-            <span>🟢 {t("activeAccountBanner", language)} <strong>cSpec Live AWS Account (616399034957)</strong> in <strong>eu-west-1 (Ireland)</strong></span>
+            <span>🟢 {t("activeAccountBanner", language)} <strong>{t("liveAwsAccountLabel", language)} (616399034957)</strong> {t("liveAccountIn", language)} <strong>eu-west-1 (Ireland)</strong></span>
           </div>
           <span className="text-[11px] bg-emerald-900/80 text-emerald-200 px-3 py-1 rounded border border-emerald-400/40">
             {t("liveMonitoredDb", language)} free-tier-sandbox-db (RDS PostgreSQL db.t4g.micro)
@@ -428,7 +428,7 @@ export default function Dashboard() {
         </section>
 
         {/* Column 2: Cost Recommendations & Topology */}
-        <section style={{ order: layoutOrder.indexOf("recommendations") }} className="flex flex-col gap-6">
+        <section style={{ order: layoutOrder.indexOf("balancer") >= 0 ? layoutOrder.indexOf("balancer") : 1 }} className="flex flex-col gap-6">
           <CostRecommendations
             totalCost={accountMonthlyCost}
             potentialSavings={potentialSavings}

@@ -107,7 +107,7 @@ export function HeaderToolbar({
             id="toggle-app-mode-btn"
             onClick={() => setAppMode(appMode === "mode_a" ? "mode_b" : "mode_a")}
             className="px-2 py-0.5 rounded bg-aws-orange/10 hover:bg-aws-orange/20 border border-aws-orange/30 text-amber-900 dark:text-aws-orange text-[10px] font-bold transition-all cursor-pointer flex items-center gap-1"
-            title="Toggle between Mode A (Standalone SaaS Console) and Mode B (AWS Management Console Extension)"
+            title={t("modeToggleTitle", language)}
           >
             {appMode === "mode_a" ? t("modeA", language) : t("modeB", language)}
           </button>
@@ -128,17 +128,15 @@ export function HeaderToolbar({
             {t("tourBtn", language)}
           </button>
 
-          {/* Option A: Export CSV Report Button */}
           <button
             id="export-csv-report-btn"
             onClick={exportCSVReport}
             className="px-2.5 py-1.5 rounded bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/10 border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs font-bold transition-all shadow-sm flex items-center gap-1 cursor-pointer"
-            title="Export CSV Performance Report"
+            title={t("exportCsvTitle", language)}
           >
             {t("exportCsvBtn", language)}
           </button>
 
-          {/* Phase 5: SOC2 / HIPAA Compliance Report Export Button */}
           <button
             id="export-soc2-compliance-btn"
             onClick={() => {
@@ -150,7 +148,7 @@ export function HeaderToolbar({
               downloadCompliancePackage(report);
             }}
             className="px-2.5 py-1.5 rounded bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/10 border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs font-bold transition-all shadow-sm flex items-center gap-1 cursor-pointer"
-            title="Export SOC2 / HIPAA Security Compliance Audit Package"
+            title={t("exportSoc2Title", language)}
           >
             {t("soc2Btn", language)}
           </button>
@@ -160,7 +158,7 @@ export function HeaderToolbar({
             id="open-settings-modal-btn"
             onClick={() => setIsSettingsModalOpen(true)}
             className="px-2.5 py-1.5 rounded bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/10 border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs font-bold transition-all shadow-sm flex items-center gap-1 cursor-pointer"
-            title="Open Dashboard Settings & Account Management"
+            title={t("openSettingsTitle", language)}
           >
             {t("settingsBtn", language)}
           </button>
@@ -206,7 +204,7 @@ export function HeaderToolbar({
           {/* Option C: Language Dropdown Selector */}
           <select
             id="header-language-selector"
-            aria-label="Select Display Language"
+            aria-label={t("selectLanguageAria", language)}
             value={language}
             onChange={(e) => setLanguage(e.target.value as LanguageCode)}
             className="px-2 py-1.5 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs font-bold transition-all shadow-sm cursor-pointer hover:border-aws-orange"
@@ -222,7 +220,7 @@ export function HeaderToolbar({
           <button
             onClick={() => setIsDarkMode(!isDarkMode)}
             className="px-2.5 py-1.5 rounded bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/10 border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs font-bold transition-all shadow-sm cursor-pointer"
-            title="Toggle Theme"
+            title={t("toggleThemeTitle", language)}
           >
             {isDarkMode ? "☀️ " + t("lightTheme", language) : "🌙 " + t("darkTheme", language)}
           </button>
@@ -239,7 +237,7 @@ export function HeaderToolbar({
               <span className="text-[10px] uppercase font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary mr-1 hidden sm:inline-block">{t("accountLabel", language)}</span>
               <select
                 id="aws-account-selector"
-                aria-label="Select AWS Account"
+                aria-label={t("selectAccountAria", language)}
                 value={selectedAccountId}
                 onChange={(e) => setSelectedAccountId(e.target.value)}
                 className="px-2 py-1 rounded bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs font-bold transition-all shadow-sm cursor-pointer hover:border-aws-orange"
@@ -332,7 +330,7 @@ export function HeaderToolbar({
               className="flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-800/10 dark:bg-emerald-500/10 border border-emerald-800/20 dark:border-emerald-500/20 text-emerald-900 dark:text-emerald-400 text-[10px] font-bold transition-all cursor-pointer hover:bg-emerald-800/20 dark:hover:bg-emerald-500/20"
               title={`AWS Live Pricing API Sync Active. Est. Account Monthly Cost: $${accountMonthlyCost.toFixed(2)}/mo. Click to re-sync.`}
             >
-              <span>🟢 AWS Rates: ${accountMonthlyCost.toFixed(2)}/mo</span>
+              <span>{t("awsRatesLabel", language)}{accountMonthlyCost.toFixed(2)}/mo</span>
               <span className="text-[9px] font-bold">({pricingSyncMetadata.region})</span>
             </button>
           </div>

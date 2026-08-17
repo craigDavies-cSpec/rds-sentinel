@@ -303,6 +303,70 @@ export interface TranslationDictionary {
   failoverPriorityLabel: string;
   iopsThroughputLabel: string;
   nodeInspectorTitle: string;
+
+  // Automated AST Scanner Comprehensive Keys
+  moveBalancerLeftAria: string;
+  moveBalancerRightAria: string;
+  crossRegionLagLabel: string;
+  failoverRtoLabel: string;
+  webhookUrlAria: string;
+  alertDeliveredTo: string;
+  resetRoiSliderTitle: string;
+  roiDbSliderAria: string;
+  packageIdLabel: string;
+  statusLabel: string;
+  evaluatedStandardLabel: string;
+  generatedForLabel: string;
+  kmsMasterKeyLabel: string;
+  tlsEnforcementLabel: string;
+  proofLabel: string;
+  iamAssumeRolePolicyLabel: string;
+  externalIdConditionLabel: string;
+  formatSoc2JsonPackageLabel: string;
+  modeToggleTitle: string;
+  exportCsvTitle: string;
+  exportSoc2Title: string;
+  openSettingsTitle: string;
+  selectLanguageAria: string;
+  toggleThemeTitle: string;
+  selectAccountAria: string;
+  awsRatesLabel: string;
+  displayLanguagePrefTitle: string;
+  externalIdPlaceholder: string;
+  scpCheckerTitle: string;
+  orgArnPlaceholder: string;
+  foundAccountsLabel: string;
+  accountsLabel: string;
+  activeScpPoliciesLabel: string;
+  scpEnforcementActive: string;
+  apiKeyNamePlaceholder: string;
+  charsLabel: string;
+  bitsEntropyLabel: string;
+  soc2AuditDesc: string;
+  realTimeLogsLockedTitle: string;
+  realTimeLogsLockedDesc: string;
+  unlockMediumTierBtn: string;
+  piiRedactedLabel: string;
+  dbLabel: string;
+  waitEventLabel: string;
+  automatedIndexAdvisorTitle: string;
+  aiExplainTitle: string;
+  copyStandardDdlAria: string;
+  zeroDowntimeProductionDdlTitle: string;
+  copyZeroDowntimeDdlAria: string;
+  optimizedQueryRewriteTitle: string;
+  moveDbsLeftAria: string;
+  moveDbsRightAria: string;
+  cpuLabel: string;
+  resetCpuTitle: string;
+  simulateCpuLoadAria: string;
+  engineLabel: string;
+  regionLabel: string;
+  liveAwsAccountLabel: string;
+  liveAccountIn: string;
+  targetTierLabel: string;
+  monthLabel: string;
+  moLabel: string;
 }
 
 export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
@@ -566,6 +630,69 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     failoverPriorityLabel: "Failover Priority:",
     iopsThroughputLabel: "IOPS Throughput:",
     nodeInspectorTitle: "🔍 Node Inspector:",
+
+    moveBalancerLeftAria: "Move Balancer Left",
+    moveBalancerRightAria: "Move Balancer Right",
+    crossRegionLagLabel: "Cross-Region Replication Lag:",
+    failoverRtoLabel: "Failover RTO:",
+    webhookUrlAria: "Webhook Endpoint URL",
+    alertDeliveredTo: "RDS Sentinel Anomaly Alert delivered to",
+    resetRoiSliderTitle: "Reset ROI DB slider count to default 10 DBs",
+    roiDbSliderAria: "Database Instances Count for ROI Calculation",
+    packageIdLabel: "Package ID:",
+    statusLabel: "Status:",
+    evaluatedStandardLabel: "Evaluated standard:",
+    generatedForLabel: "Generated for",
+    kmsMasterKeyLabel: "KMS Master Key",
+    tlsEnforcementLabel: "TLS Transport Enforcement",
+    proofLabel: "Proof:",
+    iamAssumeRolePolicyLabel: "IAM AssumeRole Policy",
+    externalIdConditionLabel: "ExternalId Condition",
+    formatSoc2JsonPackageLabel: "Format: SOC2 Audit JSON Package",
+    modeToggleTitle: "Toggle between Mode A (Standalone SaaS Console) and Mode B (AWS Management Console Extension)",
+    exportCsvTitle: "Export CSV Performance Report",
+    exportSoc2Title: "Export SOC2 / HIPAA Security Compliance Audit Package",
+    openSettingsTitle: "Open Dashboard Settings & Account Management",
+    selectLanguageAria: "Select Display Language",
+    toggleThemeTitle: "Toggle Theme",
+    selectAccountAria: "Select AWS Account",
+    awsRatesLabel: "🟢 AWS Rates: $",
+    displayLanguagePrefTitle: "Display Language / Sprache / Langue / 言語",
+    externalIdPlaceholder: "ExternalId",
+    scpCheckerTitle: "SCP Policy Checker",
+    orgArnPlaceholder: "Management Account Organization ARN (arn:aws:organizations::...)",
+    foundAccountsLabel: "Found",
+    accountsLabel: "Accounts ·",
+    activeScpPoliciesLabel: "Active SCP Policies",
+    scpEnforcementActive: "SCP Enforcement: ACTIVE",
+    apiKeyNamePlaceholder: "API Key Name (e.g. Datadog Stream)",
+    charsLabel: "chars",
+    bitsEntropyLabel: "Bits Entropy (",
+    soc2AuditDesc: "Download certified audit proofs or open interactive drawer inspector.",
+    realTimeLogsLockedTitle: "Real-Time Log Scanning Locked",
+    realTimeLogsLockedDesc: "Real-time log scanning is a premium feature available in the Medium and Enterprise tiers.",
+    unlockMediumTierBtn: "Unlock Medium Tier",
+    piiRedactedLabel: "PII Redacted",
+    dbLabel: "DB:",
+    waitEventLabel: "Wait Event:",
+    automatedIndexAdvisorTitle: "💡 Automated Index Advisor DDL",
+    aiExplainTitle: "🤖 AI EXPLAIN Natural Language Diagnostic Advice:",
+    copyStandardDdlAria: "Copy standard DDL index SQL statement",
+    zeroDowntimeProductionDdlTitle: "⚡ Zero-Downtime Production DDL:",
+    copyZeroDowntimeDdlAria: "Copy zero-downtime production DDL index SQL statement",
+    optimizedQueryRewriteTitle: "Optimized Query Rewrite:",
+    moveDbsLeftAria: "Move Databases Left",
+    moveDbsRightAria: "Move Databases Right",
+    cpuLabel: "CPU:",
+    resetCpuTitle: "Reset CPU load to baseline performing state",
+    simulateCpuLoadAria: "Simulate CPU Utilization Load",
+    engineLabel: "Engine:",
+    regionLabel: "Region:",
+    liveAwsAccountLabel: "cSpec Live AWS Account",
+    liveAccountIn: "in",
+    targetTierLabel: "Target Tier:",
+    monthLabel: "month",
+    moLabel: "mo",
   },
   de: {
     dashboardTitle: "RDS Sentinel",
@@ -827,6 +954,69 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     failoverPriorityLabel: "Failover-Priorität:",
     iopsThroughputLabel: "IOPS-Durchsatz:",
     nodeInspectorTitle: "🔍 Knoten-Inspektor:",
+
+    moveBalancerLeftAria: "Balancer nach links verschieben",
+    moveBalancerRightAria: "Balancer nach rechts verschieben",
+    crossRegionLagLabel: "Regionenübergreifende Replikationsverzögerung:",
+    failoverRtoLabel: "Failover-RTO:",
+    webhookUrlAria: "Webhook-Endpunkt-URL",
+    alertDeliveredTo: "RDS Sentinel Anomalie-Warnung gesendet an",
+    resetRoiSliderTitle: "ROI-DB-Schieberegler auf Standard 10 DBs zurücksetzen",
+    roiDbSliderAria: "Anzahl der Datenbankinstanzen für ROI-Berechnung",
+    packageIdLabel: "Paket-ID:",
+    statusLabel: "Status:",
+    evaluatedStandardLabel: "Bewerteter Standard:",
+    generatedForLabel: "Erstellt für",
+    kmsMasterKeyLabel: "KMS-Hauptschlüssel",
+    tlsEnforcementLabel: "TLS-Transport erzwingen",
+    proofLabel: "Nachweis:",
+    iamAssumeRolePolicyLabel: "IAM-AssumeRole-Richtlinie",
+    externalIdConditionLabel: "ExternalId-Bedingung",
+    formatSoc2JsonPackageLabel: "Format: SOC2 Audit JSON-Paket",
+    modeToggleTitle: "Umschalten zwischen Modus A (SaaS-Konsole) und Modus B (AWS-Konsolen-Erweiterung)",
+    exportCsvTitle: "CSV-Leistungsbericht exportieren",
+    exportSoc2Title: "SOC2 / HIPAA Sicherheits-Audit-Paket exportieren",
+    openSettingsTitle: "Dashboard-Einstellungen & Kontoverwaltung öffnen",
+    selectLanguageAria: "Anzeigesprache auswählen",
+    toggleThemeTitle: "Design umschalten",
+    selectAccountAria: "AWS-Konto auswählen",
+    awsRatesLabel: "🟢 AWS-Tarife: $",
+    displayLanguagePrefTitle: "Display Language / Sprache / Langue / 言語",
+    externalIdPlaceholder: "ExternalId",
+    scpCheckerTitle: "SCP-Richtlinien-Prüfer",
+    orgArnPlaceholder: "Management-Konto Organisations-ARN (arn:aws:organizations::...)",
+    foundAccountsLabel: "Gefunden",
+    accountsLabel: "Konten ·",
+    activeScpPoliciesLabel: "Aktive SCP-Richtlinien",
+    scpEnforcementActive: "SCP-Durchsetzung: AKTIV",
+    apiKeyNamePlaceholder: "API-Schlüssel-Name (z.B. Datadog Stream)",
+    charsLabel: "Zeichen",
+    bitsEntropyLabel: "Bit Entropie (",
+    soc2AuditDesc: "Zertifizierte Audit-Nachweise herunterladen oder interaktiven Inspector öffnen.",
+    realTimeLogsLockedTitle: "Echtzeit-Log-Scanning gesperrt",
+    realTimeLogsLockedDesc: "Echtzeit-Log-Scanning ist eine Premium-Funktion, die in den Tarifen Medium und Enterprise verfügbar ist.",
+    unlockMediumTierBtn: "Medium Tarif freischalten",
+    piiRedactedLabel: "PII anonymisiert",
+    dbLabel: "DB:",
+    waitEventLabel: "Warte-Ereignis:",
+    automatedIndexAdvisorTitle: "💡 Automatisierter Index Advisor DDL",
+    aiExplainTitle: "🤖 KI EXPLAIN Diagnosehinweise in natürlicher Sprache:",
+    copyStandardDdlAria: "Standard DDL Index SQL-Anweisung kopieren",
+    zeroDowntimeProductionDdlTitle: "⚡ Ausfallfreie Produktions-DDL:",
+    copyZeroDowntimeDdlAria: "Ausfallfreie Produktions-DDL Index SQL-Anweisung kopieren",
+    optimizedQueryRewriteTitle: "Optimierte Abfrage-Umschreibung:",
+    moveDbsLeftAria: "Datenbanken nach links verschieben",
+    moveDbsRightAria: "Datenbanken nach rechts verschieben",
+    cpuLabel: "CPU:",
+    resetCpuTitle: "CPU-Auslastung auf Baseline zurücksetzen",
+    simulateCpuLoadAria: "CPU-Auslastung simulieren",
+    engineLabel: "Engine:",
+    regionLabel: "Region:",
+    liveAwsAccountLabel: "cSpec Live AWS Konto",
+    liveAccountIn: "in",
+    targetTierLabel: "Ziel-Tarif:",
+    monthLabel: "Monat",
+    moLabel: "Mon",
   },
   fr: {
     dashboardTitle: "RDS Sentinel",
@@ -1088,6 +1278,69 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     failoverPriorityLabel: "Priorité de basculement :",
     iopsThroughputLabel: "Débit IOPS :",
     nodeInspectorTitle: "🔍 Inspecteur de nœud :",
+
+    moveBalancerLeftAria: "Déplacer le balancier vers la gauche",
+    moveBalancerRightAria: "Déplacer le balancier vers la droite",
+    crossRegionLagLabel: "Retard de réplication interrégionale :",
+    failoverRtoLabel: "RTO de basculement :",
+    webhookUrlAria: "URL du point de terminaison webhook",
+    alertDeliveredTo: "Alerte d'anomalie RDS Sentinel livrée à",
+    resetRoiSliderTitle: "Réinitialiser le curseur ROI à 10 BDD par défaut",
+    roiDbSliderAria: "Nombre d'instances de BDD pour le calcul du ROI",
+    packageIdLabel: "ID du paquet :",
+    statusLabel: "Statut :",
+    evaluatedStandardLabel: "Norme évaluée :",
+    generatedForLabel: "Généré pour",
+    kmsMasterKeyLabel: "Clé maître KMS",
+    tlsEnforcementLabel: "Application du transport TLS",
+    proofLabel: "Preuve :",
+    iamAssumeRolePolicyLabel: "Politique IAM AssumeRole",
+    externalIdConditionLabel: "Condition ExternalId",
+    formatSoc2JsonPackageLabel: "Format : Paquet JSON d'audit SOC2",
+    modeToggleTitle: "Basculez entre le Mode A (Console SaaS) et le Mode B (Extension AWS)",
+    exportCsvTitle: "Exporter le rapport de performance CSV",
+    exportSoc2Title: "Exporter le paquet d'audit de sécurité SOC2 / HIPAA",
+    openSettingsTitle: "Ouvrir les paramètres et la gestion du compte",
+    selectLanguageAria: "Sélectionner la langue d'affichage",
+    toggleThemeTitle: "Changer de thème",
+    selectAccountAria: "Sélectionner le compte AWS",
+    awsRatesLabel: "🟢 Tarifs AWS : $",
+    displayLanguagePrefTitle: "Display Language / Sprache / Langue / 言語",
+    externalIdPlaceholder: "ExternalId",
+    scpCheckerTitle: "Vérificateur de politiques SCP",
+    orgArnPlaceholder: "ARN d'organisation du compte de gestion (arn:aws:organizations::...)",
+    foundAccountsLabel: "Trouvé",
+    accountsLabel: "Comptes ·",
+    activeScpPoliciesLabel: "Politiques SCP actives",
+    scpEnforcementActive: "Application SCP : ACTIVE",
+    apiKeyNamePlaceholder: "Nom de la clé API (ex. Datadog Stream)",
+    charsLabel: "caractères",
+    bitsEntropyLabel: "Bits d'entropie (",
+    soc2AuditDesc: "Téléchargez des preuves d'audit certifiées ou ouvrez l'inspecteur.",
+    realTimeLogsLockedTitle: "Analyse des journaux en temps réel verrouillée",
+    realTimeLogsLockedDesc: "L'analyse des journaux en temps réel est disponible dans les niveaux Medium et Enterprise.",
+    unlockMediumTierBtn: "Débloquer le niveau Medium",
+    piiRedactedLabel: "PII anonymisée",
+    dbLabel: "BDD :",
+    waitEventLabel: "Événement d'attente :",
+    automatedIndexAdvisorTitle: "💡 DDL automatisé du conseiller d'index",
+    aiExplainTitle: "🤖 Conseil de diagnostic en langage naturel IA EXPLAIN :",
+    copyStandardDdlAria: "Copier l'instruction SQL DDL d'index standard",
+    zeroDowntimeProductionDdlTitle: "⚡ DDL de production sans interruption :",
+    copyZeroDowntimeDdlAria: "Copier l'instruction SQL DDL d'index de production sans interruption",
+    optimizedQueryRewriteTitle: "Réécriture d'une requête optimisée :",
+    moveDbsLeftAria: "Déplacer les bases de données vers la gauche",
+    moveDbsRightAria: "Déplacer les bases de données vers la droite",
+    cpuLabel: "CPU :",
+    resetCpuTitle: "Réinitialiser la charge CPU à l'état de référence",
+    simulateCpuLoadAria: "Simuler la charge d'utilisation CPU",
+    engineLabel: "Moteur :",
+    regionLabel: "Région :",
+    liveAwsAccountLabel: "Compte AWS en direct cSpec",
+    liveAccountIn: "dans",
+    targetTierLabel: "Niveau cible :",
+    monthLabel: "mois",
+    moLabel: "mois",
   },
   ja: {
     dashboardTitle: "RDS Sentinel",
@@ -1349,6 +1602,69 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     failoverPriorityLabel: "フェイルオーバー優先度:",
     iopsThroughputLabel: "IOPS スループット:",
     nodeInspectorTitle: "🔍 ノード インスペクター:",
+
+    moveBalancerLeftAria: "バランサーを左に移動",
+    moveBalancerRightAria: "バランサーを右に移動",
+    crossRegionLagLabel: "クロスリージョン レプリケーション遅延:",
+    failoverRtoLabel: "フェイルオーバー RTO:",
+    webhookUrlAria: "Webhook エンドポイント URL",
+    alertDeliveredTo: "RDS Sentinel 異常アラートが送信されました:",
+    resetRoiSliderTitle: "ROI DB スライダー数をデフォルトの 10 DB にリセット",
+    roiDbSliderAria: "ROI 計算用データベース インスタンス数",
+    packageIdLabel: "パッケージ ID:",
+    statusLabel: "ステータス:",
+    evaluatedStandardLabel: "評価規格:",
+    generatedForLabel: "作成対象:",
+    kmsMasterKeyLabel: "KMS マスターキー",
+    tlsEnforcementLabel: "TLS 輸送の強制",
+    proofLabel: "証明:",
+    iamAssumeRolePolicyLabel: "IAM AssumeRole ポリシー",
+    externalIdConditionLabel: "ExternalId 条件",
+    formatSoc2JsonPackageLabel: "フォーマット: SOC2 監査 JSON パッケージ",
+    modeToggleTitle: "モード A（スタンドアロン SaaS）とモード B（AWS コンソール拡張）を切り替え",
+    exportCsvTitle: "CSV パフォーマンス レポートをエクスポート",
+    exportSoc2Title: "SOC2 / HIPAA セキュリティ監査パッケージをエクスポート",
+    openSettingsTitle: "ダッシュボード設定およびアカウント管理を開く",
+    selectLanguageAria: "表示言語を選択",
+    toggleThemeTitle: "テーマ切り替え",
+    selectAccountAria: "AWS アカウントを選択",
+    awsRatesLabel: "🟢 AWS 料金: $",
+    displayLanguagePrefTitle: "Display Language / Sprache / Langue / 言語",
+    externalIdPlaceholder: "ExternalId",
+    scpCheckerTitle: "SCP ポリシー チェッカー",
+    orgArnPlaceholder: "管理アカウントの組織 ARN (arn:aws:organizations::...)",
+    foundAccountsLabel: "発見",
+    accountsLabel: "アカウント ·",
+    activeScpPoliciesLabel: "アクティブな SCP ポリシー",
+    scpEnforcementActive: "SCP 適用: アクティブ",
+    apiKeyNamePlaceholder: "API キー名 (例: Datadog Stream)",
+    charsLabel: "文字",
+    bitsEntropyLabel: "ビット エントロピー (",
+    soc2AuditDesc: "認定された監査証明をダウンロードするか、インスペクターを開きます。",
+    realTimeLogsLockedTitle: "リアルタイム ログ スキャンがロックされています",
+    realTimeLogsLockedDesc: "リアルタイム ログ スキャンは Medium および Enterprise ティアで利用可能です。",
+    unlockMediumTierBtn: "Medium ティアを解放",
+    piiRedactedLabel: "PII マスク済み",
+    dbLabel: "DB:",
+    waitEventLabel: "待機イベント:",
+    automatedIndexAdvisorTitle: "💡 自動インデックス アドバイザー DDL",
+    aiExplainTitle: "🤖 AI EXPLAIN 自然言語診断アドバイス:",
+    copyStandardDdlAria: "標準 DDL インデックス SQL ステートメントをコピー",
+    zeroDowntimeProductionDdlTitle: "⚡ ゼロダウンタイム生産 DDL:",
+    copyZeroDowntimeDdlAria: "ゼロダウンタイム生産 DDL インデックス SQL ステートメントをコピー",
+    optimizedQueryRewriteTitle: "最適化されたクエリの書き換え:",
+    moveDbsLeftAria: "データベースを左に移動",
+    moveDbsRightAria: "データベースを右に移動",
+    cpuLabel: "CPU:",
+    resetCpuTitle: "CPU 負荷をパフォーマンス基準状態にリセット",
+    simulateCpuLoadAria: "CPU 利用率負荷をシミュレート",
+    engineLabel: "エンジン:",
+    regionLabel: "リージョン:",
+    liveAwsAccountLabel: "cSpec ライブ AWS アカウント",
+    liveAccountIn: "リージョン:",
+    targetTierLabel: "対象ティア:",
+    monthLabel: "月",
+    moLabel: "月",
   },
 };
 

@@ -269,20 +269,21 @@ export function SettingsModal({
               {/* IAM Connection Tester Form */}
               <div className="p-4 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border flex flex-col gap-3">
                 <h5 className="font-bold text-xs uppercase text-aws-orange">{t("testStsConnection", language)}</h5>
-                <div className="grid grid-cols-2 gap-3">
+                {/* Form Input Fields */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <input
                     type="text"
-                    placeholder="Role ARN (e.g. arn:aws:iam::123456789012:role/...)"
+                    placeholder={t("roleArnPlaceholder", language)}
                     value={newAccountForm.roleArn}
                     onChange={(e) => setNewAccountForm({ ...newAccountForm, roleArn: e.target.value })}
-                    className="p-2 rounded bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border text-xs font-mono"
+                    className="w-full px-3 py-1.5 text-xs font-mono rounded bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary"
                   />
                   <input
                     type="text"
-                    placeholder="ExternalId"
+                    placeholder={t("externalIdPlaceholder", language)}
                     value={newAccountForm.externalId}
                     onChange={(e) => setNewAccountForm({ ...newAccountForm, externalId: e.target.value })}
-                    className="p-2 rounded bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border text-xs font-mono"
+                    className="w-full px-3 py-1.5 text-xs font-mono rounded bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary"
                   />
                 </div>
 
@@ -365,7 +366,7 @@ export function SettingsModal({
                     </p>
                   </div>
                   <span className="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-bold text-[10px] uppercase">
-                    SCP Policy Checker
+                    {t("scpCheckerTitle", language)}
                   </span>
                 </div>
 
@@ -373,7 +374,7 @@ export function SettingsModal({
                   <input
                     id="aws-org-management-arn-input"
                     type="text"
-                    placeholder="Management Account Organization ARN (arn:aws:organizations::...)"
+                    placeholder={t("orgArnPlaceholder", language)}
                     value={awsOrgArnInput}
                     onChange={(e) => setAwsOrgArnInput(e.target.value)}
                     className="flex-1 p-2 rounded bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border text-xs font-mono text-aws-lightTextPrimary dark:text-aws-textPrimary"
@@ -395,10 +396,10 @@ export function SettingsModal({
                   <div className="flex flex-col gap-3 mt-2 p-3 rounded bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border">
                     <div className="flex justify-between items-center border-b border-aws-lightBorder dark:border-aws-border pb-2">
                       <span className="font-bold text-xs text-aws-lightTextPrimary dark:text-aws-textPrimary">
-                        Found {awsOrgResult.discoveredAccountsCount} Accounts · {awsOrgResult.scpPolicies.length} Active SCP Policies
+                        {t("foundAccountsLabel", language)} {awsOrgResult.discoveredAccountsCount} {t("accountsLabel", language)} {awsOrgResult.scpPolicies.length} {t("activeScpPoliciesLabel", language)}
                       </span>
                       <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-mono text-[10px] font-bold">
-                        SCP Enforcement: ACTIVE
+                        {t("scpEnforcementActive", language)}
                       </span>
                     </div>
 
@@ -530,7 +531,7 @@ export function SettingsModal({
                   <input
                     id="new-api-key-name-input"
                     type="text"
-                    placeholder="API Key Name (e.g. Datadog Stream)"
+                    placeholder={t("apiKeyNamePlaceholder", language)}
                     value={newApiKeyName}
                     onChange={(e) => setNewApiKeyName(e.target.value)}
                     className="flex-1 p-2 rounded bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border text-xs font-mono"
@@ -586,7 +587,7 @@ export function SettingsModal({
                     onChange={(e) => setOwaspPasswordLength(Number(e.target.value))}
                     className="flex-1 accent-aws-orange cursor-pointer"
                   />
-                  <span className="font-mono font-bold text-xs">{owaspPasswordLength} chars</span>
+                  <span className="font-mono font-bold text-xs">{owaspPasswordLength} {t("charsLabel", language)}</span>
                   <button
                     id="generate-owasp-password-btn"
                     onClick={() => {
@@ -616,7 +617,7 @@ export function SettingsModal({
                     </div>
                     {passwordAnalysis && (
                       <span className="text-[10px] text-emerald-300 font-sans">
-                        {passwordAnalysis.entropyBits} Bits Entropy ({passwordAnalysis.qualityGrade})
+                        {passwordAnalysis.entropyBits} {t("bitsEntropyLabel", language)}{passwordAnalysis.qualityGrade})
                       </span>
                     )}
                   </div>
@@ -644,7 +645,7 @@ export function SettingsModal({
               <div className="p-4 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border flex justify-between items-center">
                 <div>
                   <strong className="block text-xs text-aws-lightTextPrimary dark:text-aws-textPrimary">{t("soc2PackageTitle", language)}</strong>
-                  <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary">Download certified audit proofs or open interactive drawer inspector.</span>
+                  <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary">{t("soc2AuditDesc", language)}</span>
                 </div>
                 <div className="flex gap-2">
                   <button
