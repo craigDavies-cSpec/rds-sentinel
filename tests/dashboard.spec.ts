@@ -83,7 +83,7 @@ test.describe("RDS Sentinel Dashboard Functional E2E Tests", () => {
     await expect(page.getByText("RDS Proxy Connection Pooling Advisor")).toBeVisible();
     await expect(page.getByText("+82% Pool Efficiency")).toBeVisible();
     
-    await expect(page.getByText("Cross-Region Latency & Cost Modeler")).toBeVisible();
+    await expect(page.getByText("Multi-Region Replication Modeler")).toBeVisible();
     await expect(page.getByText("98.5% Failover Ready")).toBeVisible();
   });
 
@@ -114,7 +114,7 @@ test.describe("RDS Sentinel Dashboard Functional E2E Tests", () => {
     // Shift to Enterprise tier via Settings modal
     await page.locator("#open-settings-modal-btn").click();
     await page.locator("#tab-billing-btn").click();
-    await page.locator("button:has-text('Switch to Enterprise')").click();
+    await page.locator("button:has-text('Select Plan Enterprise')").click();
     await page.locator("#close-settings-modal-btn").click();
 
     // Verify Enterprise Webhook Dispatch Simulator card is unlocked
@@ -168,8 +168,8 @@ test.describe("RDS Sentinel Dashboard Functional E2E Tests", () => {
     await expect(page.getByText(/Aurora Enterprise Multi-Region Cluster/)).toBeVisible();
 
     // Primary Writer badge should be visible
-    await expect(page.getByText("Primary Writer").first()).toBeVisible();
-    await expect(page.getByText("Read Replica").first()).toBeVisible();
+    await expect(page.getByText("WRITER").first()).toBeVisible();
+    await expect(page.getByText("REPLICA").first()).toBeVisible();
   });
 
   test("should launch Guided Product Tour and navigate through steps and toggle Chaos Circuit Breaker", async ({ page }) => {
@@ -181,14 +181,14 @@ test.describe("RDS Sentinel Dashboard Functional E2E Tests", () => {
     await startTourBtn.click();
 
     // Step 1: Multi-AWS Account Selector
-    await expect(page.getByText("Step 1 of 6")).toBeVisible();
+    await expect(page.getByText(/Step 1 \/ 6/)).toBeVisible();
     await expect(page.getByText("Multi-AWS Account Selector")).toBeVisible();
 
     // Click Next Step
     await page.locator("button:has-text('Next Step')").click();
 
     // Step 2: Instance Telemetry & CPU Simulator
-    await expect(page.getByText("Step 2 of 6")).toBeVisible();
+    await expect(page.getByText(/Step 2 \/ 6/)).toBeVisible();
     await expect(page.getByText("Instance Telemetry & CPU Simulator")).toBeVisible();
 
     // Click Skip Tour to dismiss overlay
@@ -238,10 +238,10 @@ test.describe("RDS Sentinel Dashboard Functional E2E Tests", () => {
 
     // Switch to Tab 3: Subscription & Billing
     await page.locator("#tab-billing-btn").click();
-    await expect(page.getByText("Subscription Tiers & Billing Charging Mechanism")).toBeVisible();
+    await expect(page.getByText("RDS Sentinel SaaS Subscription & Billing Portal")).toBeVisible();
 
     // Switch to Small Business plan
-    const switchSmallBtn = page.locator("button:has-text('Switch to Small Business')");
+    const switchSmallBtn = page.locator("button:has-text('Select Plan Small Business')");
     await expect(switchSmallBtn).toBeVisible();
     await switchSmallBtn.click();
 
@@ -277,7 +277,7 @@ test.describe("RDS Sentinel Dashboard Functional E2E Tests", () => {
 
     // Navigate to Security & Vault tab
     await page.locator("#tab-security-btn").click();
-    await expect(page.getByText("HIPAA BAA Agreement Portal")).toBeVisible();
+    await expect(page.getByText("HIPAA Business Associate Agreement (BAA)")).toBeVisible();
 
     // Execute HIPAA BAA
     const signBaaBtn = page.locator("#sign-hipaa-baa-btn");
@@ -339,7 +339,7 @@ test.describe("RDS Sentinel Dashboard Functional E2E Tests", () => {
 
     // Navigate to Security & Vault tab
     await page.locator("#tab-security-btn").click();
-    await expect(page.getByText("AWS Control Tower Guardrail Compliance Audit")).toBeVisible();
+    await expect(page.getByText("AWS Control Tower Guardrails & MFA Verification")).toBeVisible();
     await expect(page.getByText("CT.RDS.PR.1 — Enforce RDS Storage Encryption")).toBeVisible();
   });
 
@@ -364,7 +364,7 @@ test.describe("RDS Sentinel Dashboard Functional E2E Tests", () => {
 
     // Navigate to Tab 2: AWS Accounts
     await page.locator("#tab-aws-accounts-btn").click();
-    await expect(page.getByText("AWS Infrastructure Exporter (CloudFormation & Service Catalog)")).toBeVisible();
+    await expect(page.getByText("CloudFormation & AWS Service Catalog IaC Infrastructure Exports")).toBeVisible();
     await expect(page.locator("#export-cfn-template-btn")).toBeVisible();
     await expect(page.locator("#export-service-catalog-btn")).toBeVisible();
   });
@@ -375,7 +375,7 @@ test.describe("RDS Sentinel Dashboard Functional E2E Tests", () => {
 
     // Navigate to Security & Vault tab
     await page.locator("#tab-security-btn").click();
-    await expect(page.getByText("Developer API Key & Request Rate-Limiting Vault")).toBeVisible();
+    await expect(page.getByText("API Keys & Rate-Limiting Control Panel")).toBeVisible();
 
     // Generate new key
     await page.locator("#new-api-key-name-input").fill("Datadog Realtime Stream");

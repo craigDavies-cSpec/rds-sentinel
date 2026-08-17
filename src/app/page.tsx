@@ -16,7 +16,7 @@ import { exportCSVReport } from "@/lib/reportExporter";
 import { dispatchWebhookAlert, WebhookDispatchResult } from "@/lib/webhookSimulator";
 import { analyzeSlowQuery, IndexRecommendation } from "@/lib/indexAdvisor";
 import { getClusterTopology, ClusterNode, ClusterTopologyData } from "@/lib/clusterTopology";
-import { PRODUCT_TOUR_STEPS, TourStep, isTourCompleted, markTourCompleted, resetTourState } from "@/lib/productTour";
+import { getLocalizedTourSteps, TourStep, isTourCompleted, markTourCompleted, resetTourState } from "@/lib/productTour";
 import { generateComplianceReport, downloadCompliancePackage } from "@/lib/complianceExporter";
 import {
   UserAppPreferences,
@@ -40,7 +40,7 @@ import {
   generateHipaaBaaAgreement,
   HipaaBaaAgreement,
 } from "@/lib/agentBacklogEnhancements";
-import { t, LanguageCode, SUPPORTED_LANGUAGES } from "@/lib/localization";
+import { t, LanguageCode, SUPPORTED_LANGUAGES, getLocalizedRecommendation } from "@/lib/localization";
 import { AccentTheme, ACCENT_THEMES } from "@/lib/themeAccent";
 import { evaluateControlTowerGuardrails } from "@/lib/controlTower";
 import {
@@ -227,7 +227,8 @@ export default function Dashboard() {
       return;
     }
 
-    const step = PRODUCT_TOUR_STEPS[currentTourStepIndex];
+    const tourSteps = getLocalizedTourSteps(language);
+    const step = tourSteps[currentTourStepIndex];
     if (step && step.targetElementId && typeof document !== "undefined") {
       document.querySelectorAll(".tour-spotlight-active").forEach((el) => el.classList.remove("tour-spotlight-active"));
       const targetEl = document.querySelector(step.targetElementId);
@@ -1061,31 +1062,37 @@ export default function Dashboard() {
 
             {/* Recommendations Grid */}
             <div className="flex flex-col gap-3">
-              {activeRecommendations.map((rec) => (
-                <div 
-                  key={rec.id} 
-                  className={`p-3 rounded border text-xs ${
-                    rec.costDelta < 0 
-                      ? "bg-aws-green/5 border-aws-green/20" 
-                      : "bg-aws-blue/5 border-aws-blue/20"
-                  }`}
-                >
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <span className={`text-[9px] uppercase font-bold px-1.5 py-0.5 rounded mr-2 ${
-                        rec.costDelta < 0 ? "bg-aws-green/10 text-emerald-800 dark:text-emerald-400" : "bg-aws-blue/10 text-sky-800 dark:text-sky-400"
-                      }`}>
-                        {rec.type}
+              {activeRecommendations.map((rec) => {
+                const loc = getLocalizedRecommendation(rec.id, language);
+                const title = loc.title || rec.title;
+                const reason = loc.reason || rec.reason;
+
+                return (
+                  <div 
+                    key={rec.id} 
+                    className={`p-3 rounded border text-xs ${
+                      rec.costDelta < 0 
+                        ? "bg-aws-green/5 border-aws-green/20" 
+                        : "bg-aws-blue/5 border-aws-blue/20"
+                    }`}
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <span className={`text-[9px] uppercase font-bold px-1.5 py-0.5 rounded mr-2 ${
+                          rec.costDelta < 0 ? "bg-aws-green/10 text-emerald-800 dark:text-emerald-400" : "bg-aws-blue/10 text-sky-800 dark:text-sky-400"
+                        }`}>
+                          {rec.type}
+                        </span>
+                        <strong className="text-aws-lightTextPrimary dark:text-aws-textPrimary">{title}</strong>
+                      </div>
+                      <span className={`font-mono font-bold text-sm ${rec.costDelta < 0 ? "text-emerald-800 dark:text-emerald-400" : "text-sky-800 dark:text-sky-400"}`}>
+                        {rec.costDelta < 0 ? `-$${Math.abs(rec.costDelta)}` : `+$${rec.costDelta}`} / mo
                       </span>
-                      <strong className="text-aws-lightTextPrimary dark:text-aws-textPrimary">{rec.title}</strong>
                     </div>
-                    <span className={`font-mono font-bold text-sm ${rec.costDelta < 0 ? "text-emerald-800 dark:text-emerald-400" : "text-sky-800 dark:text-sky-400"}`}>
-                      {rec.costDelta < 0 ? `-$${Math.abs(rec.costDelta)}` : `+$${rec.costDelta}`} / mo
-                    </span>
+                    <p className="text-[11px] text-aws-lightTextSecondary dark:text-aws-textSecondary leading-relaxed">{reason}</p>
                   </div>
-                  <p className="text-[11px] text-aws-lightTextSecondary dark:text-aws-textSecondary leading-relaxed">{rec.reason}</p>
-                </div>
-              ))}
+                );
+              })}
 
               {/* RDS Proxy Connection Pooling Advisor Card (Medium/Enterprise Tier) */}
               {hasFeature("real-time-logs") && (
@@ -1095,16 +1102,16 @@ export default function Dashboard() {
                       <span className="text-[9px] uppercase font-bold px-1.5 py-0.5 rounded bg-aws-blue/10 text-sky-800 dark:text-sky-400">
                         RDS Proxy
                       </span>
-                      <strong className="text-aws-lightTextPrimary dark:text-aws-textPrimary">RDS Proxy Connection Pooling Advisor</strong>
+                      <strong className="text-aws-lightTextPrimary dark:text-aws-textPrimary">{t("proxyAdvisorTitle", language)}</strong>
                     </div>
-                    <span className="font-mono font-bold text-xs text-sky-800 dark:text-sky-400">+82% Pool Efficiency</span>
+                    <span className="font-mono font-bold text-xs text-sky-800 dark:text-sky-400">+82% {t("poolEfficiency", language)}</span>
                   </div>
                   <p className="text-[11px] text-aws-lightTextSecondary dark:text-aws-textSecondary leading-relaxed mb-2">
-                    Current active connection pool on <strong>{selectedDb.name}</strong> is at <strong>{selectedDb.connections} / 150</strong>. Provisioning an RDS Proxy target will multiplex database connections, reducing memory overhead and preventing CPU spikes during surge traffic.
+                    {t("proxyAdvisorDesc", language)}
                   </p>
                   <div className="flex justify-between items-center text-[10px] font-mono pt-1.5 border-t border-aws-blue/10">
-                    <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">Estimated Latency Gain: <strong className="text-emerald-800 dark:text-emerald-400">-12ms handshake</strong></span>
-                    <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">Memory Savings: <strong className="text-sky-800 dark:text-sky-400">~1.4 GB RAM</strong></span>
+                    <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">{t("latencyGain", language)} <strong className="text-emerald-800 dark:text-emerald-400">-12ms handshake</strong></span>
+                    <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">{t("memorySavings", language)} <strong className="text-sky-800 dark:text-sky-400">~1.4 GB RAM</strong></span>
                   </div>
                 </div>
               )}
@@ -1114,19 +1121,19 @@ export default function Dashboard() {
                 <div className="flex justify-between items-center mb-2 pb-1.5 border-b border-aws-lightBorder dark:border-aws-divider">
                   <div className="flex items-center gap-2">
                     <span className="text-[9px] uppercase font-bold px-1.5 py-0.5 rounded bg-aws-orange/10 text-amber-800 dark:text-aws-orange border border-aws-orange/20">
-                      Topology Visualizer
+                      {t("clusterTopologyTitle", language)}
                     </span>
                     <strong className="text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs font-mono">
                       {topologyData.clusterName}
                     </strong>
                   </div>
                   <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-800 dark:text-emerald-400 font-mono font-bold text-[10px] border border-emerald-500/20">
-                    ⚡ {topologyData.failoverReadinessPct}% Failover Ready
+                    ⚡ {topologyData.failoverReadinessPct}% {t("failoverReady", language)}
                   </span>
                 </div>
 
                 <p className="text-[11px] text-aws-lightTextSecondary dark:text-aws-textSecondary mb-3">
-                  Interactive multi-region cluster node graph. Click any node to inspect instance class, IOPS throughput, and promotion priority.
+                  {t("clusterTopologyDesc", language)}
                 </p>
 
                 {/* Visual Node Graph */}
@@ -1154,7 +1161,7 @@ export default function Dashboard() {
                           <div className="flex items-center gap-1.5 w-full justify-between">
                             <span className={`w-2 h-2 rounded-full ${isWriter ? "bg-aws-green animate-pulse" : "bg-aws-blue"}`} />
                             <span className="text-[9px] uppercase font-bold font-mono px-1 py-0.2 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-divider text-aws-lightTextSecondary dark:text-aws-textSecondary">
-                              {node.role === "writer" ? "Primary Writer" : node.role === "cross-region-replica" ? "Cross-Region" : "Read Replica"}
+                              {node.role === "writer" ? t("writerRole", language) : node.role === "cross-region-replica" ? t("drRole", language) : t("replicaRole", language)}
                             </span>
                           </div>
 
@@ -1184,13 +1191,13 @@ export default function Dashboard() {
                           onClick={() => setSelectedTopologyNode(null)}
                           className="text-[10px] px-1.5 py-0.5 rounded bg-aws-lightContainer dark:bg-aws-container hover:bg-aws-orange/20 text-aws-lightTextSecondary dark:text-aws-textSecondary"
                         >
-                          ✕ Close
+                          {t("closeBtn", language)}
                         </button>
                       </div>
 
                       <div className="grid grid-cols-2 gap-2 text-[10px]">
                         <div><span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">Engine:</span> <strong>{selectedTopologyNode.engine}</strong></div>
-                        <div><span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">Instance Class:</span> <strong>{selectedTopologyNode.instanceClass}</strong></div>
+                        <div><span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">{t("instanceClass", language)}:</span> <strong>{selectedTopologyNode.instanceClass}</strong></div>
                         <div><span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">Region:</span> <strong>{selectedTopologyNode.region}</strong></div>
                         <div><span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">Failover Priority:</span> <strong>Tier-{selectedTopologyNode.failoverPriority}</strong></div>
                         <div><span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">Replication Lag:</span> <strong className="text-emerald-800 dark:text-emerald-400">{selectedTopologyNode.replicationLagMs}ms</strong></div>
@@ -1209,16 +1216,16 @@ export default function Dashboard() {
                       <span className="text-[9px] uppercase font-bold px-1.5 py-0.5 rounded bg-teal-500/10 text-teal-800 dark:text-teal-400">
                         Multi-Region
                       </span>
-                      <strong className="text-aws-lightTextPrimary dark:text-aws-textPrimary">Cross-Region Latency & Cost Modeler</strong>
+                      <strong className="text-aws-lightTextPrimary dark:text-aws-textPrimary">{t("multiRegionTitle", language)}</strong>
                     </div>
-                    <span className="font-mono font-bold text-xs text-teal-800 dark:text-teal-400">98.5% Failover Ready</span>
+                    <span className="font-mono font-bold text-xs text-teal-800 dark:text-teal-400">98.5% {t("failoverReady", language)}</span>
                   </div>
                   <p className="text-[11px] text-aws-lightTextSecondary dark:text-aws-textSecondary leading-relaxed mb-2">
-                    Cross-region read replica (<strong>us-east-1 ➔ us-west-2</strong>) synchronization lag averages <strong>62ms</strong>. Data transfer egress is optimized at ~$14.20/mo.
+                    {t("multiRegionDesc", language)}
                   </p>
                   <div className="flex justify-between items-center text-[10px] font-mono pt-1.5 border-t border-teal-500/10">
-                    <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">Sync Latency: <strong className="text-teal-800 dark:text-teal-400">62ms avg</strong></span>
-                    <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">Egress Cost: <strong className="text-aws-lightTextPrimary dark:text-aws-textPrimary">$14.20/mo</strong></span>
+                    <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">{t("syncLatency", language)} <strong className="text-teal-800 dark:text-teal-400">62ms avg</strong></span>
+                    <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">{t("egressCost", language)} <strong className="text-aws-lightTextPrimary dark:text-aws-textPrimary">$14.20/mo</strong></span>
                   </div>
                 </div>
               )}
@@ -1227,11 +1234,11 @@ export default function Dashboard() {
               <div className="p-3.5 bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border rounded text-xs mt-2">
                 <div className="flex justify-between items-center mb-2 pb-1.5 border-b border-aws-lightBorder dark:border-aws-divider">
                   <span className="font-bold text-aws-lightTextPrimary dark:text-aws-orange uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                    📊 Interactive AWS Bill ROI Calculator
+                    📊 {t("roiCalculator", language)}
                   </span>
                   <div className="flex items-center gap-2">
                     <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-800 dark:text-emerald-400 font-mono font-bold text-xs border border-emerald-500/20">
-                      {((roiDbCount * 145) / (tier === "enterprise" ? 499 : tier === "medium" ? 179 : tier === "small" ? 59 : 179)).toFixed(1)}x Net ROI
+                      {((roiDbCount * 145) / (tier === "enterprise" ? 499 : tier === "medium" ? 179 : tier === "small" ? 59 : 179)).toFixed(1)}x {t("netRoi", language)}
                     </span>
                     <button
                       id="reset-roi-slider-btn"
@@ -1242,14 +1249,14 @@ export default function Dashboard() {
                       className="px-2 py-0.5 rounded bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/20 border border-aws-lightBorder dark:border-aws-border text-[9px] font-bold text-aws-lightTextPrimary dark:text-aws-textPrimary cursor-pointer transition-all flex items-center gap-1"
                       title="Reset ROI DB slider count to default 10 DBs"
                     >
-                      🔄 Reset Slider
+                      🔄 {t("resetSlider", language)}
                     </button>
                   </div>
                 </div>
 
                 <div className="flex flex-col gap-2">
                   <div className="flex justify-between items-center text-[11px]">
-                    <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">Database Instances Managed:</span>
+                    <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary">{t("dbInstancesManaged", language)}</span>
                     <span className="font-mono font-bold text-amber-800 dark:text-aws-orange">{roiDbCount} Instances</span>
                   </div>
 
@@ -1266,17 +1273,17 @@ export default function Dashboard() {
 
                   <div className="grid grid-cols-3 gap-2 mt-1 font-mono text-[10px] text-center">
                     <div className="p-1.5 bg-aws-lightContainer dark:bg-aws-container rounded border border-aws-lightBorder dark:border-aws-border">
-                      <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary block text-[9px]">Est. AWS Bill Savings</span>
+                      <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary block text-[9px]">{t("estAnnualCost", language)}</span>
                       <strong className="text-emerald-800 dark:text-emerald-400 text-xs">${(roiDbCount * 145).toLocaleString()}/mo</strong>
                     </div>
                     <div className="p-1.5 bg-aws-lightContainer dark:bg-aws-container rounded border border-aws-lightBorder dark:border-aws-border">
-                      <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary block text-[9px]">Subscription Cost ({tier})</span>
+                      <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary block text-[9px]">{t("optAnnualCost", language)} ({tier})</span>
                       <strong className="text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs">
                         ${tier === "enterprise" ? 499 : tier === "medium" ? 179 : tier === "small" ? 59 : 0}/mo
                       </strong>
                     </div>
                     <div className="p-1.5 bg-aws-lightContainer dark:bg-aws-container rounded border border-aws-lightBorder dark:border-aws-border">
-                      <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary block text-[9px]">Net Annual Savings</span>
+                      <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary block text-[9px]">{t("netAnnualSavings", language)}</span>
                       <strong className="text-sky-800 dark:text-aws-blue text-xs">
                         ${((roiDbCount * 145 - (tier === "enterprise" ? 499 : tier === "medium" ? 179 : tier === "small" ? 59 : 0)) * 12).toLocaleString()}/yr
                       </strong>
@@ -1326,12 +1333,12 @@ export default function Dashboard() {
                     : "bg-aws-red/10 text-red-800 dark:text-red-400 border-aws-red/30 hover:bg-aws-red/20"
                 }`}
               >
-                {maskSql ? "🛡️ Parameter Masking: ACTIVE (Safe)" : "⚠️ Parameter Masking: OFF (Raw)"}
+                {maskSql ? t("paramMaskingActive", language) : t("paramMaskingOff", language)}
               </button>
             </div>
 
             <p className="text-[11px] text-aws-lightTextSecondary dark:text-aws-textSecondary mb-4 leading-relaxed">
-              Below are slow queries captured. Turning masking off exposes customer emails and credit cards in raw query strings (simulated local VPC view). Active masking converts database inputs to safe placeholder parameters before sending.
+              {t("slowQueryDesc", language)}
             </p>
 
             <div className="flex flex-col gap-3">
@@ -1357,11 +1364,11 @@ export default function Dashboard() {
                         onClick={() => setActiveAdvisorQueryId(isExpanded ? null : q.id)}
                         className="px-2 py-1 rounded bg-aws-orange/10 hover:bg-aws-orange/20 text-amber-800 dark:text-aws-orange border border-aws-orange/20 font-bold transition-all flex items-center gap-1"
                       >
-                        {isExpanded ? "▲ Hide Index Advisor" : "⚡ Analyze & Suggest Index"}
+                        {isExpanded ? "▲ Hide Index Advisor" : `⚡ ${t("analyzeIndex", language)}`}
                       </button>
 
                       <span className="text-emerald-800 dark:text-emerald-400 font-bold">
-                        Est. Speedup: -{rec.estimatedSpeedupPct}%
+                        {t("estSpeedup", language)} -{rec.estimatedSpeedupPct}%
                       </span>
                     </div>
 
@@ -1380,7 +1387,7 @@ export default function Dashboard() {
                           {rec.explanation}
                         </p>
 
-                        <div className="relative bg-aws-lightBg dark:bg-aws-dark p-2 rounded border border-aws-lightBorder dark:border-aws-border font-mono text-[11px] text-emerald-800 dark:text-emerald-400 font-bold">
+                        <div className="relative bg-aws-lightBg dark:bg-aws-dark p-2 rounded border border-aws-lightBorder dark:border-aws-border font-mono text-[11px] text-emerald-800 dark:text-emerald-400 font-bold flex justify-between items-center">
                           <code>{rec.suggestedDdl}</code>
                           <button
                             onClick={() => {
@@ -1388,9 +1395,9 @@ export default function Dashboard() {
                               setCopiedDdlQueryId(q.id);
                               setTimeout(() => setCopiedDdlQueryId(null), 2000);
                             }}
-                            className="absolute right-1.5 top-1.5 px-2 py-0.5 rounded bg-aws-orange hover:bg-aws-orangeHover text-aws-lightTextPrimary text-[9px] font-bold transition-all shadow"
+                            className="px-2 py-0.5 rounded bg-aws-orange hover:bg-aws-orangeHover text-white text-[10px] font-bold cursor-pointer transition-all"
                           >
-                            {isCopied ? "✅ Copied!" : "📋 Copy DDL"}
+                            {isCopied ? t("ddlCopied", language) : t("copyDdl", language)}
                           </button>
                         </div>
                       </div>
@@ -1772,10 +1779,10 @@ export default function Dashboard() {
           <div className="flex justify-between items-start mb-2 pb-1 border-b border-aws-lightBorder dark:border-aws-divider">
             <div className="flex items-center gap-2">
               <span className="px-1.5 py-0.5 rounded bg-aws-orange/20 text-amber-800 dark:text-aws-orange text-[9px] font-mono font-bold uppercase">
-                {PRODUCT_TOUR_STEPS[currentTourStepIndex].badgeText}
+                {getLocalizedTourSteps(language)[currentTourStepIndex].badgeText}
               </span>
               <span className="text-[10px] font-mono text-aws-lightTextSecondary dark:text-aws-textSecondary">
-                {PRODUCT_TOUR_STEPS[currentTourStepIndex].subtitle}
+                {getLocalizedTourSteps(language)[currentTourStepIndex].subtitle}
               </span>
             </div>
             <button
@@ -1787,16 +1794,16 @@ export default function Dashboard() {
           </div>
 
           <h3 className="text-sm font-bold text-aws-lightTextPrimary dark:text-aws-textPrimary mb-1">
-            {PRODUCT_TOUR_STEPS[currentTourStepIndex].title}
+            {getLocalizedTourSteps(language)[currentTourStepIndex].title}
           </h3>
 
           <p className="text-[11px] text-aws-lightTextSecondary dark:text-aws-textSecondary leading-relaxed mb-3">
-            {PRODUCT_TOUR_STEPS[currentTourStepIndex].description}
+            {getLocalizedTourSteps(language)[currentTourStepIndex].description}
           </p>
 
           <div className="flex justify-between items-center pt-2 border-t border-aws-lightBorder dark:border-aws-divider">
             <div className="flex gap-1">
-              {PRODUCT_TOUR_STEPS.map((_, idx) => (
+              {getLocalizedTourSteps(language).map((_, idx) => (
                 <span
                   key={idx}
                   className={`h-2 rounded-full transition-all ${
@@ -1812,16 +1819,16 @@ export default function Dashboard() {
                   onClick={() => setCurrentTourStepIndex((prev) => prev - 1)}
                   className="px-2.5 py-1 rounded bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/10 text-aws-lightTextPrimary dark:text-aws-textPrimary border border-aws-lightBorder dark:border-aws-border text-[10px] font-bold cursor-pointer"
                 >
-                  ◀ Back
+                  ◀ {t("tourBackBtn", language)}
                 </button>
               )}
 
-              {currentTourStepIndex < PRODUCT_TOUR_STEPS.length - 1 ? (
+              {currentTourStepIndex < getLocalizedTourSteps(language).length - 1 ? (
                 <button
                   onClick={() => setCurrentTourStepIndex((prev) => prev + 1)}
                   className="px-3 py-1 rounded bg-aws-orange hover:bg-aws-orangeHover text-aws-lightTextPrimary text-[10px] font-bold shadow cursor-pointer"
                 >
-                  Next Step ▶
+                  {t("tourNextBtn", language)} ▶
                 </button>
               ) : (
                 <button
@@ -1831,7 +1838,7 @@ export default function Dashboard() {
                   }}
                   className="px-3 py-1 rounded bg-aws-green hover:bg-emerald-600 text-white text-[10px] font-bold shadow cursor-pointer"
                 >
-                  🎉 Finish Tour
+                  🎉 {t("tourFinishBtn", language)}
                 </button>
               )}
             </div>
@@ -1846,10 +1853,10 @@ export default function Dashboard() {
             <div className="p-4 bg-aws-lightBg dark:bg-aws-dark border-b border-aws-lightBorder dark:border-aws-divider flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <span className="text-base font-bold text-aws-lightTextPrimary dark:text-aws-orange">
-                  ⚙️ Account Settings & Subscription Billing Portal
+                  ⚙️ {t("settingsModalTitle", language)}
                 </span>
                 <span className="text-[10px] px-2 py-0.5 rounded bg-aws-orange/20 text-amber-800 dark:text-aws-orange font-mono font-bold uppercase">
-                  Current Tier: {tier.toUpperCase()}
+                  {t("tierLabel", language)} {tier.toUpperCase()}
                 </span>
               </div>
               <button
@@ -1857,7 +1864,7 @@ export default function Dashboard() {
                 onClick={() => setIsSettingsModalOpen(false)}
                 className="text-sm font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary hover:text-aws-orange cursor-pointer px-2 py-1"
               >
-                ✕ Close
+                {t("closeBtn", language)}
               </button>
             </div>
 
@@ -1872,7 +1879,7 @@ export default function Dashboard() {
                     : "text-aws-lightTextSecondary dark:text-aws-textSecondary hover:text-aws-orange hover:bg-aws-orange/10"
                 }`}
               >
-                🎨 App Preferences
+                {t("tabPreferences", language)}
               </button>
               <button
                 id="tab-aws-accounts-btn"
@@ -1883,7 +1890,7 @@ export default function Dashboard() {
                     : "text-aws-lightTextSecondary dark:text-aws-textSecondary hover:text-aws-orange hover:bg-aws-orange/10"
                 }`}
               >
-                ☁️ AWS Accounts & Services
+                {t("tabAwsAccounts", language)}
               </button>
               <button
                 id="tab-billing-btn"
@@ -1894,7 +1901,7 @@ export default function Dashboard() {
                     : "text-aws-lightTextSecondary dark:text-aws-textSecondary hover:text-aws-orange hover:bg-aws-orange/10"
                 }`}
               >
-                💳 Subscription & Billing
+                {t("tabBilling", language)}
               </button>
               <button
                 id="tab-security-btn"
@@ -1905,7 +1912,7 @@ export default function Dashboard() {
                     : "text-aws-lightTextSecondary dark:text-aws-textSecondary hover:text-aws-orange hover:bg-aws-orange/10"
                 }`}
               >
-                🛡️ Security & Vault
+                {t("tabSecurity", language)}
               </button>
             </div>
 
@@ -1914,23 +1921,23 @@ export default function Dashboard() {
               {/* Tab 1: App Preferences */}
               {settingsTab === "preferences" && (
                 <div className="flex flex-col gap-4">
-                  <h4 className="font-bold text-sm text-aws-lightTextPrimary dark:text-aws-textPrimary">Dashboard Display & Notification Preferences</h4>
+                  <h4 className="font-bold text-sm text-aws-lightTextPrimary dark:text-aws-textPrimary">{t("displayNotificationPref", language)}</h4>
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[11px] font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary mb-1">Color Theme Mode</label>
+                      <label className="block text-[11px] font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary mb-1">{t("colorThemeMode", language)}</label>
                       <select
                         value={isDarkMode ? "dark" : "light"}
                         onChange={(e) => setIsDarkMode(e.target.value === "dark")}
                         className="w-full p-2 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary font-semibold"
                       >
-                        <option value="dark">🌙 Dark Slate (AWS Console Theme)</option>
-                        <option value="light">☀️ Light Slate</option>
+                        <option value="dark">{t("darkSlateConsole", language)}</option>
+                        <option value="light">{t("lightSlate", language)}</option>
                       </select>
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary mb-1">Telemetry Auto-Refresh Rate</label>
+                      <label className="block text-[11px] font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary mb-1">{t("autoRefreshRate", language)}</label>
                       <select
                         value={appPreferences.telemetryRefreshIntervalMs}
                         onChange={(e) => setAppPreferences({ ...appPreferences, telemetryRefreshIntervalMs: Number(e.target.value) })}
@@ -1989,20 +1996,20 @@ export default function Dashboard() {
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary mb-1">Alert Notification Frequency</label>
+                      <label className="block text-[11px] font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary mb-1">{t("alertFrequency", language)}</label>
                       <select
                         value={appPreferences.notificationFrequency}
                         onChange={(e) => setAppPreferences({ ...appPreferences, notificationFrequency: e.target.value as any })}
                         className="w-full p-2 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary font-semibold"
                       >
-                        <option value="immediate">🚨 Immediate Real-Time Anomaly Alerts</option>
-                        <option value="daily_digest">📅 Daily Summary Digest Email</option>
-                        <option value="weekly_summary">📊 Weekly Executive Report</option>
+                        <option value="immediate">{t("immediateAlerts", language)}</option>
+                        <option value="daily_digest">{t("dailyDigest", language)}</option>
+                        <option value="weekly_summary">{t("weeklySummary", language)}</option>
                       </select>
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary mb-1">Primary Timezone</label>
+                      <label className="block text-[11px] font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary mb-1">{t("primaryTimezone", language)}</label>
                       <input
                         type="text"
                         value={appPreferences.timezone}
@@ -2018,7 +2025,7 @@ export default function Dashboard() {
               {settingsTab === "aws_accounts" && (
                 <div className="flex flex-col gap-4">
                   <div className="flex justify-between items-center">
-                    <h4 className="font-bold text-sm text-aws-lightTextPrimary dark:text-aws-textPrimary">Linked AWS Sub-Accounts & Monitored Databases</h4>
+                    <h4 className="font-bold text-sm text-aws-lightTextPrimary dark:text-aws-textPrimary">{t("linkedSubAccounts", language)}</h4>
                     <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary font-mono">
                       {linkedAccounts.length} Linked Sub-Accounts Active
                     </span>
@@ -2048,19 +2055,19 @@ export default function Dashboard() {
                   {/* IAM Connection Tester Sandbox */}
                   <div className="p-3.5 bg-aws-lightBg dark:bg-aws-dark border border-aws-orange/30 rounded flex flex-col gap-2 mt-2">
                     <h5 className="font-bold text-xs text-aws-lightTextPrimary dark:text-aws-orange flex items-center gap-1.5">
-                      🧪 Test AWS STS AssumeRole Connection
+                      🧪 {t("testAssumeRoleConnection", language)}
                     </h5>
                     <div className="grid grid-cols-2 gap-2">
                       <input
                         type="text"
-                        placeholder="IAM Role ARN (arn:aws:iam::123456789012:role/...)"
+                        placeholder={t("roleArnPlaceholder", language)}
                         value={testRoleArn}
                         onChange={(e) => setTestRoleArn(e.target.value)}
                         className="p-2 rounded bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border text-[11px] font-mono"
                       />
                       <input
                         type="text"
-                        placeholder="ExternalId Token"
+                        placeholder={t("extIdPlaceholder", language)}
                         value={testExtId}
                         onChange={(e) => setTestExtId(e.target.value)}
                         className="p-2 rounded bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border text-[11px] font-mono"
@@ -2076,7 +2083,7 @@ export default function Dashboard() {
                         }}
                         className="px-3 py-1 rounded bg-aws-orange hover:bg-aws-orangeHover text-aws-lightTextPrimary text-xs font-bold shadow cursor-pointer"
                       >
-                        ⚡ Test IAM Connection
+                        ⚡ {t("testConnectionBtn", language)}
                       </button>
 
                       {iamTestResult && (
@@ -2091,7 +2098,7 @@ export default function Dashboard() {
                       <div className="flex justify-between items-center">
                         <div>
                           <strong className="text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs block">
-                            📦 AWS Infrastructure Exporter (CloudFormation & Service Catalog)
+                            📦 {t("cfnServiceCatalogExport", language)}
                           </strong>
                           <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary">
                             Deploy IAM cross-account monitoring role in client AWS accounts with 1-click infrastructure templates.
@@ -2110,7 +2117,7 @@ export default function Dashboard() {
                           }}
                           className="px-3 py-1.5 rounded bg-aws-orange hover:bg-aws-orangeHover text-aws-lightTextPrimary font-bold text-xs shadow cursor-pointer flex items-center gap-1"
                         >
-                          📥 Download CloudFormation IAM Template (.yaml)
+                          📥 {t("downloadCfnTemplate", language)}
                         </button>
                         <button
                           id="export-service-catalog-btn"
@@ -2121,7 +2128,7 @@ export default function Dashboard() {
                           }}
                           className="px-3 py-1.5 rounded bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-xs shadow cursor-pointer flex items-center gap-1"
                         >
-                          📦 Download Service Catalog Blueprint (.json)
+                          📦 {t("exportServiceCatalog", language)}
                         </button>
                         <button
                           id="export-terraform-hcl-btn"
@@ -2132,7 +2139,7 @@ export default function Dashboard() {
                           }}
                           className="px-3 py-1.5 rounded bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs shadow cursor-pointer flex items-center gap-1"
                         >
-                          🛠️ Download Terraform HCL (.tf)
+                          🛠️ {t("downloadTerraformHcl", language)}
                         </button>
                         <button
                           id="test-free-tier-ingestion-btn"
@@ -2141,7 +2148,7 @@ export default function Dashboard() {
                           }}
                           className="px-3 py-1.5 rounded bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow cursor-pointer flex items-center gap-1"
                         >
-                          ⚡ Test Live AWS Free Tier Ingestion ($0)
+                          ⚡ {t("runLiveIngestionTest", language)}
                         </button>
                       </div>
                     </div>
@@ -2154,7 +2161,7 @@ export default function Dashboard() {
                 <div className="flex flex-col gap-4">
                   <div className="flex justify-between items-center">
                     <div>
-                      <h4 className="font-bold text-sm text-aws-lightTextPrimary dark:text-aws-textPrimary">Subscription Tiers & Billing Charging Mechanism</h4>
+                      <h4 className="font-bold text-sm text-aws-lightTextPrimary dark:text-aws-textPrimary">{t("subscriptionBillingPortal", language)}</h4>
                       <p className="text-[11px] text-aws-lightTextSecondary dark:text-aws-textSecondary">
                         Switch plans anytime. AWS Marketplace usage is metered hourly on your AWS invoice.
                       </p>
@@ -2186,7 +2193,7 @@ export default function Dashboard() {
                               <strong className="text-xs font-bold text-aws-lightTextPrimary dark:text-aws-textPrimary">{plan.name}</strong>
                               {isCurrent && (
                                 <span className="text-[9px] px-1.5 py-0.5 rounded bg-aws-orange text-aws-lightTextPrimary font-bold uppercase">
-                                  Current
+                                  {t("currentPlanBadge", language)}
                                 </span>
                               )}
                             </div>
@@ -2231,11 +2238,11 @@ export default function Dashboard() {
                                     : "bg-gray-400 text-white cursor-not-allowed opacity-60"
                                 }`}
                               >
-                                {capCheck.allowed ? `Switch to ${plan.name}` : "Cap Exceeded"}
+                                {capCheck.allowed ? `${t("changePlanBtn", language)} ${plan.name}` : "Cap Exceeded"}
                               </button>
                             ) : (
                               <div className="w-full py-1 rounded bg-aws-orange/20 text-amber-800 dark:text-aws-orange font-bold text-[10px] text-center">
-                                Active Plan
+                                {t("activePlanBadge", language)}
                               </div>
                             )}
                           </div>
@@ -2249,7 +2256,7 @@ export default function Dashboard() {
               {/* Tab 4: Security & Vault */}
               {settingsTab === "security" && (
                 <div className="flex flex-col gap-4">
-                  <h4 className="font-bold text-sm text-aws-lightTextPrimary dark:text-aws-textPrimary">Cross-Account IAM Role Vault & Security Audit Status</h4>
+                  <h4 className="font-bold text-sm text-aws-lightTextPrimary dark:text-aws-textPrimary">{t("securityVaultTitle", language)}</h4>
                   
                   <div className="p-3.5 bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border rounded flex flex-col gap-2 font-mono">
                     <div className="flex justify-between items-center">
@@ -2270,7 +2277,7 @@ export default function Dashboard() {
                       <div className="flex justify-between items-center">
                         <div>
                           <strong className="text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs block">
-                            🔑 OWASP High-Entropy Cryptographic Password Generator
+                            🔑 {t("owaspPwdGenTitle", language)}
                           </strong>
                           <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary">
                             Generates 28-character high-entropy OWASP-compliant passwords using Web Crypto CSPRNG.
@@ -2285,7 +2292,7 @@ export default function Dashboard() {
                           }}
                           className="px-3 py-1.5 rounded bg-aws-orange hover:bg-aws-orangeHover text-aws-lightTextPrimary font-bold text-xs shadow cursor-pointer transition-all flex items-center gap-1"
                         >
-                          ⚡ Generate Password
+                          ⚡ {t("generatePwdBtn", language)}
                         </button>
                       </div>
 
@@ -2312,7 +2319,7 @@ export default function Dashboard() {
                                   : "bg-aws-orange/20 hover:bg-aws-orange/30 text-amber-900 dark:text-aws-orange"
                               }`}
                             >
-                              {isPwdCopied ? "✓ Copied!" : "Copy"}
+                              {isPwdCopied ? t("copiedPwdBtn", language) : t("copyPwdBtn", language)}
                             </button>
                           </div>
                           <div className="flex justify-between text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary">
@@ -2326,7 +2333,7 @@ export default function Dashboard() {
                     {/* Phase 8: HIPAA BAA Portal Action */}
                     <div className="pt-3 border-t border-aws-lightBorder dark:border-aws-divider flex justify-between items-center">
                       <div>
-                        <strong className="text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs block">HIPAA BAA Agreement Portal</strong>
+                        <strong className="text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs block">{t("hipaaBaaAgreement", language)}</strong>
                         <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary">Generate executed electronic BAA document for healthcare accounts.</span>
                       </div>
                       <button
@@ -2338,7 +2345,7 @@ export default function Dashboard() {
                         }}
                         className="px-3 py-1.5 rounded bg-aws-orange hover:bg-aws-orangeHover text-aws-lightTextPrimary font-bold text-xs shadow cursor-pointer"
                       >
-                        📜 Execute HIPAA BAA
+                        📜 {t("signBaaBtn", language)}
                       </button>
                     </div>
 
@@ -2353,7 +2360,7 @@ export default function Dashboard() {
                     <div className="pt-4 border-t border-aws-lightBorder dark:border-aws-divider flex flex-col gap-2">
                       <div className="flex justify-between items-center">
                         <strong className="text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs block">
-                          🏰 AWS Control Tower Guardrail Compliance Audit
+                          🏰 {t("mfaControlTower", language)}
                         </strong>
                         <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 font-mono text-[10px] font-bold">
                           Score: {controlTowerAudit.score}% ({controlTowerAudit.grade})
@@ -2378,7 +2385,7 @@ export default function Dashboard() {
                     <div className="pt-4 border-t border-aws-lightBorder dark:border-aws-divider flex flex-col gap-2">
                       <div className="flex justify-between items-center">
                         <strong className="text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs block">
-                          🔑 Developer API Key & Request Rate-Limiting Vault
+                          🔑 {t("apiKeyRateLimitVault", language)}
                         </strong>
                         <div className="flex items-center gap-2">
                           <button
@@ -2399,7 +2406,7 @@ export default function Dashboard() {
                         <input
                           id="new-api-key-name-input"
                           type="text"
-                          placeholder="API Key Name (e.g. Grafana Stream)"
+                          placeholder={t("keyNamePlaceholder", language)}
                           value={newKeyNameInput}
                           onChange={(e) => setNewKeyNameInput(e.target.value)}
                           className="flex-1 p-1.5 rounded bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border text-xs font-semibold"
@@ -2425,7 +2432,7 @@ export default function Dashboard() {
                           }}
                           className="px-3 py-1.5 rounded bg-aws-orange hover:bg-aws-orangeHover text-aws-lightTextPrimary font-bold text-xs shadow cursor-pointer"
                         >
-                          + Create Key
+                          ⚡ {t("generateApiKeyBtn", language)}
                         </button>
                       </div>
 
@@ -2599,7 +2606,7 @@ export default function Dashboard() {
           <div className="bg-aws-lightContainer dark:bg-aws-container border-2 border-indigo-500 rounded-xl p-6 w-[600px] max-w-full shadow-2xl flex flex-col gap-4 font-sans">
             <div className="flex justify-between items-center border-b border-aws-lightBorder dark:border-aws-divider pb-2">
               <span className="font-bold text-sm text-indigo-400 flex items-center gap-1.5">
-                ⚡ GraphQL Telemetry Developer API Inspector
+                ⚡ {t("graphqlModalTitle", language)}
               </span>
               <button
                 id="close-graphql-modal-btn"
@@ -2613,7 +2620,7 @@ export default function Dashboard() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-[11px] font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary mb-1">
-                  GraphQL Selection Query
+                  {t("graphqlQueryEditor", language)}
                 </label>
                 <textarea
                   id="graphql-query-input"
@@ -2626,7 +2633,7 @@ export default function Dashboard() {
 
               <div>
                 <label className="block text-[11px] font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary mb-1">
-                  JSON Response Payload
+                  {t("jsonResultTitle", language)}
                 </label>
                 <pre className="w-full p-2.5 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border font-mono text-[10px] text-emerald-800 dark:text-emerald-400 h-[172px] overflow-y-auto">
                   {graphQLResult}
@@ -2646,9 +2653,9 @@ export default function Dashboard() {
                     setGraphQLResult(JSON.stringify(res, null, 2));
                     showToast("⚡ GraphQL Query Executed!");
                   }}
-                  className="px-4 py-1.5 rounded bg-indigo-700 hover:bg-indigo-800 text-white text-xs font-bold shadow cursor-pointer"
+                  className="px-4 py-1.5 rounded bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow cursor-pointer"
                 >
-                  ▶ Execute Query
+                  ⚡ {t("executeQueryBtn", language)}
                 </button>
               </div>
             </div>
