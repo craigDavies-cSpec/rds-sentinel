@@ -61,7 +61,9 @@ export function calculateAccountHealthScore(
   else if (healthScore >= 50) grade = "D";
   else grade = "F";
 
-  const totalIdentifiedSavingsMonthly = recommendations.reduce((sum, r) => sum + Math.abs(r.costDelta), 0);
+  const totalIdentifiedSavingsMonthly = recommendations
+    .filter((r) => r.costDelta < 0)
+    .reduce((sum, r) => sum + Math.abs(r.costDelta), 0);
 
   let statusText = "Optimal Database Performance & Cost Efficiency";
   if (healthScore < 70) {
