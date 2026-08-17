@@ -277,7 +277,7 @@ export const MOCK_LOGS: DatabaseLog[] = RAW_LOGS_DATA.map((l, idx) => ({
   id: `log-${idx}`,
   dbInstanceId: l.dbInstanceId,
   accountId: l.accountId,
-  timestamp: new Date(Date.now() - idx * 15 * 60 * 1000).toISOString(),
+  timestamp: new Date(STATIC_BASE_TIME - idx * 15 * 60 * 1000).toISOString(),
   level: l.level,
   message: l.message,
   maskedMessage: l.message.replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, "[REDACTED_EMAIL]"),
