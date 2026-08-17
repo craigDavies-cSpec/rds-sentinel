@@ -52,4 +52,24 @@ describe("enterpriseSecurityVault module", () => {
     expect(policy.confusedDeputyProtection).toBe("STS_EXTERNAL_ID_ENFORCED");
     expect(policy.soc2Status).toBe("COMPLIANT_TSC_2026");
   });
+
+  it("should encrypt and decrypt payloads using AES-256-GCM and PBKDF2", async () => {
+    const { encryptDataAES256GCM, decryptDataAES256GCM } = require("../enterpriseSecurityVault");
+    const secretPayload = "SuperSecretTelemetryToken123!";
+    const masterKey = "MasterCryptographicKey2026!";
+
+    const encrypted = await encryptDataAES256GCM(secretPayload, masterKey);
+    expect(encrypted.ciphertextBase64).toBeDefined();
+    expect(encrypted.ivBase64).toBeDefined();
+    expect(encrypted.saltBase64).toBeDefined();
+
+    const decrypted = await decryptDataAES256GCM(
+      encrypted.ciphertextBase64,
+      encrypted.ivBase64,
+      encrypted.saltBase64,
+      masterKey
+    );
+
+    expect(decrypted).toBe(secretPayload);
+  });
 });

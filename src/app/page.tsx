@@ -276,6 +276,7 @@ export default function Dashboard() {
 
   // OWASP Password Analysis state
   const [owaspAnalysis, setOwaspAnalysis] = useState<PasswordAnalysis | null>(null);
+  const [isPwdCopied, setIsPwdCopied] = useState<boolean>(false);
   const [showFullKeys, setShowFullKeys] = useState<boolean>(false);
 
   // Phase 11A: Interactive Audit Evidence Inspector Drawer state
@@ -2267,11 +2268,17 @@ export default function Dashboard() {
                             <button
                               onClick={() => {
                                 navigator.clipboard.writeText(owaspAnalysis.password);
+                                setIsPwdCopied(true);
                                 showToast("📋 Password Copied to Clipboard!");
+                                setTimeout(() => setIsPwdCopied(false), 2500);
                               }}
-                              className="ml-2 px-2 py-1 bg-aws-orange/20 hover:bg-aws-orange/30 text-amber-900 dark:text-aws-orange text-[9px] font-bold rounded transition-all"
+                              className={`ml-2 px-2.5 py-1 text-[9px] font-bold rounded transition-all flex items-center gap-1 ${
+                                isPwdCopied
+                                  ? "bg-emerald-600 text-white"
+                                  : "bg-aws-orange/20 hover:bg-aws-orange/30 text-amber-900 dark:text-aws-orange"
+                              }`}
                             >
-                              Copy
+                              {isPwdCopied ? "✓ Copied!" : "Copy"}
                             </button>
                           </div>
                           <div className="flex justify-between text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary">

@@ -203,6 +203,145 @@ export function validateStsExternalId(externalId: string): {
 }
 
 /**
+ * Encrypts arbitrary string payload using AES-256-GCM (Web Crypto API)
+ */
+export async function encryptDataAES256GCM(
+  plaintext: string,
+  passphrase: string
+): Promise<{ ciphertextBase64: string; ivBase64: string; saltBase64: string }> {
+  const enc = new TextEncoder();
+  const data = enc.encode(plaintext);
+
+  let cryptoObj: SystemCrypto;
+  if (typeof window !== "undefined" && window.crypto && window.crypto.subtle) {
+    cryptoObj = window.crypto as SystemCrypto;
+  } else {
+    const nodeCrypto = require("crypto").webcrypto;
+    cryptoObj = nodeCrypto as SystemCrypto;
+  }
+
+  // Generate 16-byte random salt
+  const salt = new Uint8Array(16);
+  cryptoObj.getRandomValues(salt);
+
+  // Derive AES-256 key from passphrase via PBKDF2
+  const keyMaterial = await cryptoObj.subtle.importKey(
+    "raw",
+    enc.encode(passphrase),
+    { name: "PBKDF2" },
+    false,
+    ["deriveKey"]
+  );
+
+  const derivedKey = await cryptoObj.subtle.deriveKey(
+    {
+      name: "PBKDF2",
+      salt: salt,
+      iterations: 100000,
+      hash: "SHA-256",
+    },
+    keyMaterial,
+    { name: "AES-GCM", length: 256 },
+    false,
+    ["encrypt", "decrypt"]
+  );
+
+  // Generate 12-byte IV (standard for AES-GCM)
+  const iv = new Uint8Array(12);
+  cryptoObj.getRandomValues(iv);
+
+  const encryptedBuffer = await cryptoObj.subtle.encrypt(
+    { name: "AES-GCM", iv: iv },
+    derivedKey,
+    data
+  );
+
+  const ciphertextArray = new Uint8Array(encryptedBuffer);
+  
+  const toBase64 = (arr: Uint8Array) => {
+    if (typeof Buffer !== "undefined") {
+      return Buffer.from(arr).toString("base64");
+    }
+    let binary = "";
+    for (let i = 0; i < arr.length; i++) {
+      binary += String.fromCharCode(arr[i]);
+    }
+    return btoa(binary);
+  };
+
+  return {
+    ciphertextBase64: toBase64(ciphertextArray),
+    ivBase64: toBase64(iv),
+    saltBase64: toBase64(salt),
+  };
+}
+
+/**
+ * Decrypts AES-256-GCM encrypted base64 payload
+ */
+export async function decryptDataAES256GCM(
+  ciphertextBase64: string,
+  ivBase64: string,
+  saltBase64: string,
+  passphrase: string
+): Promise<string> {
+  const enc = new TextEncoder();
+  const dec = new TextDecoder();
+
+  let cryptoObj: SystemCrypto;
+  if (typeof window !== "undefined" && window.crypto && window.crypto.subtle) {
+    cryptoObj = window.crypto as SystemCrypto;
+  } else {
+    const nodeCrypto = require("crypto").webcrypto;
+    cryptoObj = nodeCrypto as SystemCrypto;
+  }
+
+  const fromBase64 = (b64: string) =>
+    typeof Buffer !== "undefined"
+      ? new Uint8Array(Buffer.from(b64, "base64"))
+      : new Uint8Array(Array.from(atob(b64), (c) => c.charCodeAt(0)));
+
+  const ciphertext = fromBase64(ciphertextBase64);
+  const iv = fromBase64(ivBase64);
+  const salt = fromBase64(saltBase64);
+
+  const keyMaterial = await cryptoObj.subtle.importKey(
+    "raw",
+    enc.encode(passphrase),
+    { name: "PBKDF2" },
+    false,
+    ["deriveKey"]
+  );
+
+  const derivedKey = await cryptoObj.subtle.deriveKey(
+    {
+      name: "PBKDF2",
+      salt: salt,
+      iterations: 100000,
+      hash: "SHA-256",
+    },
+    keyMaterial,
+    { name: "AES-GCM", length: 256 },
+    false,
+    ["encrypt", "decrypt"]
+  );
+
+  const decryptedBuffer = await cryptoObj.subtle.decrypt(
+    { name: "AES-GCM", iv: iv },
+    derivedKey,
+    ciphertext
+  );
+
+  return dec.decode(decryptedBuffer);
+}
+
+// Polyfill type for cross-environment Web Crypto API
+interface SystemCrypto {
+  getRandomValues<T extends ArrayBufferView | null>(array: T): T;
+  subtle: SubtleCrypto;
+}
+
+/**
  * Retrieves global Enterprise Security Policy status
  */
 export function getEnterpriseSecurityPolicy(): SecurityPolicyStatus {
