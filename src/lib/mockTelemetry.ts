@@ -112,6 +112,22 @@ export const MOCK_INSTANCES: DBInstance[] = [
     accountName: "Staging & Dev AWS Account",
     projectTag: "Analytics Data Pipeline",
   },
+  {
+    id: "db-cspec-live",
+    name: "free-tier-sandbox-db",
+    engine: "RDS PostgreSQL",
+    class: "db.t4g.micro",
+    region: "eu-west-1 (Ireland)",
+    status: "available",
+    cpuLoad: 18,
+    connections: 6,
+    iops: 300,
+    storageGb: 20,
+    freeStorageGb: 18,
+    accountId: "616399034957",
+    accountName: "cSpec Live AWS Account",
+    projectTag: "Production Workloads",
+  },
 ];
 
 // 2. Cost Recommendations seed data

@@ -332,17 +332,36 @@ export default function Dashboard() {
     return () => clearTimeout(timer);
   };
 
-  // Handle manual CPU simulator slider changes for testing real-time scrape cadence
   const handleCpuSliderChange = (newCpu: number) => {
-    setSelectedDb(prev => ({ ...prev, cpuLoad: newCpu }));
-    setInstances(prev =>
-      prev.map(instance => (instance.id === selectedDb.id ? { ...instance, cpuLoad: newCpu } : instance))
+    setInstances((prev) =>
+      prev.map((inst) => (inst.id === selectedDb.id ? { ...inst, cpuLoad: newCpu } : inst))
     );
+    setSelectedDb((prev) => ({ ...prev, cpuLoad: newCpu }));
     setCpuHistory(prev => {
       const currentHistory = prev[selectedDb.id] || [];
       const updatedHistory = [...currentHistory, newCpu].slice(-50);
       return { ...prev, [selectedDb.id]: updatedHistory };
     });
+  };
+
+  const handleResetCpuToBaseline = (dbId: string) => {
+    const seed = MOCK_INSTANCES.find((d) => d.id === dbId);
+    const baselineCpu = seed ? seed.cpuLoad : 20;
+    setInstances((prev) =>
+      prev.map((inst) => (inst.id === dbId ? { ...inst, cpuLoad: baselineCpu } : inst))
+    );
+    setSelectedDb((prev) => (prev.id === dbId ? { ...prev, cpuLoad: baselineCpu } : prev));
+    showToast(`🔄 CPU load for ${selectedDb.name} reset to baseline (${baselineCpu}%)!`);
+  };
+
+  const handleResetAllSimulators = () => {
+    setInstances(MOCK_INSTANCES);
+    setSelectedDb(MOCK_INSTANCES[0]);
+    setIsDbEndpointOnline(true);
+    outbox.resetCircuitBreaker();
+    setRoiDbCount(10);
+    setMaskSql(true);
+    showToast("🔄 All telemetry load spikes, circuit breakers, and sliders reset to live baseline!");
   };
 
   // Telemetry loop to simulate real-time metrics drifting slightly
@@ -565,6 +584,16 @@ export default function Dashboard() {
               {t("settingsBtn", language)}
             </button>
 
+            {/* Global Reset All Simulators Button */}
+            <button
+              id="global-reset-simulators-btn"
+              onClick={handleResetAllSimulators}
+              className="px-2.5 py-1.5 rounded bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-800 dark:text-aws-orange text-xs font-bold transition-all shadow-sm flex items-center gap-1 cursor-pointer"
+              title="Reset all CPU load spikes, circuit breakers, and sliders back to live baseline"
+            >
+              🔄 Reset All Simulators
+            </button>
+
             {/* Light/Dark Toggle */}
             <button
               onClick={() => setIsDarkMode(!isDarkMode)}
@@ -654,6 +683,19 @@ export default function Dashboard() {
           </div>
         </div>
       </header>
+
+      {/* Live AWS Account Connected Banner */}
+      {selectedAccountId === "616399034957" && (
+        <div id="live-account-active-banner" className="bg-emerald-950/80 border-b border-emerald-500/50 text-emerald-300 px-6 py-2.5 text-xs font-mono font-bold flex flex-wrap items-center justify-between shadow-md">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
+            <span>🟢 Active Live AWS Account: <strong>cSpec Live AWS Account (616399034957)</strong> in <strong>eu-west-1 (Ireland)</strong></span>
+          </div>
+          <span className="text-[11px] bg-emerald-900/80 text-emerald-200 px-3 py-1 rounded border border-emerald-400/40">
+            Live Monitored DB: free-tier-sandbox-db (RDS PostgreSQL db.t4g.micro)
+          </span>
+        </div>
+      )}
 
       <main className="max-w-[1600px] mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* LEFT COLUMN: Database Selectors & Health Telemetry */}
@@ -756,11 +798,21 @@ export default function Dashboard() {
                   <div className="mt-2.5 p-2 bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border rounded">
                     <div className="flex justify-between items-center text-[10px] font-bold mb-1">
                       <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary uppercase">Simulate Load Spike</span>
-                      <span className={`px-1.5 py-0.5 rounded font-mono ${
-                        selectedDb.cpuLoad > 85 ? "bg-aws-red/10 text-red-800 dark:text-red-400" : "text-amber-800 dark:text-aws-orange"
-                      }`}>
-                        {selectedDb.cpuLoad}%
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <span className={`px-1.5 py-0.5 rounded font-mono ${
+                          selectedDb.cpuLoad > 85 ? "bg-aws-red/10 text-red-800 dark:text-red-400" : "text-amber-800 dark:text-aws-orange"
+                        }`}>
+                          {selectedDb.cpuLoad}%
+                        </span>
+                        <button
+                          id="reset-cpu-load-btn"
+                          onClick={() => handleResetCpuToBaseline(selectedDb.id)}
+                          className="px-2 py-0.5 rounded bg-aws-lightContainer dark:bg-aws-container hover:bg-aws-orange/20 border border-aws-lightBorder dark:border-aws-border text-[9px] font-bold text-aws-lightTextPrimary dark:text-aws-textPrimary cursor-pointer transition-all flex items-center gap-1"
+                          title="Reset CPU load to baseline performing state"
+                        >
+                          🔄 Reset CPU
+                        </button>
+                      </div>
                     </div>
                     <input 
                       type="range" 
@@ -1083,9 +1135,22 @@ export default function Dashboard() {
                   <span className="font-bold text-aws-lightTextPrimary dark:text-aws-orange uppercase tracking-wider text-[11px] flex items-center gap-1.5">
                     📊 Interactive AWS Bill ROI Calculator
                   </span>
-                  <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-800 dark:text-emerald-400 font-mono font-bold text-xs border border-emerald-500/20">
-                    {((roiDbCount * 145) / (tier === "enterprise" ? 499 : tier === "medium" ? 179 : tier === "small" ? 59 : 179)).toFixed(1)}x Net ROI
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-800 dark:text-emerald-400 font-mono font-bold text-xs border border-emerald-500/20">
+                      {((roiDbCount * 145) / (tier === "enterprise" ? 499 : tier === "medium" ? 179 : tier === "small" ? 59 : 179)).toFixed(1)}x Net ROI
+                    </span>
+                    <button
+                      id="reset-roi-slider-btn"
+                      onClick={() => {
+                        setRoiDbCount(10);
+                        showToast("🔄 ROI Calculator slider reset to baseline (10 DBs)");
+                      }}
+                      className="px-2 py-0.5 rounded bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/20 border border-aws-lightBorder dark:border-aws-border text-[9px] font-bold text-aws-lightTextPrimary dark:text-aws-textPrimary cursor-pointer transition-all flex items-center gap-1"
+                      title="Reset ROI DB slider count to default 10 DBs"
+                    >
+                      🔄 Reset Slider
+                    </button>
+                  </div>
                 </div>
 
                 <div className="flex flex-col gap-2">

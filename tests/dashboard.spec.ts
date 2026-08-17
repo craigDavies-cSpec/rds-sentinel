@@ -136,7 +136,7 @@ test.describe("RDS Sentinel Dashboard Functional E2E Tests", () => {
     await expect(accountSelect).toBeVisible();
 
     // Select Staging Account
-    await accountSelect.selectOption({ index: 2 });
+    await accountSelect.selectOption("987654321098");
     await page.waitForTimeout(300);
 
     // dev-sandbox-db should be visible in database list
@@ -462,5 +462,28 @@ test.describe("RDS Sentinel Dashboard Functional E2E Tests", () => {
     // Skip tour
     await page.getByText("✕ Skip").click();
     await expect(selector).not.toHaveClass(/tour-spotlight-active/);
+  });
+
+  test("should reset CPU load, ROI slider, and all simulators when clicking reset buttons", async ({ page }) => {
+    // 1. Move CPU slider
+    const slider = page.locator("#cpu-simulator-slider");
+    await slider.fill("95");
+
+    // Click Reset CPU button
+    await page.locator("#reset-cpu-load-btn").click();
+
+    // 2. Click Reset All Simulators button in header
+    await page.locator("#global-reset-simulators-btn").click();
+    await expect(page.getByText(/All telemetry load spikes, circuit breakers, and sliders reset/)).toBeVisible();
+  });
+
+  test("should switch to user's live AWS Account 616399034957 and render live active banner", async ({ page }) => {
+    // Select account 616399034957 in header selector
+    const accountSelector = page.locator("#aws-account-selector");
+    await accountSelector.selectOption("616399034957");
+
+    // Assert live account active banner is visible
+    await expect(page.locator("#live-account-active-banner")).toBeVisible();
+    await expect(page.locator("#live-account-active-banner strong").first()).toBeVisible();
   });
 });

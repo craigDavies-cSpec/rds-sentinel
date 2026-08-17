@@ -98,8 +98,17 @@ export const INITIAL_APP_PREFERENCES: UserAppPreferences = {
 
 export const INITIAL_LINKED_AWS_ACCOUNTS: LinkedAwsAccount[] = [
   {
+    id: "616399034957",
+    accountName: "🟢 cSpec Live AWS Account",
+    roleArn: "arn:aws:iam::616399034957:role/RDSSentinelMonitoringRole",
+    externalId: "Sentinel-Secret-0001",
+    region: "eu-west-1",
+    status: "active",
+    monitoredServices: ["free-tier-sandbox-db"],
+  },
+  {
     id: "123456789012",
-    accountName: "Production Primary",
+    accountName: "🔵 Production Primary (Sandbox)",
     roleArn: "arn:aws:iam::123456789012:role/RDSSentinelMonitoringRole",
     externalId: "ext-prod-9401-sec",
     region: "us-east-1",
@@ -108,7 +117,7 @@ export const INITIAL_LINKED_AWS_ACCOUNTS: LinkedAwsAccount[] = [
   },
   {
     id: "987654321098",
-    accountName: "Staging & Dev",
+    accountName: "🔵 Staging & Dev (Sandbox)",
     roleArn: "arn:aws:iam::987654321098:role/RDSSentinelStagingRole",
     externalId: "ext-stg-3320-dev",
     region: "us-west-2",
