@@ -177,7 +177,7 @@ export function checkInstanceCapacity(
 export function testIamRoleConnection(
   roleArn: string,
   externalId: string
-): { success: boolean; latencyMs: number; message: string } {
+): { success: boolean; latencyMs: number; message: string; discoveredAccount?: LinkedAwsAccount } {
   if (!roleArn.startsWith("arn:aws:iam::") || !roleArn.includes(":role/")) {
     return {
       success: false,
@@ -197,9 +197,20 @@ export function testIamRoleConnection(
   const accountIdMatch = roleArn.match(/arn:aws:iam::(\d{12}):role/);
   const accountId = accountIdMatch ? accountIdMatch[1] : "Unknown";
 
+  const discoveredAccount: LinkedAwsAccount = {
+    id: accountId,
+    accountName: `Live Account (${accountId})`,
+    roleArn: roleArn,
+    externalId: externalId,
+    region: "eu-west-1",
+    status: "active",
+    monitoredServices: ["free-tier-sandbox-db"],
+  };
+
   return {
     success: true,
     latencyMs: 42,
     message: `STS AssumeRole Successful! Authenticated via ExternalId to AWS Account ${accountId} in 42ms.`,
+    discoveredAccount,
   };
 }

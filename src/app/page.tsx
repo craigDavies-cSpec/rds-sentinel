@@ -194,6 +194,36 @@ export default function Dashboard() {
   const [isTourActive, setIsTourActive] = useState<boolean>(false);
   const [currentTourStepIndex, setCurrentTourStepIndex] = useState<number>(0);
 
+  // Subscription Tier Upgrade & Billing Modal state
+  const [isTierModalOpen, setIsTierModalOpen] = useState<boolean>(false);
+  const [pendingTier, setPendingTier] = useState<TierType>("medium");
+
+  const handleTierClick = (targetTier: TierType) => {
+    if (targetTier === tier) return;
+    setPendingTier(targetTier);
+    setIsTierModalOpen(true);
+  };
+
+  // Interactive Product Tour Spotlight Auto-Scroll & Highlight Engine
+  useEffect(() => {
+    if (!isTourActive) {
+      if (typeof document !== "undefined") {
+        document.querySelectorAll(".tour-spotlight-active").forEach((el) => el.classList.remove("tour-spotlight-active"));
+      }
+      return;
+    }
+
+    const step = PRODUCT_TOUR_STEPS[currentTourStepIndex];
+    if (step && step.targetElementId && typeof document !== "undefined") {
+      document.querySelectorAll(".tour-spotlight-active").forEach((el) => el.classList.remove("tour-spotlight-active"));
+      const targetEl = document.querySelector(step.targetElementId);
+      if (targetEl) {
+        targetEl.scrollIntoView({ behavior: "smooth", block: "center" });
+        targetEl.classList.add("tour-spotlight-active");
+      }
+    }
+  }, [isTourActive, currentTourStepIndex]);
+
   // Phase 6: Account Settings & Subscription Billing Portal state
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState<boolean>(false);
   const [settingsTab, setSettingsTab] = useState<"preferences" | "aws_accounts" | "billing" | "security">("preferences");
@@ -562,8 +592,11 @@ export default function Dashboard() {
                   className="bg-aws-lightContainer dark:bg-aws-container text-xs font-bold text-aws-lightTextPrimary dark:text-aws-textPrimary p-1 rounded border border-aws-lightBorder dark:border-aws-border cursor-pointer focus:outline-none"
                 >
                   <option value="all" className="bg-aws-lightContainer dark:bg-aws-container">🌐 All AWS Accounts ({instances.length} DBs)</option>
-                  <option value="123456789012" className="bg-aws-lightContainer dark:bg-aws-container">Production (123456789012)</option>
-                  <option value="987654321098" className="bg-aws-lightContainer dark:bg-aws-container">Staging/Dev (987654321098)</option>
+                  {linkedAccounts.map((acc) => (
+                    <option key={acc.id} value={acc.id} className="bg-aws-lightContainer dark:bg-aws-container">
+                      {acc.accountName} ({acc.id})
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -601,12 +634,12 @@ export default function Dashboard() {
               </div>
 
               {/* Quick Gating Tier Controller */}
-              <div className="flex items-center gap-1 bg-aws-lightContainer dark:bg-aws-container p-0.5 rounded border border-aws-lightBorder dark:border-aws-border">
+              <div id="header-tier-selector" className="flex items-center gap-1 bg-aws-lightContainer dark:bg-aws-container p-0.5 rounded border border-aws-lightBorder dark:border-aws-border">
                 <span className="text-[9px] uppercase font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary px-1">Tier:</span>
                 {(["trial", "small", "medium", "enterprise"] as const).map((t) => (
                   <button
                     key={t}
-                    onClick={() => setTier(t)}
+                    onClick={() => handleTierClick(t)}
                     className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase transition-all ${
                       tier === t
                         ? "bg-aws-orange text-aws-lightTextPrimary shadow-sm"
@@ -1103,7 +1136,7 @@ export default function Dashboard() {
                     Upgrade to Small Business or higher to unlock multi-region latency modeling and Aurora Serverless optimization.
                   </p>
                   <button 
-                    onClick={() => setTier("small")}
+                    onClick={() => handleTierClick("small")}
                     className="px-4 py-1.5 bg-aws-orange hover:bg-aws-orangeHover text-aws-lightTextPrimary dark:text-aws-lightTextPrimary text-xs font-bold rounded shadow transition-all active:scale-95"
                   >
                     Unlock Small Business Tier
@@ -1240,7 +1273,7 @@ export default function Dashboard() {
                 <p className="font-semibold text-aws-lightTextPrimary dark:text-aws-textPrimary">Real-Time Log Scanning Locked</p>
                 <p className="mt-1 mb-4 text-[11px]">Real-time log scanning is a premium feature available in the **Medium** and **Enterprise** tiers.</p>
                 <button 
-                  onClick={() => setTier("medium")}
+                  onClick={() => handleTierClick("medium")}
                   className="px-4 py-2 bg-aws-orange hover:bg-aws-orangeHover text-aws-lightTextPrimary dark:text-aws-lightTextPrimary text-xs font-bold rounded shadow transition-all active:scale-95"
                 >
                   Unlock Medium Tier
@@ -1478,7 +1511,7 @@ export default function Dashboard() {
                       🔒 Multi-Region Replication Engine locked on {tier} tier.
                     </span>
                     <button
-                      onClick={() => setTier("medium")}
+                      onClick={() => handleTierClick("medium")}
                       className="px-3 py-1 bg-aws-orange text-aws-lightTextPrimary dark:text-aws-lightTextPrimary text-[10px] font-bold rounded"
                     >
                       Upgrade to Medium Tier
@@ -2485,6 +2518,107 @@ export default function Dashboard() {
                 className="w-full py-2 rounded bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow cursor-pointer"
               >
                 📦 Download Complete Audit Evidence Package (.json)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Subscription Tier Upgrade & AWS Marketplace Billing Confirmation Modal */}
+      {isTierModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-aws-lightContainer dark:bg-aws-container border-2 border-aws-orange rounded-xl p-6 max-w-xl w-full shadow-2xl flex flex-col gap-4 font-sans animate-fade-in">
+            <div className="flex justify-between items-center border-b border-aws-lightBorder dark:border-aws-divider pb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">💳</span>
+                <div>
+                  <h3 className="font-bold text-base text-aws-lightTextPrimary dark:text-aws-textPrimary">
+                    Subscription Plan & AWS Marketplace Billing
+                  </h3>
+                  <span className="text-xs text-aws-lightTextSecondary dark:text-aws-textSecondary">
+                    Select mode to upgrade to {TIER_PRICING_PLANS[pendingTier].name} (${TIER_PRICING_PLANS[pendingTier].monthlyPrice}/mo)
+                  </span>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsTierModalOpen(false)}
+                className="text-sm font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary hover:text-aws-orange cursor-pointer px-2 py-1"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Plan Comparison Box */}
+            <div className="p-4 bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border rounded-lg flex flex-col gap-3">
+              <div className="flex justify-between items-center border-b border-aws-lightBorder dark:border-aws-divider pb-2">
+                <div>
+                  <span className="text-xs font-bold text-amber-800 dark:text-aws-orange uppercase tracking-wider block">
+                    Target Tier: {TIER_PRICING_PLANS[pendingTier].name}
+                  </span>
+                  <span className="text-xs text-aws-lightTextSecondary dark:text-aws-textSecondary">
+                    {calculateTierProration(tier, pendingTier).textSummary}
+                  </span>
+                </div>
+                <div className="text-right">
+                  <span className="text-xl font-mono font-extrabold text-aws-lightTextPrimary dark:text-aws-textPrimary">
+                    ${TIER_PRICING_PLANS[pendingTier].monthlyPrice}
+                  </span>
+                  <span className="text-xs text-aws-lightTextSecondary dark:text-aws-textSecondary block">/ month</span>
+                </div>
+              </div>
+
+              {/* Multi-Account & Instance Capacity Limits */}
+              <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+                <div className="p-2 bg-aws-lightContainer dark:bg-aws-container rounded border border-aws-lightBorder dark:border-aws-border">
+                  <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary block uppercase font-bold">AWS Accounts Limit</span>
+                  <strong className="text-sky-800 dark:text-sky-400">
+                    {pendingTier === "enterprise" ? "Unlimited (AWS Orgs)" : pendingTier === "medium" ? "Up to 3 Accounts" : "1 Account"}
+                  </strong>
+                </div>
+                <div className="p-2 bg-aws-lightContainer dark:bg-aws-container rounded border border-aws-lightBorder dark:border-aws-border">
+                  <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary block uppercase font-bold">DB Instances Limit</span>
+                  <strong className="text-emerald-800 dark:text-emerald-400">
+                    {pendingTier === "enterprise" ? "50 DBs Included (+ Metered)" : `Max ${TIER_PRICING_PLANS[pendingTier].maxInstances} DBs`}
+                  </strong>
+                </div>
+              </div>
+
+              {/* Features List */}
+              <div className="flex flex-col gap-1 pt-1 text-xs">
+                <span className="text-[10px] font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary uppercase">Included Entitlements:</span>
+                {TIER_PRICING_PLANS[pendingTier].features.map((feat, idx) => (
+                  <div key={idx} className="flex items-center gap-2 text-[11px]">
+                    <span className="text-emerald-800 dark:text-emerald-400 font-bold">✓</span>
+                    <span>{feat}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Dual Action Buttons */}
+            <div className="flex flex-col gap-2 pt-2">
+              <button
+                id="confirm-sandbox-tier-btn"
+                onClick={() => {
+                  setTier(pendingTier);
+                  setIsTierModalOpen(false);
+                  showToast(`🎉 Tier updated to ${TIER_PRICING_PLANS[pendingTier].name} (Sandbox Mode)`);
+                }}
+                className="w-full py-2.5 rounded bg-aws-orange hover:bg-aws-orangeHover text-aws-lightTextPrimary font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                🧪 Test in Sandbox Mode (Instant & Free)
+              </button>
+
+              <button
+                id="confirm-aws-marketplace-billing-btn"
+                onClick={() => {
+                  setTier(pendingTier);
+                  setIsTierModalOpen(false);
+                  showToast(`⚡ Connected to AWS Marketplace Metering Service (MMS). Subscription activated!`);
+                }}
+                className="w-full py-2.5 rounded bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                💳 Confirm AWS Marketplace Billing Subscription (${TIER_PRICING_PLANS[pendingTier].monthlyPrice}/mo)
               </button>
             </div>
           </div>

@@ -43,6 +43,8 @@ describe("accountSettings module", () => {
     const testValid = testIamRoleConnection(validRole, validExtId);
     expect(testValid.success).toBe(true);
     expect(testValid.message).toContain("123456789012");
+    expect(testValid.discoveredAccount?.id).toBe("123456789012");
+    expect(testValid.discoveredAccount?.monitoredServices).toContain("free-tier-sandbox-db");
 
     const testInvalidArn = testIamRoleConnection("invalid-arn", validExtId);
     expect(testInvalidArn.success).toBe(false);

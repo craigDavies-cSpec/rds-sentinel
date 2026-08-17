@@ -47,3 +47,21 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(135, 135, 135, 0.4);
 }
+
+/* Interactive Guided Product Tour Spotlight */
+.tour-spotlight-active {
+  outline: 4px solid #ff9900 !important;
+  outline-offset: 4px !important;
+  box-shadow: 0 0 25px rgba(255, 153, 0, 0.6) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  animation: tourPulse 2s infinite ease-in-out !important;
+}
+
+@keyframes tourPulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(255, 153, 0, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 35px rgba(255, 153, 0, 0.85);
+  }
+}

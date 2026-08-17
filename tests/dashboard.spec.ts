@@ -24,12 +24,14 @@ test.describe("RDS Sentinel Dashboard Functional E2E Tests", () => {
   });
 
   test("should gate logs on Trial/Small tiers and unlock on Medium/Enterprise", async ({ page }) => {
-    // 1. Shift to Trial tier using quick-tier button
-    await page.locator("button:has-text('trial')").first().click();
+    // 1. Shift to Trial tier using quick-tier button & confirm in billing modal
+    await page.locator("#header-tier-selector button:has-text('trial')").click();
+    await page.locator("#confirm-sandbox-tier-btn").click();
     await expect(page.getByText("Real-Time Log Scanning Locked")).toBeVisible();
 
-    // 2. Click upgrade CTA to shift to Medium tier
+    // 2. Click upgrade CTA to shift to Medium tier & confirm in billing modal
     await page.locator("button:has-text('Unlock Medium Tier')").click();
+    await page.locator("#confirm-sandbox-tier-btn").click();
     await expect(page.getByText("Real-Time Log Scanning Locked")).not.toBeVisible();
     
     // 3. Confirm active billing matrix shows Logs as active
@@ -431,5 +433,34 @@ test.describe("RDS Sentinel Dashboard Functional E2E Tests", () => {
     await expect(btn).toBeVisible();
     await btn.click();
     await expect(page.getByText(/Real AWS Free Tier/)).toBeVisible();
+  });
+
+  test("should render Subscription Tier Upgrade & Billing Confirmation Modal when clicking tier buttons", async ({ page }) => {
+    // Click enterprise tier pill
+    await page.locator("#header-tier-selector button:has-text('enterprise')").click();
+
+    // Assert Billing Modal is visible
+    await expect(page.getByText("Subscription Plan & AWS Marketplace Billing")).toBeVisible();
+    await expect(page.getByText("Target Tier: Enterprise")).toBeVisible();
+
+    // Click confirm sandbox mode button
+    await page.locator("#confirm-sandbox-tier-btn").click();
+    await expect(page.getByText("Subscription Plan & AWS Marketplace Billing")).not.toBeVisible();
+  });
+
+  test("should auto-scroll and apply spotlight highlight ring during 2-Minute Product Tour", async ({ page }) => {
+    // Click start product tour button
+    await page.locator("#start-product-tour-btn").click();
+
+    // Assert tour step 1 overlay is visible
+    await expect(page.getByText("Multi-AWS Account Selector")).toBeVisible();
+
+    // Assert target element has tour-spotlight-active CSS class
+    const selector = page.locator("#aws-account-selector");
+    await expect(selector).toHaveClass(/tour-spotlight-active/);
+
+    // Skip tour
+    await page.getByText("✕ Skip").click();
+    await expect(selector).not.toHaveClass(/tour-spotlight-active/);
   });
 });
