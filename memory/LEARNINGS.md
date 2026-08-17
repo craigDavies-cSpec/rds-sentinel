@@ -12,6 +12,10 @@
   - *Problem*: `crypto.subtle` is available in modern browsers and Node v18 (`require("crypto").webcrypto`). Base64 conversion using spread operators (`String.fromCharCode(...arr)`) throws TypeScript `TS2802` downlevel iteration errors under standard target settings.
   - *Learning*: Use safe array-from loop iteration `for (let i = 0; i < arr.length; i++) binary += String.fromCharCode(arr[i])` for cross-platform Uint8Array base64 encoding.
 
+* **AI Natural Language SQL EXPLAIN & Zero-Downtime DDL Optimizer Engine**
+  - *Problem*: Raw SQL EXPLAIN output (e.g. `Seq Scan on users (cost=0.00..4250.00)`) is cryptic for non-DBA developers, and naive `CREATE INDEX` statements can lock enterprise production tables during execution.
+  - *Learning*: Parse query AST patterns to output plain-English diagnostic advice alongside non-blocking zero-downtime DDL (`CREATE INDEX CONCURRENTLY` for PostgreSQL / `ALGORITHM=INPLACE, LOCK=NONE` for MySQL) and optimized SQL query rewrites inside `SlowQueryInspector.tsx`.
+
 * **AWS Organizations SCP & Cross-Account Auto-Discovery Engine**
   - *Problem*: Multi-account enterprise environments require individual manual IAM role configuration for every child account, adding high friction to customer onboarding.
   - *Learning*: Implement AWS Organizations Management Account ARN scanner (`arn:aws:organizations::...`) that validates active Service Control Policies (`SCP-DenyUnencryptedRDSStorage`) and auto-discovers child sub-account Aurora/RDS instances across OUs via `sts:AssumeRole`.

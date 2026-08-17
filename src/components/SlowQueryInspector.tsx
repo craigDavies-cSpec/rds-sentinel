@@ -159,9 +159,17 @@ export function SlowQueryInspector({
                     {rec.explanation}
                   </p>
 
-                  <div className="relative bg-aws-lightBg dark:bg-aws-dark p-2 rounded border border-aws-lightBorder dark:border-aws-border font-mono text-[11px] text-emerald-800 dark:text-emerald-400 font-bold flex justify-between items-center">
+                  {/* AI Natural Language Diagnostic Card */}
+                  <div className="p-2.5 rounded bg-amber-500/10 border border-amber-500/20 text-[11px] font-sans text-amber-900 dark:text-amber-300 mb-2 leading-relaxed">
+                    <strong className="block font-bold mb-1 text-aws-orange">🤖 AI EXPLAIN Natural Language Diagnostic Advice:</strong>
+                    <p>{rec.aiNaturalLanguageAdvice}</p>
+                  </div>
+
+                  {/* Recommended Standard DDL */}
+                  <div className="relative bg-aws-lightBg dark:bg-aws-dark p-2 rounded border border-aws-lightBorder dark:border-aws-border font-mono text-[11px] text-emerald-800 dark:text-emerald-400 font-bold flex justify-between items-center mb-2">
                     <code>{rec.suggestedDdl}</code>
                     <button
+                      id={`copy-ddl-btn-${q.id}`}
                       onClick={() => {
                         navigator.clipboard.writeText(rec.suggestedDdl);
                         setCopiedDdlQueryId(q.id);
@@ -171,6 +179,31 @@ export function SlowQueryInspector({
                     >
                       {isCopied ? t("ddlCopied", language) : t("copyDdl", language)}
                     </button>
+                  </div>
+
+                  {/* Zero-Downtime DDL Block */}
+                  <div className="relative bg-aws-lightBg dark:bg-aws-dark p-2 rounded border border-aws-lightBorder dark:border-aws-border font-mono text-[11px] text-blue-800 dark:text-blue-400 font-bold flex justify-between items-center mb-2">
+                    <div>
+                      <span className="block text-[9px] uppercase text-blue-500 font-sans font-bold">⚡ Zero-Downtime Production DDL:</span>
+                      <code>{rec.zeroDowntimeDdl}</code>
+                    </div>
+                    <button
+                      id={`copy-zero-downtime-ddl-btn-${q.id}`}
+                      onClick={() => {
+                        navigator.clipboard.writeText(rec.zeroDowntimeDdl);
+                        setCopiedDdlQueryId(`zero-${q.id}`);
+                        setTimeout(() => setCopiedDdlQueryId(null), 2000);
+                      }}
+                      className="px-2 py-0.5 rounded bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold cursor-pointer transition-all"
+                    >
+                      {copiedDdlQueryId === `zero-${q.id}` ? "Copied!" : "Copy Zero-Downtime DDL"}
+                    </button>
+                  </div>
+
+                  {/* Query Rewrite Suggestion */}
+                  <div className="p-2 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border font-mono text-[10px] text-aws-lightTextPrimary dark:text-aws-textPrimary">
+                    <strong className="block text-[9px] uppercase text-purple-400 font-sans font-bold mb-1">Optimized Query Rewrite:</strong>
+                    <code>{rec.queryRewriteSuggestion}</code>
                   </div>
                 </div>
               )}

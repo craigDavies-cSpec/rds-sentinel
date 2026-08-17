@@ -2,11 +2,14 @@ import { analyzeSlowQuery } from "../indexAdvisor";
 import { MOCK_SLOW_QUERIES } from "../mockTelemetry";
 
 describe("Index Advisor Utility Unit Tests", () => {
-  test("should analyze slow query and generate tailored CREATE INDEX DDL", () => {
+  test("should analyze slow query and generate tailored CREATE INDEX DDL with AI EXPLAIN advice", () => {
     const recommendation = analyzeSlowQuery(MOCK_SLOW_QUERIES[0]); // users table query
 
     expect(recommendation.targetTable).toBe("users");
     expect(recommendation.suggestedDdl).toContain("CREATE INDEX idx_users_email_hash ON users");
+    expect(recommendation.zeroDowntimeDdl).toContain("CREATE INDEX CONCURRENTLY idx_users_email_hash ON users");
+    expect(recommendation.aiNaturalLanguageAdvice).toContain("AI EXPLAIN Diagnostic");
+    expect(recommendation.queryRewriteSuggestion).toContain("SELECT id, email, role FROM users");
     expect(recommendation.estimatedSpeedupPct).toBeGreaterThan(90);
     expect(recommendation.optimizedDurationMs).toBeLessThan(recommendation.originalDurationMs);
     expect(recommendation.tableScanRows).toBeGreaterThan(0);
