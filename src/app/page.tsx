@@ -641,6 +641,23 @@ export default function Dashboard() {
               🔄 Reset All Simulators
             </button>
 
+            {/* Global Language Selection Dropdown (Visible on Header Toolbar for Non-English Users) */}
+            <div className="relative flex items-center">
+              <select
+                id="header-language-selector"
+                value={language}
+                onChange={(e) => setLanguage(e.target.value as LanguageCode)}
+                className="px-2 py-1.5 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs font-bold transition-all shadow-sm cursor-pointer hover:border-aws-orange focus:outline-none"
+                title="Switch Display Language / Sprache / Langue / 言語"
+              >
+                {SUPPORTED_LANGUAGES.map((lang) => (
+                  <option key={lang.code} value={lang.code}>
+                    {lang.flag} {lang.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             {/* Light/Dark Toggle */}
             <button
               onClick={() => setIsDarkMode(!isDarkMode)}
@@ -760,7 +777,7 @@ export default function Dashboard() {
         <section className="lg:col-span-1 flex flex-col gap-6" style={{ order: layoutOrder.indexOf("databases") }}>
           <div className="bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border rounded-lg p-4">
             <div className="flex justify-between items-center mb-3">
-              <h2 className="text-sm font-bold text-aws-lightTextPrimary dark:text-aws-orange uppercase tracking-wider">Target Databases</h2>
+              <h2 className="text-sm font-bold text-aws-lightTextPrimary dark:text-aws-orange uppercase tracking-wider">{t("targetDatabases", language)}</h2>
               <div className="flex gap-1" data-testid="layout-controls-databases">
                 <button
                   onClick={() => moveLeft("databases")}

@@ -52,6 +52,8 @@ A living backlog of deferred items, future roadmap features, and architectural i
 * **Phase 11A (Interactive Audit Evidence Inspector Drawer)**: ✅ **Completed & Verified** (Slide-Over Live Evidence Inspector & Proof Copying).
 * **Phase 11B (Terraform HCL Provider & Infrastructure Exporter)**: ✅ **Completed & Verified** (HashiCorp HCL Exporter).
 * **Phase 11C (Multi-Region Database Replication Engine)**: ✅ **Completed & Verified** (Cross-Region Lag Matrix & Failover Simulator).
+* **Phase 12 (Enterprise Security Vault & Data Leak Protection)**: ✅ **Completed & Verified** (Web Crypto AES-256-GCM authenticated encryption, OWASP 28-char CSPRNG password generator with >120 bits entropy, deep parameter masking, and STS ExternalId protection).
+* **Phase 13 (Global Toolbar Language Selector)**: ✅ **Completed & Verified** (Instant flag-based language switching 🇺🇸 🇩🇪 🇫🇷 🇯🇵 directly on main top header toolbar).
 
 ---
 

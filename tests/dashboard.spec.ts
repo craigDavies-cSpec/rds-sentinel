@@ -288,6 +288,21 @@ test.describe("RDS Sentinel Dashboard Functional E2E Tests", () => {
     await expect(page.getByText(/BAA Active: BAA-HIPAA-/)).toBeVisible();
   });
 
+  test("should switch display language directly via header toolbar dropdown", async ({ page }) => {
+    const headerLangSelect = page.locator("#header-language-selector");
+    await expect(headerLangSelect).toBeVisible();
+
+    // Switch language to Japanese (ja)
+    await headerLangSelect.selectOption("ja");
+
+    // Verify localized text updates on main page
+    await expect(page.getByText("ターゲット データベース")).toBeVisible();
+
+    // Switch back to English (en)
+    await headerLangSelect.selectOption("en");
+    await expect(page.getByText("Target Databases")).toBeVisible();
+  });
+
   test("should switch display language and custom accent color palette in Settings App Preferences tab", async ({ page }) => {
     // Open settings modal
     await page.locator("#open-settings-modal-btn").click();
