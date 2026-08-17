@@ -1,8 +1,9 @@
-import { t, SUPPORTED_LANGUAGES, LanguageCode } from "../localization";
+import { t, TRANSLATIONS, SUPPORTED_LANGUAGES, LanguageCode, getLocalizedRecommendation } from "../localization";
+import { getLocalizedTourSteps } from "../productTour";
 import { getAccentStyles, ACCENT_THEMES } from "../themeAccent";
 
-describe("localization module", () => {
-  it("should return correct translations for supported languages", () => {
+describe("Enterprise Localization Engine (Phase 9A & 12)", () => {
+  it("should return correct translations for all supported languages", () => {
     expect(t("settingsBtn", "en")).toBe("⚙️ Settings");
     expect(t("settingsBtn", "de")).toBe("⚙️ Einstellungen");
     expect(t("settingsBtn", "fr")).toBe("⚙️ Paramètres");
@@ -15,6 +16,49 @@ describe("localization module", () => {
 
   it("should list 4 supported languages", () => {
     expect(SUPPORTED_LANGUAGES.length).toBe(4);
+    expect(SUPPORTED_LANGUAGES.map((l) => l.code)).toEqual(["en", "de", "fr", "ja"]);
+  });
+
+  it("should have zero missing or empty translation keys across all 4 languages", () => {
+    const enKeys = Object.keys(TRANSLATIONS.en) as (keyof typeof TRANSLATIONS.en)[];
+    const languages: LanguageCode[] = ["en", "de", "fr", "ja"];
+
+    languages.forEach((lang) => {
+      enKeys.forEach((key) => {
+        const val = t(key, lang);
+        expect(val).toBeDefined();
+        expect(val.length).toBeGreaterThan(0);
+      });
+    });
+  });
+
+  it("should return localized recommendations for rec-1 through rec-5 in German, French, and Japanese", () => {
+    const recIds = ["rec-1", "rec-2", "rec-3", "rec-4", "rec-5"];
+    const langs: LanguageCode[] = ["de", "fr", "ja"];
+
+    langs.forEach((lang) => {
+      recIds.forEach((id) => {
+        const loc = getLocalizedRecommendation(id, lang);
+        expect(loc.title).toBeDefined();
+        expect(loc.title!.length).toBeGreaterThan(0);
+        expect(loc.reason).toBeDefined();
+        expect(loc.reason!.length).toBeGreaterThan(0);
+      });
+    });
+  });
+
+  it("should return localized product tour steps for all 6 steps across de, fr, ja", () => {
+    const langs: LanguageCode[] = ["de", "fr", "ja"];
+
+    langs.forEach((lang) => {
+      const steps = getLocalizedTourSteps(lang);
+      expect(steps.length).toBe(6);
+      steps.forEach((step) => {
+        expect(step.title.length).toBeGreaterThan(0);
+        expect(step.subtitle.length).toBeGreaterThan(0);
+        expect(step.description.length).toBeGreaterThan(0);
+      });
+    });
   });
 });
 

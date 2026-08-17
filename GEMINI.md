@@ -63,3 +63,4 @@ To maintain compatibility with local Node.js `v18.12.0` and development guidelin
 - **Node v18 Compatibility**: Never upgrade Next.js to v14/15 or Jest to v30, as they are incompatible with the host Node.js version.
 - **No Committed Secrets**: Environment variables must reside only in git-ignored `.env` files. Access keys must never be committed. The git hook in `.githooks/pre-commit` enforces this automatically.
 - **Script-First Token Saving**: Utilize local scripts (`cve-audit-all.ps1`, unit tests, builds) instead of LLM-based evaluation to minimize token consumption.
+- **100% Zero-Hardcoded-String Rule**: ALL UI text, card containers, settings forms, modal titles, recommendation reasons, and tour tooltips MUST be fully localized using `t(key, language)`. Agents must perform meticulous empirical verification across all 4 supported languages (`en`, `de`, `fr`, `ja`) before certifying production readiness.

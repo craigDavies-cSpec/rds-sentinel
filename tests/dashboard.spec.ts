@@ -288,19 +288,35 @@ test.describe("RDS Sentinel Dashboard Functional E2E Tests", () => {
     await expect(page.getByText(/BAA Active: BAA-HIPAA-/)).toBeVisible();
   });
 
-  test("should switch display language directly via header toolbar dropdown", async ({ page }) => {
+  test("should switch display language directly via header toolbar dropdown across German, French, Japanese, and English", async ({ page }) => {
     const headerLangSelect = page.locator("#header-language-selector");
     await expect(headerLangSelect).toBeVisible();
 
-    // Switch language to Japanese (ja)
+    // 1. Switch language to German (de)
+    await headerLangSelect.selectOption("de");
+    await expect(page.getByText("Ziel-Datenbanken")).toBeVisible();
+    await expect(page.getByText("Instanz-Telemetrie")).toBeVisible();
+    await expect(page.getByText("Kosten-Leistungs-Optimierer")).toBeVisible();
+    await expect(page.getByText("Langsame Abfragen Inspektor")).toBeVisible();
+
+    // 2. Switch language to French (fr)
+    await headerLangSelect.selectOption("fr");
+    await expect(page.getByText("Bases de Données Cibles")).toBeVisible();
+    await expect(page.getByText("Télémétrie d'instance")).toBeVisible();
+    await expect(page.getByText("Équilibreur Coût-Performance")).toBeVisible();
+    await expect(page.getByText("Inspecteur de Requêtes Lentes")).toBeVisible();
+
+    // 3. Switch language to Japanese (ja)
     await headerLangSelect.selectOption("ja");
-
-    // Verify localized text updates on main page
     await expect(page.getByText("ターゲット データベース")).toBeVisible();
+    await expect(page.getByText("インスタンス テレメトリ")).toBeVisible();
+    await expect(page.getByText("コスト パフォーマンス バランサー")).toBeVisible();
+    await expect(page.getByText("スロー クエリ インスペクター")).toBeVisible();
 
-    // Switch back to English (en)
+    // 4. Switch back to English (en)
     await headerLangSelect.selectOption("en");
     await expect(page.getByText("Target Databases")).toBeVisible();
+    await expect(page.getByText("Instance Telemetry")).toBeVisible();
   });
 
   test("should switch display language and custom accent color palette in Settings App Preferences tab", async ({ page }) => {
@@ -314,6 +330,12 @@ test.describe("RDS Sentinel Dashboard Functional E2E Tests", () => {
     const langSelect = page.locator("#language-selector");
     await expect(langSelect).toBeVisible();
     await langSelect.selectOption("de");
+
+    // Verify settings tab buttons translated to German
+    await expect(page.locator("#tab-preferences-btn")).toHaveText("🎨 Einstellungen");
+    await expect(page.locator("#tab-aws-accounts-btn")).toHaveText("☁️ AWS Konten & Dienste");
+    await expect(page.locator("#tab-billing-btn")).toHaveText("💳 Abonnements & Abrechnung");
+    await expect(page.locator("#tab-security-btn")).toHaveText("🛡️ Sicherheit & Tresor");
 
     // Close Settings modal
     await page.locator("#close-settings-modal-btn").click();
