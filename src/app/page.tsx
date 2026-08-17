@@ -642,7 +642,6 @@ export default function Dashboard() {
                     }}
                     className="w-full text-left p-2 rounded hover:bg-aws-orange/10 text-aws-lightTextPrimary dark:text-aws-textPrimary font-bold flex items-center gap-2 cursor-pointer"
                   >
-                    <span>⚡</span>
                     <span>{t("graphqlApi", language)}</span>
                   </button>
                   <button
@@ -653,7 +652,6 @@ export default function Dashboard() {
                     }}
                     className="w-full text-left p-2 rounded hover:bg-amber-500/10 text-amber-800 dark:text-aws-orange font-bold flex items-center gap-2 cursor-pointer"
                   >
-                    <span>🔄</span>
                     <span>{t("resetSimulators", language)}</span>
                   </button>
                 </div>
@@ -695,7 +693,7 @@ export default function Dashboard() {
             <div className="flex items-center gap-3">
               {/* Multi-AWS Account Selector */}
               <div className="flex items-center gap-1.5">
-                <span className="text-[10px] uppercase font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary">Account:</span>
+                <span className="text-[10px] uppercase font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary">{t("accountLabel", language)}</span>
                 <select
                   id="aws-account-selector"
                   aria-label="Select AWS Account"
@@ -714,7 +712,7 @@ export default function Dashboard() {
 
               {/* Phase 7: Cost Center Tag Filter Bar */}
               <div className="flex items-center gap-1">
-                <span className="text-[10px] uppercase font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary px-1">Tag:</span>
+                <span className="text-[10px] uppercase font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary px-1">{t("tagLabel", language)}</span>
                 {availableTags.map((tag) => (
                   <button
                     key={tag}
@@ -725,7 +723,7 @@ export default function Dashboard() {
                         : "bg-aws-lightBg dark:bg-aws-dark text-aws-lightTextSecondary dark:text-aws-textSecondary border border-aws-lightBorder dark:border-aws-border hover:text-aws-orange"
                     }`}
                   >
-                    {tag === "ALL_TAGS" ? "All Tags" : tag}
+                    {tag === "ALL_TAGS" ? t("allTags", language) : tag}
                   </button>
                 ))}
               </div>
@@ -735,13 +733,13 @@ export default function Dashboard() {
             <div className="flex items-center gap-2">
               {/* Phase 7: Account Health Score Badge */}
               <div className="flex items-center gap-1 px-2.5 py-0.5 rounded bg-aws-blue/15 border border-aws-blue/30 text-sky-950 dark:text-sky-300 font-mono font-bold text-[11px]">
-                <span>🛡️ Health Score:</span>
+                <span>🛡️ {t("healthScore", language)}</span>
                 <span className="text-sky-950 dark:text-sky-300 font-extrabold">{healthMetrics.healthScore}/100 ({healthMetrics.grade})</span>
               </div>
 
               {/* Identified Savings Header Badge */}
               <div className="flex items-center gap-1 px-2.5 py-0.5 rounded bg-emerald-500/20 dark:bg-emerald-500/10 border border-emerald-600/40 text-slate-950 dark:text-emerald-300 font-mono font-bold text-[11px]">
-                <span>💰 Savings:</span>
+                <span>💰 {t("savingsLabel", language)}</span>
                 <span className="text-slate-950 dark:text-emerald-300 font-extrabold">${potentialSavings.toFixed(2)}/mo</span>
               </div>
 
@@ -752,13 +750,13 @@ export default function Dashboard() {
                 className="flex items-center gap-1 px-2.5 py-0.5 rounded bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-900 dark:text-amber-300 font-mono font-bold text-[11px] cursor-pointer transition-all"
                 title="Click to trigger live sync with AWS Price List API"
               >
-                <span>⚡ AWS Rates:</span>
+                <span>⚡ {t("awsRates", language)}</span>
                 <span className="font-extrabold">{pricingSync.isLiveSynced ? "Live API Synced" : "Synced"}</span>
               </button>
 
               {/* Quick Gating Tier Controller */}
               <div id="header-tier-selector" className="flex items-center gap-1 bg-aws-lightContainer dark:bg-aws-container p-0.5 rounded border border-aws-lightBorder dark:border-aws-border">
-                <span className="text-[9px] uppercase font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary px-1">Tier:</span>
+                <span className="text-[9px] uppercase font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary px-1">{t("tierLabel", language)}</span>
                 {(["trial", "small", "medium", "enterprise"] as const).map((t) => (
                   <button
                     key={t}
@@ -778,15 +776,15 @@ export default function Dashboard() {
         </div>
       </header>
 
-      {/* Live AWS Account Connected Banner */}
+      {/* Phase 12B: Active Account & Region Indicator Banner */}
       {selectedAccountId === "616399034957" && (
-        <div id="live-account-active-banner" className="bg-emerald-950/80 border-b border-emerald-500/50 text-emerald-300 px-6 py-2.5 text-xs font-mono font-bold flex flex-wrap items-center justify-between shadow-md">
+        <div id="live-account-active-banner" className="bg-emerald-950/90 border-b border-emerald-500/40 px-4 py-2 flex flex-wrap items-center justify-between text-xs font-mono text-emerald-300">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
-            <span>🟢 Active Live AWS Account: <strong>cSpec Live AWS Account (616399034957)</strong> in <strong>eu-west-1 (Ireland)</strong></span>
+            <span>🟢 {t("activeAccountBanner", language)} <strong>cSpec Live AWS Account (616399034957)</strong> in <strong>eu-west-1 (Ireland)</strong></span>
           </div>
           <span className="text-[11px] bg-emerald-900/80 text-emerald-200 px-3 py-1 rounded border border-emerald-400/40">
-            Live Monitored DB: free-tier-sandbox-db (RDS PostgreSQL db.t4g.micro)
+            {t("liveMonitoredDb", language)} free-tier-sandbox-db (RDS PostgreSQL db.t4g.micro)
           </span>
         </div>
       )}
@@ -891,7 +889,7 @@ export default function Dashboard() {
                   {/* Interactive CPU Load Simulator Slider */}
                   <div className="mt-2.5 p-2 bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border rounded">
                     <div className="flex justify-between items-center text-[10px] font-bold mb-1">
-                      <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary uppercase">Simulate Load Spike</span>
+                      <span className="text-aws-lightTextSecondary dark:text-aws-textSecondary uppercase">{t("simulateLoadSpike", language)}</span>
                       <div className="flex items-center gap-1.5">
                         <span className={`px-1.5 py-0.5 rounded font-mono ${
                           selectedDb.cpuLoad > 85 ? "bg-aws-red/10 text-red-800 dark:text-red-400" : "text-amber-800 dark:text-aws-orange"
@@ -904,7 +902,7 @@ export default function Dashboard() {
                           className="px-2 py-0.5 rounded bg-aws-lightContainer dark:bg-aws-container hover:bg-aws-orange/20 border border-aws-lightBorder dark:border-aws-border text-[9px] font-bold text-aws-lightTextPrimary dark:text-aws-textPrimary cursor-pointer transition-all flex items-center gap-1"
                           title="Reset CPU load to baseline performing state"
                         >
-                          🔄 Reset CPU
+                          🔄 {t("resetCpu", language)}
                         </button>
                       </div>
                     </div>
@@ -924,7 +922,7 @@ export default function Dashboard() {
                 {/* Connections count */}
                 <div>
                   <div className="flex justify-between text-xs font-bold mb-1">
-                    <span>Active Connections</span>
+                    <span>{t("activeConnections", language)}</span>
                     <span className="font-mono">{selectedDb.connections} / 150</span>
                   </div>
                   <div className="w-full h-2.5 bg-aws-lightBg dark:bg-aws-dark rounded-full overflow-hidden border border-aws-lightBorder dark:border-aws-border">
@@ -938,21 +936,21 @@ export default function Dashboard() {
                 {/* CPU History Sparkline (Developer Agent Audit - Clamped to 50 max points in memory) */}
                 <div>
                   <div className="flex justify-between text-xs font-bold mb-1">
-                    <span>Historical CPU Profile (Last {cpuHistory[selectedDb.id]?.length || 0} samples)</span>
-                    <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary">Clamped to 50 max</span>
+                    <span>{t("historicalCpuProfile", language)}</span>
+                    <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary">50 max</span>
                   </div>
 
                   {/* Benchmark Grid Legend & Tooltip Header */}
                   <div className="flex justify-between items-center text-[9px] font-mono text-aws-lightTextSecondary dark:text-aws-textSecondary mb-1">
                     <div className="flex gap-2">
                       <span className="flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-aws-red"></span> 85%+ Critical
+                        <span className="w-1.5 h-1.5 rounded-full bg-aws-red"></span> {t("critical", language)}
                       </span>
                       <span className="flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-aws-yellow"></span> 60%+ High
+                        <span className="w-1.5 h-1.5 rounded-full bg-aws-yellow"></span> {t("high", language)}
                       </span>
                       <span className="flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-aws-blue"></span> Normal
+                        <span className="w-1.5 h-1.5 rounded-full bg-aws-blue"></span> {t("normal", language)}
                       </span>
                     </div>
 
@@ -1003,11 +1001,11 @@ export default function Dashboard() {
                 {/* DB Class & Storage Meta */}
                 <div className="grid grid-cols-2 gap-2 pt-2 border-t border-aws-lightBorder dark:border-aws-divider text-xs">
                   <div>
-                    <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary block uppercase font-semibold">Instance Class</span>
+                    <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary block uppercase font-semibold">{t("instanceClass", language)}</span>
                     <span className="font-bold font-mono">{selectedDb.class}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary block uppercase font-semibold">Free Storage</span>
+                    <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary block uppercase font-semibold">{t("freeStorage", language)}</span>
                     <span className="font-bold font-mono text-emerald-800 dark:text-emerald-400">{selectedDb.freeStorageGb} GB</span>
                   </div>
                 </div>
@@ -1040,23 +1038,23 @@ export default function Dashboard() {
                   </button>
                 </div>
               </div>
-              <span className="text-[11px] font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary">Tier Capability: <span className="text-teal-800 dark:text-aws-teal uppercase font-extrabold">{tier}</span></span>
+              <span className="text-[11px] font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary">{t("tierCapability", language)} <span className="text-teal-800 dark:text-aws-teal uppercase font-extrabold">{tier}</span></span>
             </div>
 
             {/* Key Billing Highlights */}
             <div className="grid grid-cols-3 gap-4 mb-4">
               <div className="p-3 bg-aws-lightBg dark:bg-aws-dark rounded border border-aws-lightBorder dark:border-aws-border text-center">
-                <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary uppercase block">Base DB Cost</span>
+                <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary uppercase block">{t("baseDbCost", language)}</span>
                 <span className="text-lg font-bold font-mono text-aws-lightTextPrimary dark:text-aws-textPrimary">
                   {totalCost === 0 ? "$0/mo (Free Tier)" : `$${totalCost}/mo`}
                 </span>
               </div>
               <div className="p-3 bg-aws-lightBg dark:bg-aws-dark rounded border border-aws-lightBorder dark:border-aws-border text-center">
-                <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary uppercase block">Optimized Savings</span>
+                <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary uppercase block">{t("optimizedSavings", language)}</span>
                 <span className="text-lg font-bold font-mono text-emerald-800 dark:text-emerald-400">${potentialSavings}/mo</span>
               </div>
               <div className="p-3 bg-aws-lightBg dark:bg-aws-dark rounded border border-aws-lightBorder dark:border-aws-border text-center">
-                <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary uppercase block">Optimized Cost</span>
+                <span className="text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary uppercase block">{t("optimizedCost", language)}</span>
                 <span className="text-lg font-bold font-mono text-sky-800 dark:text-aws-blue">${totalCost - potentialSavings}/mo</span>
               </div>
             </div>
