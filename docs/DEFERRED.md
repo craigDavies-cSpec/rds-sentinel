@@ -77,4 +77,7 @@ A living backlog of deferred items, future roadmap features, and architectural i
 * **AWS Audit Manager Direct Integration Webhook** (AWS Expert): Webhook dispatch of evidence packages directly to AWS Audit Manager.
 * **Multi-Region Active-Active Latency Visualizer** (AWS Expert): Topology graph overlay showing active-active Aurora Global DB latency vectors.
 * **AWS Route 53 Application Recovery Controller (ARC) Integration** (PO Agent): Automatic DNS routing failover trigger.
-
+* **Touch & Mobile Gesture Support for Container Reordering** (Senior Dev / UI UX): Integrate Touch/Pointer event handlers (`onTouchStart`, `onTouchMove`, `onTouchEnd`) so tablet and mobile web users can drag and reorder containers via touch gestures.
+* **Active Drag Over Drop-Zone Visual Highlight Ring** (Senior UI UX Designer): Add a visual drop-zone highlight ring (`border-2 border-dashed border-aws-orange bg-aws-orange/5 animate-pulse`) on target columns during active `onDragOver` events.
+* **Custom Per-User Layout Presets** (Senior Product Owner): Support saving and toggling between multiple layout presets (*Default Balanced*, *FinOps Cost Heavy*, *DBA Telemetry Heavy*).
+* **Visual Sparkline Dynamic Canvas Resizing Animation** (Senior Dev): Add SVG/Canvas resize observer triggers to sparkline graphs to animate width changes upon column drops.
