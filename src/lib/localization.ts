@@ -392,6 +392,23 @@ export interface TranslationDictionary {
   layoutProfilesHeader: string;
   systemControlsHeader: string;
   cpuHistorySparkline: string;
+  subscribeAwsMarketplace: string;
+  edpEligibleBadge: string;
+  edpModalTitle: string;
+  edpModalDesc: string;
+  exportAceLeadsBtn: string;
+  runFtrAuditBtn: string;
+  ftrScoreLabel: string;
+  ftrAuditPassedToast: string;
+  aceLeadsExportedToast: string;
+  listingIdLabel: string;
+  edpDrawdownLabel: string;
+  procurementFrictionLabel: string;
+  zeroFrictionDesc: string;
+  proceedToMarketplaceBtn: string;
+  overallScoreLabel: string;
+  doneBtn: string;
+  awsPartnerHeader: string;
 }
 
 export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
@@ -743,6 +760,23 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     layoutProfilesHeader: "Operational Layout Profiles",
     systemControlsHeader: "System Diagnostics & Controls",
     cpuHistorySparkline: "📈 Historical CPU Trend (Sparkline)",
+    subscribeAwsMarketplace: "🛒 Subscribe on AWS Marketplace",
+    edpEligibleBadge: "⚡ AWS EDP Commitment Eligible",
+    edpModalTitle: "AWS Marketplace Procurement & EDP Commitment Spend-Down",
+    edpModalDesc: "100% of your RDS Sentinel subscription draws down against your organization's mandatory annual AWS Enterprise Discount Program (EDP) commitment with zero procurement friction.",
+    exportAceLeadsBtn: "🤝 Export APN ACE Pipeline Leads",
+    runFtrAuditBtn: "🛡️ Run AWS FTR Security Scanner",
+    ftrScoreLabel: "AWS FTR Security Score",
+    ftrAuditPassedToast: "✅ AWS FTR Security Review Completed: 100% Compliant!",
+    aceLeadsExportedToast: "📥 APN ACE Opportunity CSV Package Exported!",
+    listingIdLabel: "• AWS Marketplace Listing ID:",
+    edpDrawdownLabel: "• Enterprise Discount Program (EDP) Drawdown:",
+    procurementFrictionLabel: "• Procurement Friction:",
+    zeroFrictionDesc: "Zero (Bypasses RFP & Vendor Onboarding)",
+    proceedToMarketplaceBtn: "🛒 Proceed to AWS Marketplace",
+    overallScoreLabel: "Overall Score",
+    doneBtn: "Done",
+    awsPartnerHeader: "AWS Partner & Co-Sell Enablement",
   },
   de: {
     dashboardTitle: "RDS Sentinel",
@@ -1092,6 +1126,23 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     layoutProfilesHeader: "Betriebliche Layout-Profile",
     systemControlsHeader: "Systemdiagnose & Steuerung",
     cpuHistorySparkline: "📈 Historischer CPU-Trend (Sparkline)",
+    subscribeAwsMarketplace: "🛒 Auf dem AWS Marketplace abonnieren",
+    edpEligibleBadge: "⚡ AWS EDP-Verpflichtung anrechenbar",
+    edpModalTitle: "AWS Marketplace Beschaffung & EDP-Anrechnung",
+    edpModalDesc: "100% Ihres RDS Sentinel Abonnements wird auf die jährliche AWS EDP-Verpflichtung Ihres Unternehmens angerechnet.",
+    exportAceLeadsBtn: "🤝 APN ACE Pipeline-Leads exportieren",
+    runFtrAuditBtn: "🛡️ AWS FTR Sicherheits-Scanner ausführen",
+    ftrScoreLabel: "AWS FTR Sicherheitsscore",
+    ftrAuditPassedToast: "✅ AWS FTR Sicherheitsüberprüfung abgeschlossen: 100% konform!",
+    aceLeadsExportedToast: "📥 APN ACE Opportunity-CSV-Paket exportiert!",
+    listingIdLabel: "• AWS Marketplace Eintrags-ID:",
+    edpDrawdownLabel: "• Enterprise Discount Program (EDP) Anrechnung:",
+    procurementFrictionLabel: "• Beschaffungsaufwand:",
+    zeroFrictionDesc: "Null (Umgeht RFP & Anbieterschulung)",
+    proceedToMarketplaceBtn: "🛒 Weiter zum AWS Marketplace",
+    overallScoreLabel: "Gesamtergebnis",
+    doneBtn: "Fertig",
+    awsPartnerHeader: "AWS Partner & Co-Sell Bereitstellung",
   },
   fr: {
     dashboardTitle: "RDS Sentinel",
@@ -1441,6 +1492,23 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     layoutProfilesHeader: "Profils de Disposition Opérationnels",
     systemControlsHeader: "Diagnostics Système & Contrôles",
     cpuHistorySparkline: "📈 Tendance Historique du CPU (Sparkline)",
+    subscribeAwsMarketplace: "🛒 S'abonner sur AWS Marketplace",
+    edpEligibleBadge: "⚡ Éligible à l'engagement AWS EDP",
+    edpModalTitle: "Achats AWS Marketplace & Imputation Engagement EDP",
+    edpModalDesc: "100% de votre abonnement RDS Sentinel s'impute sur l'engagement annuel AWS Enterprise Discount Program (EDP) de votre entreprise.",
+    exportAceLeadsBtn: "🤝 Exporter les Leads APN ACE Pipeline",
+    runFtrAuditBtn: "🛡️ Exécuter le Scanner de Sécurité AWS FTR",
+    ftrScoreLabel: "Score de Sécurité AWS FTR",
+    ftrAuditPassedToast: "✅ Examen de sécurité AWS FTR terminé : 100% conforme !",
+    aceLeadsExportedToast: "📥 Package CSV d'opportunités APN ACE exporté !",
+    listingIdLabel: "• Identifiant Offre AWS Marketplace :",
+    edpDrawdownLabel: "• Imputation Enterprise Discount Program (EDP) :",
+    procurementFrictionLabel: "• Friction d'achat :",
+    zeroFrictionDesc: "Zéro (Évite l'appel d'offres et l'enregistrement fournisseur)",
+    proceedToMarketplaceBtn: "🛒 Accéder à AWS Marketplace",
+    overallScoreLabel: "Score Global",
+    doneBtn: "Terminé",
+    awsPartnerHeader: "Partenaire AWS & Co-Vente",
   },
   ja: {
     dashboardTitle: "RDS Sentinel",
@@ -1790,6 +1858,23 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     layoutProfilesHeader: "運用レイアウトプロファイル",
     systemControlsHeader: "システム診断とコントロール",
     cpuHistorySparkline: "📈 過去のCPU使用率トレンド (スパークライン)",
+    subscribeAwsMarketplace: "🛒 AWS Marketplace で購読",
+    edpEligibleBadge: "⚡ AWS EDP 契約消化対象",
+    edpModalTitle: "AWS Marketplace 購買 & EDP 契約消化手続き",
+    edpModalDesc: "RDS Sentinel の購読料の 100% が、貴社の年間 AWS Enterprise Discount Program (EDP) 契約コミットメントの消化としてカウントされます。",
+    exportAceLeadsBtn: "🤝 APN ACE パイプラインリードを出力",
+    runFtrAuditBtn: "🛡️ AWS FTR セキュリティスキャナーを実行",
+    ftrScoreLabel: "AWS FTR セキュリティスコア",
+    ftrAuditPassedToast: "✅ AWS FTR セキュリティ監査完了：100% 適合！",
+    aceLeadsExportedToast: "📥 APN ACE 案件 CSV パッケージを出力しました！",
+    listingIdLabel: "• AWS Marketplace 出品 ID:",
+    edpDrawdownLabel: "• Enterprise Discount Program (EDP) 契約消化:",
+    procurementFrictionLabel: "• 購買摩擦:",
+    zeroFrictionDesc: "ゼロ (RFP およびベンダー審査手続きを短縮)",
+    proceedToMarketplaceBtn: "🛒 AWS Marketplace へ進む",
+    overallScoreLabel: "総合スコア",
+    doneBtn: "完了",
+    awsPartnerHeader: "AWS パートナー & 共創販売支援",
   },
 };
 

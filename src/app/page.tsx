@@ -18,6 +18,8 @@ import { analyzeSlowQuery } from "@/lib/indexAdvisor";
 import { getClusterTopology, ClusterNode, ClusterTopologyData } from "@/lib/clusterTopology";
 import { getLocalizedTourSteps, isTourCompleted, markTourCompleted, resetTourState } from "@/lib/productTour";
 import { generateComplianceReport, downloadCompliancePackage } from "@/lib/complianceExporter";
+import { downloadAceLeadCsvPackage, MOCK_ACE_LEADS } from "@/lib/aceLeadExporter";
+import { runFtrSecurityAudit } from "@/lib/ftrChecker";
 import {
   UserAppPreferences,
   LinkedAwsAccount,
@@ -242,6 +244,22 @@ export default function Dashboard() {
     await saveLayoutAction(presetOrder);
     setDragOverColumn(null);
     showToast(`${t("presetAppliedToast", language)}: ${t(presetLabelKey as any, language)}`);
+  };
+
+  const [isEdpModalOpen, setIsEdpModalOpen] = useState<boolean>(false);
+  const [ftrAuditResult, setFtrAuditResult] = useState<any | null>(null);
+  const [isFtrModalOpen, setIsFtrModalOpen] = useState<boolean>(false);
+
+  const handleExportAceLeads = () => {
+    downloadAceLeadCsvPackage(MOCK_ACE_LEADS);
+    showToast(t("aceLeadsExportedToast", language));
+  };
+
+  const handleRunFtrAudit = () => {
+    const res = runFtrSecurityAudit();
+    setFtrAuditResult(res);
+    setIsFtrModalOpen(true);
+    showToast(t("ftrAuditPassedToast", language));
   };
 
   const handleDragStart = (e: React.DragEvent, componentKey: string) => {
@@ -490,6 +508,9 @@ export default function Dashboard() {
         showToast={showToast}
         resetDefaultLayout={resetDefaultLayout}
         applyLayoutPreset={applyLayoutPreset}
+        setIsEdpModalOpen={setIsEdpModalOpen}
+        handleExportAceLeads={handleExportAceLeads}
+        handleRunFtrAudit={handleRunFtrAudit}
       />
 
       {/* Live Account Banner */}
@@ -726,6 +747,107 @@ export default function Dashboard() {
         setIsTourActive={setIsTourActive}
         language={language}
       />
+
+      {/* AWS EDP Procurement & Spend-Down Modal */}
+      {isEdpModalOpen && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div id="edp-procurement-modal" className="bg-aws-lightContainer dark:bg-aws-container border border-aws-orange/40 rounded-xl shadow-2xl w-full max-w-xl p-6 flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center border-b border-aws-lightBorder dark:border-aws-border pb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">🛒</span>
+                <h3 className="font-extrabold text-aws-lightTextPrimary dark:text-aws-textPrimary text-base">
+                  {t("edpModalTitle", language)}
+                </h3>
+              </div>
+              <button
+                onClick={() => setIsEdpModalOpen(false)}
+                className="text-aws-lightTextSecondary dark:text-aws-textSecondary hover:text-aws-orange font-bold text-sm"
+              >
+                ✕
+              </button>
+            </div>
+            <p className="text-xs text-aws-lightTextSecondary dark:text-aws-textSecondary leading-relaxed">
+              {t("edpModalDesc", language)}
+            </p>
+            <div className="p-4 rounded-lg bg-aws-orange/10 border border-aws-orange/30 text-xs font-mono text-aws-orange flex flex-col gap-2">
+              <div className="flex items-center gap-2 font-bold">
+                <span>⚡ {t("edpEligibleBadge", language)}</span>
+              </div>
+              <div>{t("listingIdLabel", language)} <span className="font-extrabold">rds-sentinel-v2-enterprise</span></div>
+              <div>{t("edpDrawdownLabel", language)} <span className="font-extrabold text-emerald-400">100% Eligible</span></div>
+              <div>{t("procurementFrictionLabel", language)} <span className="font-extrabold text-emerald-400">{t("zeroFrictionDesc", language)}</span></div>
+            </div>
+            <div className="flex justify-end gap-2 pt-2 border-t border-aws-lightBorder dark:border-aws-border">
+              <button
+                onClick={() => setIsEdpModalOpen(false)}
+                className="px-4 py-2 rounded-md bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/10 border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs font-bold transition-all"
+              >
+                {t("closeBtn", language)}
+              </button>
+              <a
+                href="https://aws.amazon.com/marketplace"
+                target="_blank"
+                rel="noreferrer"
+                className="px-4 py-2 rounded-md bg-aws-orange hover:bg-aws-orange/90 text-slate-950 font-black text-xs transition-all shadow-md flex items-center gap-1.5"
+              >
+                <span>{t("proceedToMarketplaceBtn", language)}</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* AWS FTR Security Scanner Modal */}
+      {isFtrModalOpen && ftrAuditResult && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div id="ftr-security-modal" className="bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border rounded-xl shadow-2xl w-full max-w-2xl p-6 flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center border-b border-aws-lightBorder dark:border-aws-border pb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">🛡️</span>
+                <h3 className="font-extrabold text-aws-lightTextPrimary dark:text-aws-textPrimary text-base">
+                  {t("ftrScoreLabel", language)}: {ftrAuditResult.overallScore}%
+                </h3>
+              </div>
+              <button
+                onClick={() => setIsFtrModalOpen(false)}
+                className="text-aws-lightTextSecondary dark:text-aws-textSecondary hover:text-aws-orange font-bold text-sm"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold flex justify-between items-center font-mono">
+              <span>{t("statusLabel", language)} {ftrAuditResult.status}</span>
+              <span>{t("overallScoreLabel", language)}: {ftrAuditResult.overallScore}/100</span>
+            </div>
+            <div className="flex flex-col gap-2.5 max-h-[350px] overflow-y-auto pr-1">
+              {ftrAuditResult.items.map((item: any) => (
+                <div key={item.id} className="p-3 rounded-lg bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border flex flex-col gap-1 text-xs">
+                  <div className="flex justify-between items-center font-bold">
+                    <span className="text-aws-lightTextPrimary dark:text-aws-textPrimary">{item.title}</span>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                      {item.status}
+                    </span>
+                  </div>
+                  <p className="text-aws-lightTextSecondary dark:text-aws-textSecondary text-[11px]">
+                    {item.description}
+                  </p>
+                  <span className="text-[10px] font-mono text-amber-950 dark:text-aws-orange mt-0.5">
+                    💡 {item.recommendation}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div className="flex justify-end pt-2 border-t border-aws-lightBorder dark:border-aws-border">
+              <button
+                onClick={() => setIsFtrModalOpen(false)}
+                className="px-4 py-2 rounded-md bg-aws-orange text-slate-950 font-black text-xs transition-all shadow-md cursor-pointer"
+              >
+                {t("doneBtn", language)}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -48,6 +48,9 @@ interface HeaderToolbarProps {
   showToast?: (msg: string) => void;
   resetDefaultLayout?: () => void;
   applyLayoutPreset?: (presetOrder: string[], presetLabelKey: string) => void;
+  setIsEdpModalOpen?: (open: boolean) => void;
+  handleExportAceLeads?: () => void;
+  handleRunFtrAudit?: () => void;
 }
 
 export function HeaderToolbar({
@@ -91,6 +94,9 @@ export function HeaderToolbar({
   showToast,
   resetDefaultLayout,
   applyLayoutPreset,
+  setIsEdpModalOpen,
+  handleExportAceLeads,
+  handleRunFtrAudit,
 }: HeaderToolbarProps) {
   return (
     <header className="bg-aws-lightContainer dark:bg-aws-container border-b border-aws-lightBorder dark:border-aws-border px-4 py-3 shadow-md">
@@ -117,6 +123,20 @@ export function HeaderToolbar({
 
         {/* Right Side: Global Controls */}
         <div className="flex items-center flex-wrap gap-1.5 sm:gap-2">
+          {/* Subscribe on AWS Marketplace Procurement Badge */}
+          <button
+            id="subscribe-aws-marketplace-btn"
+            onClick={() => setIsEdpModalOpen && setIsEdpModalOpen(true)}
+            className="px-3 py-1.5 bg-gradient-to-r from-amber-500/20 to-aws-orange/20 hover:from-amber-500/30 hover:to-aws-orange/30 border border-aws-orange/50 text-aws-orange font-extrabold text-xs rounded-md transition-all active:scale-95 shadow-sm cursor-pointer flex items-center gap-1.5"
+            title={t("edpModalDesc", language)}
+          >
+            <span>🛒</span>
+            <span>{t("subscribeAwsMarketplace", language)}</span>
+            <span className="text-[9px] bg-aws-orange text-slate-950 px-1.5 py-0.5 rounded font-black uppercase hidden lg:inline-block">
+              EDP
+            </span>
+          </button>
+
           <button
             onClick={() => {
               resetTourState();
@@ -236,6 +256,30 @@ export function HeaderToolbar({
                   className="w-full text-left px-3.5 py-2 text-xs text-aws-lightTextPrimary dark:text-aws-textPrimary hover:bg-aws-orange/10 flex items-center gap-2 cursor-pointer font-medium border-t border-aws-lightBorder dark:border-aws-divider transition-colors"
                 >
                   <span>⚡</span> {t("graphqlApi", language)}
+                </button>
+
+                <div className="px-3 py-1.5 border-t border-b border-aws-lightBorder dark:border-aws-border text-[10px] font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary uppercase tracking-wider mt-1">
+                  {t("awsPartnerHeader", language)}
+                </div>
+                <button
+                  id="export-ace-leads-btn"
+                  onClick={() => {
+                    if (handleExportAceLeads) handleExportAceLeads();
+                    setIsDevToolsOpen(false);
+                  }}
+                  className="w-full text-left px-3.5 py-2 text-xs text-aws-lightTextPrimary dark:text-aws-textPrimary hover:bg-aws-orange/10 flex items-center gap-2 cursor-pointer font-medium transition-colors"
+                >
+                  <span>🤝</span> {t("exportAceLeadsBtn", language)}
+                </button>
+                <button
+                  id="run-ftr-audit-btn"
+                  onClick={() => {
+                    if (handleRunFtrAudit) handleRunFtrAudit();
+                    setIsDevToolsOpen(false);
+                  }}
+                  className="w-full text-left px-3.5 py-2 text-xs text-aws-lightTextPrimary dark:text-aws-textPrimary hover:bg-aws-orange/10 flex items-center gap-2 cursor-pointer font-medium border-t border-aws-lightBorder dark:border-aws-divider transition-colors"
+                >
+                  <span>🛡️</span> {t("runFtrAuditBtn", language)}
                 </button>
               </div>
             )}
