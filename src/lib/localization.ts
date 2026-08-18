@@ -367,6 +367,20 @@ export interface TranslationDictionary {
   targetTierLabel: string;
   monthLabel: string;
   moLabel: string;
+  accountNamePlaceholder: string;
+  accountIdPlaceholder: string;
+  addAccountBtn: string;
+  removeAccountBtn: string;
+  refresh5s: string;
+  refresh15s: string;
+  refresh30s: string;
+  refresh60s: string;
+  tzUtc: string;
+  tzEst: string;
+  tzPst: string;
+  tzBst: string;
+  tzCet: string;
+  tzJst: string;
 }
 
 export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
@@ -693,6 +707,20 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     targetTierLabel: "Target Tier:",
     monthLabel: "month",
     moLabel: "mo",
+    accountNamePlaceholder: "Account Name (e.g. Production East)",
+    accountIdPlaceholder: "12-Digit Account ID (e.g. 123456789012)",
+    addAccountBtn: "➕ Add Linked AWS Account",
+    removeAccountBtn: "Remove",
+    refresh5s: "⚡ 5 Seconds (Real-Time)",
+    refresh15s: "⏱️ 15 Seconds (Balanced)",
+    refresh30s: "💤 30 Seconds (Eco Mode)",
+    refresh60s: "😴 60 Seconds (Low CloudWatch API)",
+    tzUtc: "UTC (GMT+00:00) Universal Coordinated",
+    tzEst: "EST (GMT-05:00) US Eastern Standard",
+    tzPst: "PST (GMT-08:00) US Pacific Standard",
+    tzBst: "London / BST (GMT+01:00) United Kingdom",
+    tzCet: "CET (GMT+01:00) Central European",
+    tzJst: "JST (GMT+09:00) Japan Standard",
   },
   de: {
     dashboardTitle: "RDS Sentinel",
@@ -1017,6 +1045,20 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     targetTierLabel: "Ziel-Tarif:",
     monthLabel: "Monat",
     moLabel: "Mon",
+    accountNamePlaceholder: "Konto-Name (z.B. Produktion Ost)",
+    accountIdPlaceholder: "12-stellige Konto-ID (z.B. 123456789012)",
+    addAccountBtn: "➕ Verknüpftes AWS-Konto hinzufügen",
+    removeAccountBtn: "Entfernen",
+    refresh5s: "⚡ 5 Sekunden (Echtzeit)",
+    refresh15s: "⏱️ 15 Sekunden (Ausgewogen)",
+    refresh30s: "💤 30 Sekunden (Öko-Modus)",
+    refresh60s: "😴 60 Sekunden (Niedrige API-Nutzung)",
+    tzUtc: "UTC (GMT+00:00) Koordinierte Weltzeit",
+    tzEst: "EST (GMT-05:00) US-Ostküstenzeit",
+    tzPst: "PST (GMT-08:00) US-Pazifikzeit",
+    tzBst: "London / BST (GMT+01:00) Großbritannien",
+    tzCet: "MEZ (GMT+01:00) Mitteleuropäische Zeit",
+    tzJst: "JST (GMT+09:00) Japanische Standardzeit",
   },
   fr: {
     dashboardTitle: "RDS Sentinel",
@@ -1341,6 +1383,20 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     targetTierLabel: "Niveau cible :",
     monthLabel: "mois",
     moLabel: "mois",
+    accountNamePlaceholder: "Nom du compte (ex. Production Est)",
+    accountIdPlaceholder: "ID de compte à 12 chiffres (ex. 123456789012)",
+    addAccountBtn: "➕ Ajouter un compte AWS lié",
+    removeAccountBtn: "Supprimer",
+    refresh5s: "⚡ 5 Secondes (Temps réel)",
+    refresh15s: "⏱️ 15 Secondes (Équilibré)",
+    refresh30s: "💤 30 Secondes (Mode Éco)",
+    refresh60s: "😴 60 Secondes (Faible coût API)",
+    tzUtc: "UTC (GMT+00:00) Temps universel coordonné",
+    tzEst: "EST (GMT-05:00) Heure normale de l'Est",
+    tzPst: "PST (GMT-08:00) Heure normale du Pacifique",
+    tzBst: "Londres / BST (GMT+01:00) Royaume-Uni",
+    tzCet: "HNEC (GMT+01:00) Heure normale d'Europe centrale",
+    tzJst: "JST (GMT+09:00) Heure normale du Japon",
   },
   ja: {
     dashboardTitle: "RDS Sentinel",
@@ -1665,6 +1721,20 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     targetTierLabel: "対象ティア:",
     monthLabel: "月",
     moLabel: "月",
+    accountNamePlaceholder: "アカウント名 (例: 本番東部)",
+    accountIdPlaceholder: "12桁のアカウントID (例: 123456789012)",
+    addAccountBtn: "➕ 連携AWSアカウントを追加",
+    removeAccountBtn: "削除",
+    refresh5s: "⚡ 5秒 (リアルタイム)",
+    refresh15s: "⏱️ 15秒 (標準)",
+    refresh30s: "💤 30秒 (省エネ)",
+    refresh60s: "😴 60秒 (CloudWatch API節約)",
+    tzUtc: "UTC (GMT+00:00) 協定世界時",
+    tzEst: "EST (GMT-05:00) 米国東部標準時",
+    tzPst: "PST (GMT-08:00) 米国太平洋標準時",
+    tzBst: "ロンドン / BST (GMT+01:00) 英国夏時間",
+    tzCet: "CET (GMT+01:00) 中央ヨーロッパ時間",
+    tzJst: "JST (GMT+09:00) 日本標準時",
   },
 };
 

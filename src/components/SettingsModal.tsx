@@ -197,7 +197,7 @@ export function SettingsModal({
                 {/* Language Dropdown */}
                 <div className="flex flex-col gap-1.5 p-3 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border">
                   <label className="font-bold text-aws-lightTextPrimary dark:text-aws-textPrimary">
-                    Display Language / Sprache / Langue / 言語
+                    {t("displayLanguagePrefTitle", language)}
                   </label>
                   <select
                     id="language-selector"
@@ -210,6 +210,77 @@ export function SettingsModal({
                         {lang.flag} {lang.name}
                       </option>
                     ))}
+                  </select>
+                </div>
+
+                {/* Color Theme Mode Selector */}
+                <div className="flex flex-col gap-1.5 p-3 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border">
+                  <label className="font-bold text-aws-lightTextPrimary dark:text-aws-textPrimary">
+                    {t("colorThemeMode", language)}
+                  </label>
+                  <select
+                    id="theme-mode-selector"
+                    value={appPreferences.theme || "dark"}
+                    onChange={(e) => setAppPreferences({ ...appPreferences, theme: e.target.value as "dark" | "light" | "system" })}
+                    className="p-2 rounded bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary font-bold focus:outline-none"
+                  >
+                    <option value="dark">{t("darkSlateConsole", language)}</option>
+                    <option value="light">{t("lightSlate", language)}</option>
+                  </select>
+                </div>
+
+                {/* Auto Refresh Rate */}
+                <div className="flex flex-col gap-1.5 p-3 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border">
+                  <label className="font-bold text-aws-lightTextPrimary dark:text-aws-textPrimary">
+                    {t("autoRefreshRate", language)}
+                  </label>
+                  <select
+                    id="telemetry-refresh-rate-selector"
+                    value={appPreferences.telemetryRefreshIntervalMs || 5000}
+                    onChange={(e) => setAppPreferences({ ...appPreferences, telemetryRefreshIntervalMs: Number(e.target.value) })}
+                    className="p-2 rounded bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary font-bold focus:outline-none"
+                  >
+                    <option value={5000}>{t("refresh5s", language)}</option>
+                    <option value={15000}>{t("refresh15s", language)}</option>
+                    <option value={30000}>{t("refresh30s", language)}</option>
+                    <option value={60000}>{t("refresh60s", language)}</option>
+                  </select>
+                </div>
+
+                {/* Alert Notification Frequency */}
+                <div className="flex flex-col gap-1.5 p-3 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border">
+                  <label className="font-bold text-aws-lightTextPrimary dark:text-aws-textPrimary">
+                    {t("alertFrequency", language)}
+                  </label>
+                  <select
+                    id="alert-frequency-selector"
+                    value={appPreferences.notificationFrequency || "immediate"}
+                    onChange={(e) => setAppPreferences({ ...appPreferences, notificationFrequency: e.target.value as "immediate" | "daily_digest" | "weekly_summary" })}
+                    className="p-2 rounded bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary font-bold focus:outline-none"
+                  >
+                    <option value="immediate">{t("immediateAlerts", language)}</option>
+                    <option value="daily_digest">{t("dailyDigest", language)}</option>
+                    <option value="weekly_summary">{t("weeklySummary", language)}</option>
+                  </select>
+                </div>
+
+                {/* Primary Timezone */}
+                <div className="flex flex-col gap-1.5 p-3 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border">
+                  <label className="font-bold text-aws-lightTextPrimary dark:text-aws-textPrimary">
+                    {t("primaryTimezone", language)}
+                  </label>
+                  <select
+                    id="primary-timezone-selector"
+                    value={appPreferences.timezone || "UTC (GMT+00:00)"}
+                    onChange={(e) => setAppPreferences({ ...appPreferences, timezone: e.target.value })}
+                    className="p-2 rounded bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary font-bold focus:outline-none"
+                  >
+                    <option value="UTC (GMT+00:00)">{t("tzUtc", language)}</option>
+                    <option value="EST (GMT-05:00)">{t("tzEst", language)}</option>
+                    <option value="PST (GMT-08:00)">{t("tzPst", language)}</option>
+                    <option value="GMT (GMT+01:00)">{t("tzBst", language)}</option>
+                    <option value="CET (GMT+01:00)">{t("tzCet", language)}</option>
+                    <option value="JST (GMT+09:00)">{t("tzJst", language)}</option>
                   </select>
                 </div>
 
@@ -259,18 +330,43 @@ export function SettingsModal({
                       <strong className="block text-xs text-aws-lightTextPrimary dark:text-aws-textPrimary">{acc.accountName} ({acc.id})</strong>
                       <span className="font-mono text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary">{acc.roleArn}</span>
                     </div>
-                    <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-bold text-[10px] uppercase">
-                      {acc.status}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-bold text-[10px] uppercase">
+                        {acc.status}
+                      </span>
+                      <button
+                        onClick={() => {
+                          setLinkedAccounts(linkedAccounts.filter((a) => a.id !== acc.id));
+                          showToast(`🗑️ Removed AWS Account ${acc.id} from monitoring`);
+                        }}
+                        className="px-2 py-0.5 rounded bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white font-bold text-[10px] transition-all cursor-pointer"
+                      >
+                        {t("removeAccountBtn", language)}
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
 
-              {/* IAM Connection Tester Form */}
+              {/* IAM Connection Tester Form & Add Sub-Account */}
               <div className="p-4 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border flex flex-col gap-3">
                 <h5 className="font-bold text-xs uppercase text-aws-orange">{t("testStsConnection", language)}</h5>
                 {/* Form Input Fields */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <input
+                    type="text"
+                    placeholder={t("accountNamePlaceholder", language)}
+                    value={newAccountForm.accountName}
+                    onChange={(e) => setNewAccountForm({ ...newAccountForm, accountName: e.target.value })}
+                    className="w-full px-3 py-1.5 text-xs font-mono rounded bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary"
+                  />
+                  <input
+                    type="text"
+                    placeholder={t("accountIdPlaceholder", language)}
+                    value={newAccountForm.accountId}
+                    onChange={(e) => setNewAccountForm({ ...newAccountForm, accountId: e.target.value })}
+                    className="w-full px-3 py-1.5 text-xs font-mono rounded bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary"
+                  />
                   <input
                     type="text"
                     placeholder={t("roleArnPlaceholder", language)}
@@ -287,18 +383,48 @@ export function SettingsModal({
                   />
                 </div>
 
-                <button
-                  id="test-iam-role-connection-btn"
-                  onClick={() => {
-                    const arn = newAccountForm.roleArn || "arn:aws:iam::616399034957:role/RDSSentinelMonitoringRole";
-                    const ext = newAccountForm.externalId || "Sentinel-Secret-0001";
-                    const res = testIamRoleConnection(arn, ext);
-                    setIamTestStatus(res.message);
-                  }}
-                  className="py-2 bg-aws-orange hover:bg-aws-orangeHover text-white font-bold text-xs rounded cursor-pointer transition-all"
-                >
-                  {t("testStsBtn", language)}
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    id="test-iam-role-connection-btn"
+                    onClick={() => {
+                      const arn = newAccountForm.roleArn || "arn:aws:iam::616399034957:role/RDSSentinelMonitoringRole";
+                      const ext = newAccountForm.externalId || "Sentinel-Secret-0001";
+                      const res = testIamRoleConnection(arn, ext);
+                      setIamTestStatus(res.message);
+                    }}
+                    className="flex-1 py-2 bg-aws-orange hover:bg-aws-orangeHover text-white font-bold text-xs rounded cursor-pointer transition-all"
+                  >
+                    {t("testStsBtn", language)}
+                  </button>
+
+                  <button
+                    id="add-linked-account-btn"
+                    onClick={() => {
+                      const accId = newAccountForm.accountId || "998877665544";
+                      const accName = newAccountForm.accountName || `Sub-Account (${accId})`;
+                      const arn = newAccountForm.roleArn || `arn:aws:iam::${accId}:role/RDSSentinelMonitoringRole`;
+                      const ext = newAccountForm.externalId || "Sentinel-Secret-0001";
+
+                      setLinkedAccounts([
+                        ...linkedAccounts,
+                        {
+                          id: accId,
+                          accountName: accName,
+                          roleArn: arn,
+                          externalId: ext,
+                          region: "eu-west-1",
+                          status: "active",
+                          monitoredServices: [],
+                        },
+                      ]);
+                      setNewAccountForm({ accountName: "", accountId: "", roleArn: "", externalId: "" });
+                      showToast(`✅ AWS Account ${accName} added to monitoring!`);
+                    }}
+                    className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded cursor-pointer transition-all"
+                  >
+                    {t("addAccountBtn", language)}
+                  </button>
+                </div>
 
                 {iamTestStatus && (
                   <p className="p-2 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-mono text-[11px]">
@@ -625,11 +751,47 @@ export function SettingsModal({
               </div>
 
               {/* AWS Control Tower Guardrail Compliance */}
-              <div className="p-4 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border flex flex-col gap-2">
-                <h5 className="font-bold text-xs uppercase text-aws-lightTextPrimary dark:text-aws-textPrimary">
-                  {t("controlTowerTitle", language)}
-                </h5>
-                <div className="flex flex-col gap-1.5">
+              <div className="p-4 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border flex flex-col gap-3">
+                <div className="flex justify-between items-center">
+                  <h5 className="font-bold text-xs uppercase text-aws-lightTextPrimary dark:text-aws-textPrimary">
+                    {t("controlTowerTitle", language)}
+                  </h5>
+                  <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-bold uppercase text-[10px]">
+                    100% Guardrails Active
+                  </span>
+                </div>
+
+                <div className="flex gap-2">
+                  <input
+                    id="mfa-token-input"
+                    type="text"
+                    placeholder={t("enterMfaToken", language)}
+                    value={mfaTokenInput}
+                    onChange={(e) => setMfaTokenInput(e.target.value)}
+                    className="flex-1 p-2 rounded bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border text-xs font-mono text-aws-lightTextPrimary dark:text-aws-textPrimary"
+                  />
+                  <button
+                    id="validate-mfa-token-btn"
+                    onClick={() => {
+                      const res = validateMfaToken(mfaTokenInput);
+                      setMfaStatus({ success: res.valid, message: res.message });
+                      if (res.valid) {
+                        showToast(`✅ MFA Token Validated! Control Tower Audit Approved.`);
+                      }
+                    }}
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded cursor-pointer transition-all"
+                  >
+                    {t("validateMfaBtn", language)}
+                  </button>
+                </div>
+
+                {mfaStatus && (
+                  <p className={`p-2 rounded font-mono text-[11px] border ${mfaStatus.success ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" : "bg-red-500/10 border-red-500/20 text-red-400"}`}>
+                    {mfaStatus.message}
+                  </p>
+                )}
+
+                <div className="flex flex-col gap-1.5 mt-1">
                   {controlTowerResults.map((r) => (
                     <div key={r.id} className="flex justify-between items-center text-[11px] p-2 rounded bg-aws-lightContainer dark:bg-aws-container">
                       <span>{r.code} — {r.name}</span>
