@@ -16,6 +16,7 @@ test.describe("Accessibility Audits - rds-sentinel", () => {
     
     // Move mouse out of the toggle theme button to clear the hover styling contrast scan
     await page.mouse.move(0, 0);
+    await page.evaluate(() => (document.activeElement as HTMLElement)?.blur());
     
     // Analyze page
     const results = await new AxeBuilder({ page })

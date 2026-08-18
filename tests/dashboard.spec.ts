@@ -205,12 +205,7 @@ test.describe("RDS Sentinel Dashboard Functional E2E Tests", () => {
   });
 
   test("should render SOC2 / HIPAA Compliance Export button in header and trigger report generation", async ({ page }) => {
-    // Open Developer Tools dropdown
-    const devToolsBtn = page.locator("#dev-tools-dropdown-btn");
-    await expect(devToolsBtn).toBeVisible();
-    await devToolsBtn.click();
-
-    // Confirm export SOC2 compliance button is visible in Developer Tools menu
+    // Confirm export SOC2 compliance button is visible in header toolbar
     const exportSoc2Btn = page.locator("#export-soc2-compliance-btn");
     await expect(exportSoc2Btn).toBeVisible();
 
@@ -258,6 +253,10 @@ test.describe("RDS Sentinel Dashboard Functional E2E Tests", () => {
     // Confirm Health Score badge is visible
     await expect(page.getByText(/Health Score:/)).toBeVisible();
 
+    // Open Developer Tools dropdown
+    await page.locator("#dev-tools-dropdown-btn").click();
+    await page.waitForTimeout(200);
+
     // Confirm Dual Mode toggle button is visible
     const modeBtn = page.locator("#toggle-app-mode-btn");
     await expect(modeBtn).toBeVisible();
@@ -265,7 +264,9 @@ test.describe("RDS Sentinel Dashboard Functional E2E Tests", () => {
 
     // Toggle to Mode B
     await modeBtn.click();
-    await expect(modeBtn).toHaveText(/Mode B: AWS Extension/);
+    await page.locator("#dev-tools-dropdown-btn").click();
+    await page.waitForTimeout(200);
+    await expect(page.locator("#toggle-app-mode-btn")).toHaveText(/Mode B: AWS Extension/);
 
     // Confirm Cost Center Tag buttons render
     await expect(page.getByText("All Tags")).toBeVisible();
@@ -516,6 +517,7 @@ test.describe("RDS Sentinel Dashboard Functional E2E Tests", () => {
 
     // 2. Click Reset All Simulators button inside Dev Tools dropdown
     await page.locator("#dev-tools-dropdown-btn").click();
+    await page.waitForTimeout(200);
     await page.locator("#global-reset-simulators-btn").click();
     await expect(page.getByText(/All telemetry load spikes, circuit breakers, and sliders reset/)).toBeVisible();
   });
@@ -587,7 +589,7 @@ test.describe("RDS Sentinel Dashboard Functional E2E Tests", () => {
     await expect(edpModal).toContainText("rds-sentinel-v2-enterprise");
 
     // Close modal
-    await edpModal.locator("button", { hasText: "✕" }).click();
+    await edpModal.locator("button").filter({ hasText: /^✕$/ }).click();
     await expect(edpModal).not.toBeVisible();
 
     // Open Developer Tools dropdown

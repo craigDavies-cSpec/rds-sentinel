@@ -259,7 +259,7 @@ export function TelemetrySandbox({
               <div className="mt-3 p-2.5 bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border rounded-lg flex flex-col gap-1.5">
                 <div className="flex justify-between items-center text-[10px] font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary">
                   <span>{t("cpuHistorySparkline", language)}</span>
-                  <span className="font-mono text-[9px] text-aws-orange">
+                  <span className="font-mono text-[9px] text-amber-950 dark:text-aws-orange font-bold">
                     {hoveredSparklineIndex !== null ? `${dataPoints[hoveredSparklineIndex]}% @ T-${(dataPoints.length - 1 - hoveredSparklineIndex) * 5}s` : `Live Peak: ${Math.max(...dataPoints)}%`}
                   </span>
                 </div>

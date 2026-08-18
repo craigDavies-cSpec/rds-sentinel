@@ -109,7 +109,7 @@ export function HeaderToolbar({
             <div>
               <h1 className="font-extrabold text-aws-lightTextPrimary dark:text-aws-textPrimary tracking-tight text-base sm:text-lg flex items-center gap-2">
                 {t("dashboardTitle", language)}
-                <span className="text-[10px] bg-aws-orange/20 text-aws-orange border border-aws-orange/40 px-2 py-0.5 rounded-full font-mono hidden sm:inline-block">
+                <span className="text-[10px] bg-aws-orange/20 text-amber-950 dark:text-aws-orange font-extrabold border border-aws-orange/40 px-2 py-0.5 rounded-full font-mono hidden sm:inline-block">
                   v2.0 Enterprise
                 </span>
               </h1>
@@ -127,7 +127,7 @@ export function HeaderToolbar({
           <button
             id="subscribe-aws-marketplace-btn"
             onClick={() => setIsEdpModalOpen && setIsEdpModalOpen(true)}
-            className="px-3 py-1.5 bg-gradient-to-r from-amber-500/20 to-aws-orange/20 hover:from-amber-500/30 hover:to-aws-orange/30 border border-aws-orange/50 text-aws-orange font-extrabold text-xs rounded-md transition-all active:scale-95 shadow-sm cursor-pointer flex items-center gap-1.5"
+            className="px-3 py-1.5 bg-gradient-to-r from-amber-500/20 to-aws-orange/20 hover:from-amber-500/30 hover:to-aws-orange/30 border border-aws-orange/50 text-amber-950 dark:text-aws-orange font-extrabold text-xs rounded-md transition-all active:scale-95 shadow-sm cursor-pointer flex items-center gap-1.5"
             title={t("edpModalDesc", language)}
           >
             <span>🛒</span>
@@ -138,17 +138,19 @@ export function HeaderToolbar({
           </button>
 
           <button
+            id="start-product-tour-btn"
             onClick={() => {
               resetTourState();
               setCurrentTourStepIndex(0);
               setIsTourActive(true);
             }}
-            className="px-3 py-1.5 bg-aws-orange/15 hover:bg-aws-orange/25 border border-aws-orange/40 text-aws-orange text-xs font-bold rounded-md transition-all active:scale-95 shadow-sm cursor-pointer"
+            className="px-3 py-1.5 bg-aws-orange/15 hover:bg-aws-orange/25 border border-aws-orange/40 text-amber-950 dark:text-aws-orange text-xs font-bold rounded-md transition-all active:scale-95 shadow-sm cursor-pointer"
           >
             {t("tourBtn", language)}
           </button>
 
           <button
+            id="export-csv-report-btn"
             onClick={exportCSVReport}
             className="px-3 py-1.5 bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/10 border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs font-bold rounded-md transition-all active:scale-95 shadow-sm cursor-pointer"
           >
@@ -156,6 +158,7 @@ export function HeaderToolbar({
           </button>
 
           <button
+            id="export-soc2-compliance-btn"
             onClick={() => {
               const rep = generateComplianceReport(
                 slowQueries.map((q) => q.rawSql),
@@ -227,11 +230,22 @@ export function HeaderToolbar({
                   {t("systemControlsHeader", language)}
                 </div>
                 <button
+                  id="toggle-app-mode-btn"
+                  onClick={() => {
+                    setAppMode(appMode === "mode_a" ? "mode_b" : "mode_a");
+                    setIsDevToolsOpen(false);
+                  }}
+                  className="w-full text-left px-3.5 py-2 text-xs text-aws-lightTextPrimary dark:text-aws-textPrimary hover:bg-aws-orange/10 flex items-center gap-2 cursor-pointer font-medium transition-colors"
+                >
+                  <span>🔀</span> {appMode === "mode_a" ? "Mode A: SaaS" : "Mode B: AWS Extension"}
+                </button>
+                <button
+                  id="global-reset-simulators-btn"
                   onClick={() => {
                     handleResetAllSimulators();
                     setIsDevToolsOpen(false);
                   }}
-                  className="w-full text-left px-3.5 py-2 text-xs text-aws-lightTextPrimary dark:text-aws-textPrimary hover:bg-aws-orange/10 flex items-center gap-2 cursor-pointer font-medium transition-colors"
+                  className="w-full text-left px-3.5 py-2 text-xs text-aws-lightTextPrimary dark:text-aws-textPrimary hover:bg-aws-orange/10 flex items-center gap-2 cursor-pointer font-medium border-t border-aws-lightBorder dark:border-aws-divider transition-colors"
                 >
                   <span>🔄</span> {t("resetSimulators", language)}
                 </button>
