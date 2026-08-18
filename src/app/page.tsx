@@ -427,8 +427,15 @@ export default function Dashboard() {
           />
         </section>
 
-        {/* Column 2: Cost Recommendations & Topology */}
+        {/* Column 2: Topology & Cost Recommendations */}
         <section style={{ order: layoutOrder.indexOf("balancer") >= 0 ? layoutOrder.indexOf("balancer") : 1 }} className="flex flex-col gap-6">
+          <TopologyVisualizer
+            topologyData={clusterTopology}
+            selectedTopologyNode={selectedTopologyNode}
+            setSelectedTopologyNode={setSelectedTopologyNode}
+            language={language}
+          />
+
           <CostRecommendations
             totalCost={accountMonthlyCost}
             potentialSavings={potentialSavings}
@@ -445,13 +452,6 @@ export default function Dashboard() {
             showToast={showToast}
             moveLeft={moveLeft}
             moveRight={moveRight}
-          />
-
-          <TopologyVisualizer
-            topologyData={clusterTopology}
-            selectedTopologyNode={selectedTopologyNode}
-            setSelectedTopologyNode={setSelectedTopologyNode}
-            language={language}
           />
         </section>
 
