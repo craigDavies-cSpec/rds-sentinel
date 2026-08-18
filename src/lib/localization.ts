@@ -241,6 +241,8 @@ export interface TranslationDictionary {
   // Complete UI Polish Keys
   modeA: string;
   modeB: string;
+  awsExtensionBannerTitle: string;
+  awsExtensionBannerDesc: string;
   lightTheme: string;
   darkTheme: string;
   allAccounts: string;
@@ -611,6 +613,8 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
 
     modeA: "🌐 Mode A: SaaS",
     modeB: "⚡ Mode B: AWS Extension",
+    awsExtensionBannerTitle: "☁️ AWS Management Console Extension Mode Active",
+    awsExtensionBannerDesc: "Embedded AWS Console Plug-in | Identity Center SSO Active | CloudWatch Log Subscription Ingestion | Cloudscape Native Frame",
     lightTheme: "Light",
     darkTheme: "Dark",
     allAccounts: "All AWS Accounts",
@@ -977,6 +981,8 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
 
     modeA: "🌐 Modus A: SaaS",
     modeB: "⚡ Modus B: AWS-Erweiterung",
+    awsExtensionBannerTitle: "☁️ AWS Management Console-Erweiterungsmodus Aktiv",
+    awsExtensionBannerDesc: "Eingebettetes AWS-Console-Plug-in | Identity Center SSO Aktiv | CloudWatch Log-Subscription-Ingestion | Cloudscape Native Frame",
     lightTheme: "Hell",
     darkTheme: "Dunkel",
     allAccounts: "Alle AWS-Konten",
@@ -1343,6 +1349,8 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
 
     modeA: "🌐 Mode A : SaaS",
     modeB: "⚡ Mode B : Extension AWS",
+    awsExtensionBannerTitle: "☁️ Mode Extension Console d'Administration AWS Actif",
+    awsExtensionBannerDesc: "Plug-in Console AWS Intégré | Identity Center SSO Actif | Ingestion d'Abonnement aux Journaux CloudWatch | Cadre Cloudscape Natif",
     lightTheme: "Clair",
     darkTheme: "Sombre",
     allAccounts: "Tous les comptes AWS",
@@ -1709,6 +1717,8 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
 
     modeA: "🌐 モードA: SaaS",
     modeB: "⚡ モードB: AWS拡張",
+    awsExtensionBannerTitle: "☁️ AWS マネジメントコンソール拡張機能モードが有効です",
+    awsExtensionBannerDesc: "組み込みAWSコンソールプラグイン | Identity Center SSO アクティブ | CloudWatch ログサブスクリプションインジェスト | Cloudscape ネイティブフレーム",
     lightTheme: "ライト",
     darkTheme: "ダーク",
     allAccounts: "すべてのAWSアカウント",

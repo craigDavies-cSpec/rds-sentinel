@@ -513,6 +513,19 @@ export default function Dashboard() {
         handleRunFtrAudit={handleRunFtrAudit}
       />
 
+      {/* Mode B: AWS Extension Banner */}
+      {appMode === "mode_b" && (
+        <div id="aws-extension-mode-banner" className="bg-gradient-to-r from-aws-orange/20 via-amber-500/15 to-aws-orange/20 border-b border-aws-orange/40 px-4 py-2.5 flex flex-wrap items-center justify-between text-xs font-mono text-amber-950 dark:text-aws-orange shadow-sm">
+          <div className="flex items-center gap-2">
+            <span className="text-base">⚡</span>
+            <span className="font-extrabold">{t("awsExtensionBannerTitle", language)}</span>
+          </div>
+          <span className="text-[11px] bg-aws-orange/15 border border-aws-orange/30 px-3 py-1 rounded font-semibold text-aws-lightTextPrimary dark:text-aws-textPrimary hidden sm:inline-block">
+            {t("awsExtensionBannerDesc", language)}
+          </span>
+        </div>
+      )}
+
       {/* Live Account Banner */}
       {selectedAccountId === "616399034957" && (
         <div id="live-account-active-banner" className="bg-emerald-950/90 border-b border-emerald-500/40 px-4 py-2 flex flex-wrap items-center justify-between text-xs font-mono text-emerald-300">
