@@ -21,6 +21,32 @@ export default defineConfig({
         }
       },
     },
+    {
+      name: "mobile-chrome",
+      use: { 
+        ...devices["Desktop Chrome"],
+        viewport: { width: 390, height: 844 },
+        isMobile: true,
+        hasTouch: true,
+        userAgent: "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Mobile Safari/537.36",
+        launchOptions: {
+          args: ["--disable-web-security"]
+        }
+      },
+    },
+    {
+      name: "tablet",
+      use: { 
+        ...devices["Desktop Chrome"],
+        viewport: { width: 820, height: 1180 },
+        isMobile: true,
+        hasTouch: true,
+        userAgent: "Mozilla/5.0 (iPad; CPU OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1",
+        launchOptions: {
+          args: ["--disable-web-security"]
+        }
+      },
+    },
   ],
   webServer: {
     command: "npx.cmd next dev -p 3001",

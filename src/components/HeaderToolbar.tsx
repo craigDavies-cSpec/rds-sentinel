@@ -93,9 +93,9 @@ export function HeaderToolbar({
   return (
     <header className="sticky top-0 z-40 w-full border-b border-aws-lightBorder/80 dark:border-aws-border/80 bg-aws-lightContainer/90 dark:bg-aws-container/90 backdrop-blur-md shadow-md transition-all">
       {/* Main Top Header Bar */}
-      <div className="max-w-[1600px] mx-auto px-4 lg:px-6 py-2.5 flex items-center justify-between">
+      <div className="max-w-[1600px] mx-auto px-4 lg:px-6 py-2.5 flex flex-wrap items-center justify-between gap-2">
         {/* Left: Brand Logo & Partner Badge */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <div className="flex items-center gap-2 font-bold tracking-tight">
             <span className="text-amber-800 dark:text-aws-orange font-black text-xl tracking-wider drop-shadow-sm">RDS</span>
             <span className="text-aws-lightTextPrimary dark:text-aws-textPrimary font-bold text-lg">Sentinel</span>
@@ -116,7 +116,7 @@ export function HeaderToolbar({
         </div>
 
         {/* Right: Action Controls & Navigation */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
           <button
             id="start-product-tour-btn"
             onClick={() => {
