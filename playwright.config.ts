@@ -23,6 +23,7 @@ export default defineConfig({
     },
     {
       name: "mobile-chrome",
+      testMatch: /.*responsive\.spec\.ts/,
       use: { 
         ...devices["Desktop Chrome"],
         viewport: { width: 390, height: 844 },
@@ -36,6 +37,7 @@ export default defineConfig({
     },
     {
       name: "tablet",
+      testMatch: /.*responsive\.spec\.ts/,
       use: { 
         ...devices["Desktop Chrome"],
         viewport: { width: 820, height: 1180 },
