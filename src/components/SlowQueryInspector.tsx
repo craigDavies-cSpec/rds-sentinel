@@ -88,7 +88,7 @@ export function SlowQueryInspector({
           <div>
             <h2 className="text-sm font-black text-aws-lightTextPrimary dark:text-aws-orange uppercase tracking-wider flex items-center gap-2">
               {t("slowQueries", language)}
-              <span className="text-[9px] bg-aws-red/10 text-red-800 dark:text-red-400 border border-aws-red/20 px-2 py-0.5 rounded-full font-mono">
+              <span className="text-[10px] bg-rose-500/15 text-rose-800 dark:text-rose-400 border border-rose-500/30 px-2.5 py-0.5 rounded-md font-sans font-extrabold whitespace-nowrap shadow-sm">
                 {t("piiRedactedLabel", language)}
               </span>
             </h2>
