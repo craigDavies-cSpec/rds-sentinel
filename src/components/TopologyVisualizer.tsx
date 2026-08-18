@@ -18,27 +18,27 @@ export function TopologyVisualizer({
   language,
 }: TopologyVisualizerProps) {
   return (
-    <div id="topology-visualizer-card" className="p-3.5 bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border rounded text-xs">
-      <div className="flex justify-between items-center mb-2 pb-1.5 border-b border-aws-lightBorder dark:border-aws-divider">
+    <div id="topology-visualizer-card" className="bg-aws-lightContainer/90 dark:bg-aws-container/90 backdrop-blur-md border border-aws-lightBorder/80 dark:border-aws-border/80 rounded-xl shadow-lg hover:shadow-xl p-5 flex flex-col gap-4 transition-all duration-300">
+      <div className="flex justify-between items-center pb-3 border-b border-aws-lightBorder dark:border-aws-border">
         <div className="flex items-center gap-2">
-          <span className="text-[9px] uppercase font-bold px-1.5 py-0.5 rounded bg-aws-orange/10 text-amber-800 dark:text-aws-orange border border-aws-orange/20">
+          <h2 className="text-sm font-black text-aws-lightTextPrimary dark:text-aws-orange uppercase tracking-wider flex items-center gap-2">
             {t("clusterTopologyTitle", language)}
-          </span>
-          <strong className="text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs font-mono">
+          </h2>
+          <strong className="text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs font-mono px-2 py-0.5 rounded bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border">
             {topologyData.clusterName}
           </strong>
         </div>
-        <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-800 dark:text-emerald-400 font-mono font-bold text-[10px] border border-emerald-500/20">
+        <span className="px-2.5 py-0.5 rounded-md bg-emerald-500/10 text-emerald-800 dark:text-emerald-400 font-mono font-bold text-[10px] border border-emerald-500/30 shadow-sm">
           ⚡ {topologyData.failoverReadinessPct}% {t("failoverReady", language)}
         </span>
       </div>
 
-      <p className="text-[11px] text-aws-lightTextSecondary dark:text-aws-textSecondary mb-3">
+      <p className="text-[11px] text-aws-lightTextSecondary dark:text-aws-textSecondary leading-relaxed">
         {t("clusterTopologyDesc", language)}
       </p>
 
       {/* Visual Node Graph */}
-      <div className="relative p-3 bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border rounded-lg flex flex-col gap-3">
+      <div className="relative p-4 bg-aws-lightBg/80 dark:bg-aws-dark/80 border border-aws-lightBorder dark:border-aws-border rounded-xl flex flex-col gap-3">
         <div className="flex flex-wrap justify-around items-center gap-3">
           {topologyData.nodes.map((node) => {
             const isWriter = node.role === "writer";

@@ -40,9 +40,9 @@ export function SlowQueryInspector({
   return (
     <div className="flex flex-col gap-6">
       {/* Log Watcher Card */}
-      <div className="bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border rounded-lg p-4">
-        <div className="flex justify-between items-center mb-3">
-          <h2 className="text-sm font-bold text-aws-lightTextPrimary dark:text-aws-orange uppercase tracking-wider">
+      <div className="bg-aws-lightContainer/90 dark:bg-aws-container/90 backdrop-blur-md border border-aws-lightBorder/80 dark:border-aws-border/80 rounded-xl shadow-lg hover:shadow-xl p-5 transition-all duration-300">
+        <div className="flex justify-between items-center pb-3 border-b border-aws-lightBorder dark:border-aws-border mb-3">
+          <h2 className="text-sm font-black text-aws-lightTextPrimary dark:text-aws-orange uppercase tracking-wider flex items-center gap-2">
             {t("logWatcher", language)}
           </h2>
         </div>
@@ -55,7 +55,7 @@ export function SlowQueryInspector({
             <p className="mt-1 mb-4 text-[11px]">{t("realTimeLogsLockedDesc", language)}</p>
             <button 
               onClick={() => handleTierClick && handleTierClick("medium")}
-              className="px-4 py-2 bg-aws-orange hover:bg-aws-orangeHover text-aws-lightTextPrimary dark:text-aws-lightTextPrimary text-xs font-bold rounded shadow transition-all active:scale-95 cursor-pointer"
+              className="px-4 py-2 bg-aws-orange hover:bg-aws-orangeHover text-white text-xs font-bold rounded-md shadow transition-all active:scale-95 cursor-pointer"
             >
               {t("unlockMediumTierBtn", language)}
             </button>
@@ -63,12 +63,12 @@ export function SlowQueryInspector({
         ) : (
           <div className="flex flex-col gap-3">
             {(filteredLogs || []).map((log: any) => (
-              <div key={log.id} className="p-2.5 bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border rounded text-[11px] font-mono leading-relaxed">
+              <div key={log.id} className="p-3 bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border rounded-lg text-[11px] font-mono leading-relaxed shadow-sm">
                 <div className="flex justify-between items-center mb-1">
-                  <span className={`px-1 rounded text-[9px] font-bold ${
+                  <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
                     log.level === "ERROR" 
-                      ? "bg-aws-red/10 text-red-800 dark:text-red-400" 
-                      : "bg-aws-yellow/10 text-amber-800 dark:text-aws-yellow"
+                      ? "bg-aws-red/10 text-red-800 dark:text-red-400 border border-red-500/20" 
+                      : "bg-aws-yellow/10 text-amber-800 dark:text-aws-yellow border border-amber-500/20"
                   }`}>
                     {log.level}
                   </span>
@@ -83,16 +83,16 @@ export function SlowQueryInspector({
         )}
       </div>
 
-      <div id="slow-query-inspector-card" className="bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border rounded-lg p-4">
-      <div className="flex justify-between items-center mb-3">
-        <div>
-          <h2 className="text-sm font-bold text-aws-lightTextPrimary dark:text-aws-orange uppercase tracking-wider flex items-center gap-2">
-            {t("slowQueries", language)}
-            <span className="text-[9px] bg-aws-red/10 text-red-800 dark:text-red-400 border border-aws-red/20 px-1.5 py-0.5 rounded font-mono">
-              {t("piiRedactedLabel", language)}
-            </span>
-          </h2>
-        </div>
+      <div id="slow-query-inspector-card" className="bg-aws-lightContainer/90 dark:bg-aws-container/90 backdrop-blur-md border border-aws-lightBorder/80 dark:border-aws-border/80 rounded-xl shadow-lg hover:shadow-xl p-5 transition-all duration-300">
+        <div className="flex justify-between items-center pb-3 border-b border-aws-lightBorder dark:border-aws-border mb-3">
+          <div>
+            <h2 className="text-sm font-black text-aws-lightTextPrimary dark:text-aws-orange uppercase tracking-wider flex items-center gap-2">
+              {t("slowQueries", language)}
+              <span className="text-[9px] bg-aws-red/10 text-red-800 dark:text-red-400 border border-aws-red/20 px-2 py-0.5 rounded-full font-mono">
+                {t("piiRedactedLabel", language)}
+              </span>
+            </h2>
+          </div>
 
         {/* Edge sanitization selector */}
         <button

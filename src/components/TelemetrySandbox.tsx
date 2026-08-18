@@ -56,11 +56,11 @@ export function TelemetrySandbox({
   moveRight,
 }: TelemetrySandboxProps) {
   return (
-    <div className="bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border rounded-lg p-4 flex flex-col gap-4">
+    <div className="bg-aws-lightContainer/90 dark:bg-aws-container/90 backdrop-blur-md border border-aws-lightBorder/80 dark:border-aws-border/80 rounded-xl shadow-lg hover:shadow-xl p-5 flex flex-col gap-4 transition-all duration-300">
       {/* Header */}
-      <div className="flex justify-between items-center border-b border-aws-lightBorder dark:border-aws-border pb-2">
+      <div className="flex justify-between items-center border-b border-aws-lightBorder dark:border-aws-border pb-3">
         <div>
-          <h2 className="text-sm font-bold text-aws-lightTextPrimary dark:text-aws-orange uppercase tracking-wider">
+          <h2 className="text-sm font-black text-aws-lightTextPrimary dark:text-aws-orange uppercase tracking-wider flex items-center gap-2">
             {t("targetDatabases", language)}
           </h2>
         </div>
@@ -68,14 +68,14 @@ export function TelemetrySandbox({
           <button
             onClick={() => moveLeft("databases")}
             aria-label={t("moveDbsLeftAria", language)}
-            className="px-1.5 py-0.5 bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/20 border border-aws-lightBorder dark:border-aws-border rounded text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary transition-colors"
+            className="px-2 py-1 bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/20 border border-aws-lightBorder dark:border-aws-border rounded-md text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary transition-all active:scale-95 cursor-pointer"
           >
             ◀
           </button>
           <button
             onClick={() => moveRight("databases")}
             aria-label={t("moveDbsRightAria", language)}
-            className="px-1.5 py-0.5 bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/20 border border-aws-lightBorder dark:border-aws-border rounded text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary transition-colors"
+            className="px-2 py-1 bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/20 border border-aws-lightBorder dark:border-aws-border rounded-md text-[10px] text-aws-lightTextSecondary dark:text-aws-textSecondary transition-all active:scale-95 cursor-pointer"
           >
             ▶
           </button>
@@ -83,7 +83,7 @@ export function TelemetrySandbox({
       </div>
 
       {/* Database Buttons List */}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2.5">
         {filteredInstances.map((db) => {
           const isSelected = db.id === selectedDbId;
           const isTrialRestricted =
@@ -93,12 +93,12 @@ export function TelemetrySandbox({
               key={db.id}
               disabled={isTrialRestricted}
               onClick={() => handleSelectDb(db.id)}
-              className={`w-full text-left p-3 rounded-md border transition-all flex flex-col ${
+              className={`w-full text-left p-3 rounded-xl border transition-all duration-200 flex flex-col active:scale-98 cursor-pointer ${
                 isSelected
-                  ? "bg-aws-orange/10 border-aws-orange text-aws-lightTextPrimary dark:text-aws-textPrimary"
+                  ? "bg-aws-orange/15 border-aws-orange text-aws-lightTextPrimary dark:text-aws-textPrimary shadow-md"
                   : isTrialRestricted
                   ? "opacity-40 bg-aws-lightBg/50 dark:bg-aws-dark/50 border-transparent cursor-not-allowed"
-                  : "bg-aws-lightBg dark:bg-aws-dark border-aws-lightBorder dark:border-aws-border hover:border-aws-orange/40"
+                  : "bg-aws-lightBg dark:bg-aws-dark border-aws-lightBorder dark:border-aws-border hover:border-aws-orange/50 hover:shadow"
               }`}
             >
               <div className="flex justify-between items-center w-full mb-1">
