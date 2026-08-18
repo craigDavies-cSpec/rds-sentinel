@@ -45,6 +45,10 @@ export interface TranslationDictionary {
   devTools: string;
   resetSimulators: string;
   graphqlApi: string;
+  resetLayoutBtn: string;
+  layoutResetToast: string;
+  layoutReorderedToast: string;
+  dragHandleTitle: string;
 
   // Active Account Banner
   activeAccountBanner: string;
@@ -401,6 +405,10 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     devTools: "🛠️ Dev Tools",
     resetSimulators: "Reset Simulators",
     graphqlApi: "GraphQL API",
+    resetLayoutBtn: "Reset Default Layout",
+    layoutResetToast: "🔄 Layout reset to default order!",
+    layoutReorderedToast: "✨ Container layout reordered and saved!",
+    dragHandleTitle: "Drag to reorder container",
 
     activeAccountBanner: "Active Live AWS Account:",
     liveMonitoredDb: "Live Monitored DB:",
@@ -739,6 +747,10 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     devTools: "🛠️ Entwickler-Tools",
     resetSimulators: "Simulatoren Zurücksetzen",
     graphqlApi: "GraphQL API",
+    resetLayoutBtn: "Standard-Layout zurücksetzen",
+    layoutResetToast: "🔄 Layout auf Standardreihenfolge zurückgesetzt!",
+    layoutReorderedToast: "✨ Container-Layout neu geordnet und gespeichert!",
+    dragHandleTitle: "Ziehen zum Umorganisieren des Containers",
 
     activeAccountBanner: "Aktives Live-AWS-Konto:",
     liveMonitoredDb: "Überwachte Live-DB:",
@@ -1077,6 +1089,10 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     devTools: "🛠️ Outils Développeur",
     resetSimulators: "Réinitialiser Simulateurs",
     graphqlApi: "API GraphQL",
+    resetLayoutBtn: "Réinitialiser la disposition par défaut",
+    layoutResetToast: "🔄 Disposition réinitialisée à l'ordre par défaut !",
+    layoutReorderedToast: "✨ Disposition des conteneurs réorganisée et enregistrée !",
+    dragHandleTitle: "Faites glisser pour réorganiser le conteneur",
 
     activeAccountBanner: "Compte AWS Actif en Direct:",
     liveMonitoredDb: "BDD Surveillée en Direct:",
@@ -1415,6 +1431,10 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     devTools: "🛠️ 開発者ツール",
     resetSimulators: "シミュレータをリセット",
     graphqlApi: "GraphQL API",
+    resetLayoutBtn: "デフォルトレイアウトをリセット",
+    layoutResetToast: "🔄 レイアウトがデフォルト順にリセットされました！",
+    layoutReorderedToast: "✨ コンテナレイアウトが再構成され保存されました！",
+    dragHandleTitle: "コンテナをドラッグして再構成",
 
     activeAccountBanner: "アクティブなライブAWSアカウント:",
     liveMonitoredDb: "監視中のライブDB:",

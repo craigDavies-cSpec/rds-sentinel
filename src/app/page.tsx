@@ -200,7 +200,8 @@ export default function Dashboard() {
   }, []);
 
   const moveLeft = async (componentKey: string) => {
-    const idx = layoutOrder.indexOf(componentKey);
+    const key = componentKey === "recommendations" ? "balancer" : componentKey;
+    const idx = layoutOrder.indexOf(key);
     if (idx > 0) {
       const newOrder = [...layoutOrder];
       const temp = newOrder[idx - 1];
@@ -212,7 +213,8 @@ export default function Dashboard() {
   };
 
   const moveRight = async (componentKey: string) => {
-    const idx = layoutOrder.indexOf(componentKey);
+    const key = componentKey === "recommendations" ? "balancer" : componentKey;
+    const idx = layoutOrder.indexOf(key);
     if (idx < layoutOrder.length - 1) {
       const newOrder = [...layoutOrder];
       const temp = newOrder[idx + 1];
@@ -220,6 +222,44 @@ export default function Dashboard() {
       newOrder[idx] = temp;
       setLayoutOrder(newOrder);
       await saveLayoutAction(newOrder);
+    }
+  };
+
+  const [draggedKey, setDraggedKey] = useState<string | null>(null);
+
+  const resetDefaultLayout = async () => {
+    const defaultOrder = ["databases", "balancer", "logs"];
+    setLayoutOrder(defaultOrder);
+    await saveLayoutAction(defaultOrder);
+    showToast(t("layoutResetToast", language));
+  };
+
+  const handleDragStart = (e: React.DragEvent, componentKey: string) => {
+    setDraggedKey(componentKey);
+    e.dataTransfer.setData("text/plain", componentKey);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDrop = async (e: React.DragEvent, targetKey: string) => {
+    e.preventDefault();
+    if (!draggedKey || draggedKey === targetKey) return;
+
+    const fromIndex = layoutOrder.indexOf(draggedKey);
+    const toIndex = layoutOrder.indexOf(targetKey);
+
+    if (fromIndex !== -1 && toIndex !== -1) {
+      const newOrder = [...layoutOrder];
+      const [removed] = newOrder.splice(fromIndex, 1);
+      newOrder.splice(toIndex, 0, removed);
+      setLayoutOrder(newOrder);
+      setDraggedKey(null);
+      await saveLayoutAction(newOrder);
+      showToast(t("layoutReorderedToast", language));
     }
   };
 
@@ -381,6 +421,7 @@ export default function Dashboard() {
         syncLiveAWSPricings={syncLiveAWSPricings}
         setPricingSyncMetadata={setPricingSyncMetadata}
         showToast={showToast}
+        resetDefaultLayout={resetDefaultLayout}
       />
 
       {/* Live Account Banner */}
@@ -399,7 +440,14 @@ export default function Dashboard() {
       {/* Main Grid View Layout */}
       <main className="max-w-[1600px] mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Column 1: Telemetry Sandbox & Topology Visualizer */}
-        <section style={{ order: layoutOrder.indexOf("databases") >= 0 ? layoutOrder.indexOf("databases") : 0 }} className="flex flex-col gap-6">
+        <section
+          draggable={true}
+          onDragStart={(e) => handleDragStart(e, "databases")}
+          onDragOver={handleDragOver}
+          onDrop={(e) => handleDrop(e, "databases")}
+          style={{ order: layoutOrder.indexOf("databases") >= 0 ? layoutOrder.indexOf("databases") : 0 }}
+          className="flex flex-col gap-6 transition-all duration-200"
+        >
           <TelemetrySandbox
             filteredInstances={filteredInstances}
             selectedDbId={selectedDbId}
@@ -435,7 +483,14 @@ export default function Dashboard() {
         </section>
 
         {/* Column 2: Cost Recommendations & Optimization Tools */}
-        <section style={{ order: layoutOrder.indexOf("balancer") >= 0 ? layoutOrder.indexOf("balancer") : 1 }} className="flex flex-col gap-6">
+        <section
+          draggable={true}
+          onDragStart={(e) => handleDragStart(e, "balancer")}
+          onDragOver={handleDragOver}
+          onDrop={(e) => handleDrop(e, "balancer")}
+          style={{ order: layoutOrder.indexOf("balancer") >= 0 ? layoutOrder.indexOf("balancer") : 1 }}
+          className="flex flex-col gap-6 transition-all duration-200"
+        >
           <CostRecommendations
             totalCost={accountMonthlyCost}
             potentialSavings={potentialSavings}
@@ -456,7 +511,14 @@ export default function Dashboard() {
         </section>
 
         {/* Column 3: Slow Query Inspector & Log Watcher */}
-        <section style={{ order: layoutOrder.indexOf("logs") }}>
+        <section
+          draggable={true}
+          onDragStart={(e) => handleDragStart(e, "logs")}
+          onDragOver={handleDragOver}
+          onDrop={(e) => handleDrop(e, "logs")}
+          style={{ order: layoutOrder.indexOf("logs") >= 0 ? layoutOrder.indexOf("logs") : 2 }}
+          className="flex flex-col gap-6 transition-all duration-200"
+        >
           <SlowQueryInspector
             filteredSlowQueries={filteredSlowQueries}
             instances={instances}

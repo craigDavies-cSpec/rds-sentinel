@@ -46,6 +46,7 @@ interface HeaderToolbarProps {
   syncLiveAWSPricings: () => Promise<PricingSyncMetadata>;
   setPricingSyncMetadata: (meta: PricingSyncMetadata) => void;
   showToast?: (msg: string) => void;
+  resetDefaultLayout?: () => void;
 }
 
 export function HeaderToolbar({
@@ -87,6 +88,7 @@ export function HeaderToolbar({
   syncLiveAWSPricings,
   setPricingSyncMetadata,
   showToast,
+  resetDefaultLayout,
 }: HeaderToolbarProps) {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-aws-lightBorder/80 dark:border-aws-border/80 bg-aws-lightContainer/90 dark:bg-aws-container/90 backdrop-blur-md shadow-md transition-all">
@@ -172,7 +174,7 @@ export function HeaderToolbar({
             </button>
 
             {isDevToolsOpen && (
-              <div className="absolute right-0 mt-1.5 w-48 bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border rounded-xl shadow-2xl py-1 z-50 animate-in fade-in zoom-in-95 duration-150 font-sans">
+              <div className="absolute right-0 mt-1.5 w-56 bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border rounded-xl shadow-2xl py-1 z-50 animate-in fade-in zoom-in-95 duration-150 font-sans">
                 <button
                   id="global-reset-simulators-btn"
                   onClick={() => {
@@ -182,6 +184,16 @@ export function HeaderToolbar({
                   className="w-full text-left px-3.5 py-2 text-xs text-aws-lightTextPrimary dark:text-aws-textPrimary hover:bg-aws-orange/10 flex items-center gap-2 cursor-pointer font-medium transition-colors"
                 >
                   <span>🔄</span> {t("resetSimulators", language)}
+                </button>
+                <button
+                  id="global-reset-layout-btn"
+                  onClick={() => {
+                    if (resetDefaultLayout) resetDefaultLayout();
+                    setIsDevToolsOpen(false);
+                  }}
+                  className="w-full text-left px-3.5 py-2 text-xs text-aws-lightTextPrimary dark:text-aws-textPrimary hover:bg-aws-orange/10 flex items-center gap-2 cursor-pointer font-medium border-t border-aws-lightBorder dark:border-aws-divider transition-colors"
+                >
+                  <span>{"📐"}</span> {t("resetLayoutBtn", language)}
                 </button>
                 <button
                   id="open-graphql-modal-btn"

@@ -49,9 +49,12 @@ export function CostRecommendations({
     <div className="bg-aws-lightContainer/90 dark:bg-aws-container/90 backdrop-blur-md border border-aws-lightBorder/80 dark:border-aws-border/80 rounded-xl shadow-lg hover:shadow-xl p-5 flex flex-col gap-4 transition-all duration-300">
       {/* Header */}
       <div className="flex justify-between items-center border-b border-aws-lightBorder dark:border-aws-border pb-3">
-        <h2 className="text-sm font-black text-aws-lightTextPrimary dark:text-aws-orange uppercase tracking-wider flex items-center gap-2">
-          {t("costBalancer", language)}
-        </h2>
+        <div className="flex items-center gap-2">
+          <span className="text-aws-orange font-mono cursor-grab active:cursor-grabbing text-xs tracking-tighter" title={t("dragHandleTitle", language)}>{"⋮⋮"}</span>
+          <h2 className="text-sm font-black text-aws-lightTextPrimary dark:text-aws-orange uppercase tracking-wider flex items-center gap-2">
+            {t("costBalancer", language)}
+          </h2>
+        </div>
         <div className="flex gap-1" data-testid="layout-controls-recommendations">
           <button
             onClick={() => moveLeft("recommendations")}
