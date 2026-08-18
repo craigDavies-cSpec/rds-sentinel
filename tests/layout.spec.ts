@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 
 test.describe("RDS Sentinel Dashboard Layout State Persistence", () => {
+  test.describe.configure({ mode: "serial" });
   test.beforeAll(() => {
     // Delete the local SQLite database to start from a clean state
     const dbPath = path.join(__dirname, "../rds-sentinel.db");
@@ -58,5 +59,34 @@ test.describe("RDS Sentinel Dashboard Layout State Persistence", () => {
     await expect(databasesSectionReloaded).toHaveCSS("order", "1");
     await expect(balancerSectionReloaded).toHaveCSS("order", "0");
     await expect(logsSectionReloaded).toHaveCSS("order", "2");
+  });
+
+  test("should apply operational layout presets and persist choices to database", async ({ page }) => {
+    await page.goto("/");
+
+    const devToolsBtn = page.locator("#dev-tools-dropdown-btn");
+    await expect(devToolsBtn).toBeVisible();
+    await devToolsBtn.click();
+
+    // Click FinOps / Cost View preset button
+    const finOpsBtn = page.locator("#preset-finops-btn");
+    await expect(finOpsBtn).toBeVisible();
+    await finOpsBtn.click();
+
+    // Verify Balancer moves to Column 0 and Databases moves to Column 1
+    const databasesSection = page.locator('section[data-layout-key="databases"]');
+    const balancerSection = page.locator('section[data-layout-key="balancer"]');
+    await expect(balancerSection).toHaveCSS("order", "0");
+    await expect(databasesSection).toHaveCSS("order", "1");
+
+    // Click Reset Default Layout button in Dev Tools
+    await devToolsBtn.click();
+    const resetBtn = page.locator("#global-reset-layout-btn");
+    await expect(resetBtn).toBeVisible();
+    await resetBtn.click();
+
+    // Verify Default Balanced order restored (databases = 0, balancer = 1)
+    await expect(databasesSection).toHaveCSS("order", "0");
+    await expect(balancerSection).toHaveCSS("order", "1");
   });
 });

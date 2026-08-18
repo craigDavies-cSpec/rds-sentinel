@@ -385,6 +385,12 @@ export interface TranslationDictionary {
   tzBst: string;
   tzCet: string;
   tzJst: string;
+  presetBalanced: string;
+  presetFinOps: string;
+  presetDba: string;
+  presetAppliedToast: string;
+  layoutProfilesHeader: string;
+  systemControlsHeader: string;
 }
 
 export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
@@ -729,6 +735,12 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     tzBst: "London / BST (GMT+01:00) United Kingdom",
     tzCet: "CET (GMT+01:00) Central European",
     tzJst: "JST (GMT+09:00) Japan Standard",
+    presetBalanced: "⚖️ Balanced View",
+    presetFinOps: "💰 FinOps / Cost View",
+    presetDba: "🛠️ DBA / Telemetry View",
+    presetAppliedToast: "🎯 Layout preset applied",
+    layoutProfilesHeader: "Operational Layout Profiles",
+    systemControlsHeader: "System Diagnostics & Controls",
   },
   de: {
     dashboardTitle: "RDS Sentinel",
@@ -1071,6 +1083,12 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     tzBst: "London / BST (GMT+01:00) Großbritannien",
     tzCet: "MEZ (GMT+01:00) Mitteleuropäische Zeit",
     tzJst: "JST (GMT+09:00) Japanische Standardzeit",
+    presetBalanced: "⚖️ Ausgewogene Ansicht",
+    presetFinOps: "💰 FinOps / Kosten-Ansicht",
+    presetDba: "🛠️ DBA / Telemetrie-Ansicht",
+    presetAppliedToast: "🎯 Layout-Vorlage angewendet",
+    layoutProfilesHeader: "Betriebliche Layout-Profile",
+    systemControlsHeader: "Systemdiagnose & Steuerung",
   },
   fr: {
     dashboardTitle: "RDS Sentinel",
@@ -1413,6 +1431,12 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     tzBst: "Londres / BST (GMT+01:00) Royaume-Uni",
     tzCet: "HNEC (GMT+01:00) Heure normale d'Europe centrale",
     tzJst: "JST (GMT+09:00) Heure normale du Japon",
+    presetBalanced: "⚖️ Vue Équilibrée",
+    presetFinOps: "💰 FinOps / Vue des Coûts",
+    presetDba: "🛠️ DBA / Vue Télémétrie",
+    presetAppliedToast: "🎯 Préréglage de disposition appliqué",
+    layoutProfilesHeader: "Profils de Disposition Opérationnels",
+    systemControlsHeader: "Diagnostics Système & Contrôles",
   },
   ja: {
     dashboardTitle: "RDS Sentinel",
@@ -1755,6 +1779,12 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     tzBst: "ロンドン / BST (GMT+01:00) 英国夏時間",
     tzCet: "CET (GMT+01:00) 中央ヨーロッパ時間",
     tzJst: "JST (GMT+09:00) 日本標準時",
+    presetBalanced: "⚖️ バランス表示",
+    presetFinOps: "💰 FinOps / コスト表示",
+    presetDba: "🛠️ DBA / テレメトリ表示",
+    presetAppliedToast: "🎯 レイアウトプリセットを適用しました",
+    layoutProfilesHeader: "運用レイアウトプロファイル",
+    systemControlsHeader: "システム診断とコントロール",
   },
 };
 

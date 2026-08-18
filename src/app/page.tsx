@@ -237,6 +237,13 @@ export default function Dashboard() {
     showToast(t("layoutResetToast", language));
   };
 
+  const applyLayoutPreset = async (presetOrder: string[], presetLabelKey: string) => {
+    setLayoutOrder(presetOrder);
+    await saveLayoutAction(presetOrder);
+    setDragOverColumn(null);
+    showToast(`${t("presetAppliedToast", language)}: ${t(presetLabelKey as any, language)}`);
+  };
+
   const handleDragStart = (e: React.DragEvent, componentKey: string) => {
     setDraggedKey(componentKey);
     e.dataTransfer.setData("text/plain", componentKey);
@@ -482,6 +489,7 @@ export default function Dashboard() {
         setPricingSyncMetadata={setPricingSyncMetadata}
         showToast={showToast}
         resetDefaultLayout={resetDefaultLayout}
+        applyLayoutPreset={applyLayoutPreset}
       />
 
       {/* Live Account Banner */}

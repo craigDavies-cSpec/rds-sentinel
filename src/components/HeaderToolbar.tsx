@@ -47,6 +47,7 @@ interface HeaderToolbarProps {
   setPricingSyncMetadata: (meta: PricingSyncMetadata) => void;
   showToast?: (msg: string) => void;
   resetDefaultLayout?: () => void;
+  applyLayoutPreset?: (presetOrder: string[], presetLabelKey: string) => void;
 }
 
 export function HeaderToolbar({
@@ -89,67 +90,61 @@ export function HeaderToolbar({
   setPricingSyncMetadata,
   showToast,
   resetDefaultLayout,
+  applyLayoutPreset,
 }: HeaderToolbarProps) {
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-aws-lightBorder/80 dark:border-aws-border/80 bg-aws-lightContainer/90 dark:bg-aws-container/90 backdrop-blur-md shadow-md transition-all">
-      {/* Main Top Header Bar */}
-      <div className="max-w-[1600px] mx-auto px-4 lg:px-6 py-2.5 flex flex-wrap items-center justify-between gap-2">
-        {/* Left: Brand Logo & Partner Badge */}
-        <div className="flex items-center gap-2 sm:gap-3">
-          <div className="flex items-center gap-2 font-bold tracking-tight">
-            <span className="text-amber-800 dark:text-aws-orange font-black text-xl tracking-wider drop-shadow-sm">RDS</span>
-            <span className="text-aws-lightTextPrimary dark:text-aws-textPrimary font-bold text-lg">Sentinel</span>
+    <header className="bg-aws-lightContainer dark:bg-aws-container border-b border-aws-lightBorder dark:border-aws-border px-4 py-3 shadow-md">
+      {/* Top Header Row */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 max-w-[1600px] mx-auto">
+        {/* Left Side: Brand Logo & Title */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">🛡️</span>
+            <div>
+              <h1 className="font-extrabold text-aws-lightTextPrimary dark:text-aws-textPrimary tracking-tight text-base sm:text-lg flex items-center gap-2">
+                {t("dashboardTitle", language)}
+                <span className="text-[10px] bg-aws-orange/20 text-aws-orange border border-aws-orange/40 px-2 py-0.5 rounded-full font-mono hidden sm:inline-block">
+                  v2.0 Enterprise
+                </span>
+              </h1>
+            </div>
           </div>
-          <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-aws-orange/10 text-amber-900 dark:text-aws-orange border border-aws-orange/30 font-extrabold uppercase tracking-wider hidden sm:inline-block shadow-sm">
+          <span className="text-aws-lightBorder dark:text-aws-divider hidden md:inline">|</span>
+          <span className="text-xs text-aws-lightTextSecondary dark:text-aws-textSecondary font-medium hidden md:inline-block">
             {t("partnerBadge", language)}
           </span>
-
-          {/* Dual Mode Switcher Toggle */}
-          <button
-            id="toggle-app-mode-btn"
-            onClick={() => setAppMode(appMode === "mode_a" ? "mode_b" : "mode_a")}
-            className="px-2.5 py-1 rounded-md bg-aws-orange/10 hover:bg-aws-orange/20 border border-aws-orange/30 text-amber-950 dark:text-aws-orange text-[10px] font-bold transition-all active:scale-95 cursor-pointer flex items-center gap-1 shadow-sm"
-            title={t("modeToggleTitle", language)}
-          >
-            {appMode === "mode_a" ? t("modeA", language) : t("modeB", language)}
-          </button>
         </div>
 
-        {/* Right: Action Controls & Navigation */}
-        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+        {/* Right Side: Global Controls */}
+        <div className="flex items-center flex-wrap gap-1.5 sm:gap-2">
           <button
-            id="start-product-tour-btn"
             onClick={() => {
               resetTourState();
               setCurrentTourStepIndex(0);
               setIsTourActive(true);
             }}
-            className="text-xs px-3 py-1.5 rounded-md font-extrabold bg-aws-orange hover:bg-aws-orangeHover text-slate-950 transition-all active:scale-95 shadow-md flex items-center gap-1 cursor-pointer"
+            className="px-3 py-1.5 bg-aws-orange/15 hover:bg-aws-orange/25 border border-aws-orange/40 text-aws-orange text-xs font-bold rounded-md transition-all active:scale-95 shadow-sm cursor-pointer"
           >
             {t("tourBtn", language)}
           </button>
 
           <button
-            id="export-csv-report-btn"
             onClick={exportCSVReport}
-            className="px-3 py-1.5 rounded-md bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/10 border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs font-bold transition-all active:scale-95 shadow-sm flex items-center gap-1 cursor-pointer"
-            title={t("exportCsvTitle", language)}
+            className="px-3 py-1.5 bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/10 border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs font-bold rounded-md transition-all active:scale-95 shadow-sm cursor-pointer"
           >
             {t("exportCsvBtn", language)}
           </button>
 
           <button
-            id="export-soc2-compliance-btn"
             onClick={() => {
-              const report = generateComplianceReport(
+              const rep = generateComplianceReport(
                 slowQueries.map((q) => q.rawSql),
                 maskSql,
-                "AWS Enterprise Client"
+                "cSpec Enterprise"
               );
-              downloadCompliancePackage(report);
+              downloadCompliancePackage(rep);
             }}
-            className="px-3 py-1.5 rounded-md bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/10 border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs font-bold transition-all active:scale-95 shadow-sm flex items-center gap-1 cursor-pointer"
-            title={t("exportSoc2Title", language)}
+            className="px-3 py-1.5 bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/10 border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs font-bold rounded-md transition-all active:scale-95 shadow-sm cursor-pointer"
           >
             {t("soc2Btn", language)}
           </button>
@@ -157,26 +152,61 @@ export function HeaderToolbar({
           <button
             id="open-settings-modal-btn"
             onClick={() => setIsSettingsModalOpen(true)}
-            className="px-3 py-1.5 rounded-md bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/10 border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs font-bold transition-all active:scale-95 shadow-sm flex items-center gap-1 cursor-pointer"
-            title={t("openSettingsTitle", language)}
+            className="px-3 py-1.5 bg-aws-orange text-aws-lightTextPrimary text-xs font-bold rounded-md transition-all active:scale-95 shadow-md hover:bg-aws-orange/90 cursor-pointer"
           >
             {t("settingsBtn", language)}
           </button>
 
-          {/* Developer Tools Menu Dropdown */}
+          {/* Dev Tools Dropdown */}
           <div className="relative">
             <button
               id="dev-tools-dropdown-btn"
               onClick={() => setIsDevToolsOpen(!isDevToolsOpen)}
-              className="px-3 py-1.5 rounded-md bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/10 border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs font-bold transition-all active:scale-95 shadow-sm flex items-center gap-1 cursor-pointer"
+              className="px-3 py-1.5 bg-aws-lightBg dark:bg-aws-dark hover:bg-aws-orange/10 border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs font-bold rounded-md transition-all active:scale-95 shadow-sm cursor-pointer flex items-center gap-1"
             >
-              {t("devTools", language)} ▼
+              {t("devTools", language)} ▾
             </button>
 
             {isDevToolsOpen && (
-              <div className="absolute right-0 mt-1.5 w-56 bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border rounded-xl shadow-2xl py-1 z-50 animate-in fade-in zoom-in-95 duration-150 font-sans">
+              <div className="absolute right-0 mt-2 w-64 bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border rounded-lg shadow-xl z-50 py-1 animate-in fade-in duration-150">
+                <div className="px-3 py-1.5 border-b border-aws-lightBorder dark:border-aws-border text-[10px] font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary uppercase tracking-wider">
+                  {t("layoutProfilesHeader", language)}
+                </div>
                 <button
-                  id="global-reset-simulators-btn"
+                  id="preset-balanced-btn"
+                  onClick={() => {
+                    if (applyLayoutPreset) applyLayoutPreset(["databases", "balancer", "logs"], "presetBalanced");
+                    setIsDevToolsOpen(false);
+                  }}
+                  className="w-full text-left px-3.5 py-1.5 text-xs text-aws-lightTextPrimary dark:text-aws-textPrimary hover:bg-aws-orange/10 flex items-center gap-2 cursor-pointer font-medium transition-colors"
+                >
+                  <span>{t("presetBalanced", language)}</span>
+                </button>
+                <button
+                  id="preset-finops-btn"
+                  onClick={() => {
+                    if (applyLayoutPreset) applyLayoutPreset(["balancer", "databases", "logs"], "presetFinOps");
+                    setIsDevToolsOpen(false);
+                  }}
+                  className="w-full text-left px-3.5 py-1.5 text-xs text-aws-lightTextPrimary dark:text-aws-textPrimary hover:bg-aws-orange/10 flex items-center gap-2 cursor-pointer font-medium transition-colors"
+                >
+                  <span>{t("presetFinOps", language)}</span>
+                </button>
+                <button
+                  id="preset-dba-btn"
+                  onClick={() => {
+                    if (applyLayoutPreset) applyLayoutPreset(["databases", "logs", "balancer"], "presetDba");
+                    setIsDevToolsOpen(false);
+                  }}
+                  className="w-full text-left px-3.5 py-1.5 text-xs text-aws-lightTextPrimary dark:text-aws-textPrimary hover:bg-aws-orange/10 flex items-center gap-2 cursor-pointer font-medium transition-colors"
+                >
+                  <span>{t("presetDba", language)}</span>
+                </button>
+
+                <div className="px-3 py-1.5 border-t border-b border-aws-lightBorder dark:border-aws-border text-[10px] font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary uppercase tracking-wider mt-1">
+                  {t("systemControlsHeader", language)}
+                </div>
+                <button
                   onClick={() => {
                     handleResetAllSimulators();
                     setIsDevToolsOpen(false);
@@ -210,7 +240,7 @@ export function HeaderToolbar({
               </div>
             )}
           </div>
-
+          
           {/* Language Selector Dropdown */}
           <select
             id="header-language-selector"
