@@ -27,6 +27,21 @@ test.describe("Multi-Device Responsive & Visual Audits - RDS Sentinel", () => {
     }
   });
 
+  test("responsive layout - drop zone highlight ring and touch drag handles present", async ({ page }) => {
+    const databasesSection = page.locator('section[data-layout-key="databases"]');
+    const balancerSection = page.locator('section[data-layout-key="balancer"]');
+    const logsSection = page.locator('section[data-layout-key="logs"]');
+
+    await expect(databasesSection).toBeVisible();
+    await expect(balancerSection).toBeVisible();
+    await expect(logsSection).toBeVisible();
+
+    // Verify touch-enabled drag handles are rendered inside section headers
+    const dragHandles = page.locator("span.cursor-grab").filter({ hasText: "⋮⋮" });
+    await expect(dragHandles.first()).toBeVisible();
+    expect(await dragHandles.count()).toBeGreaterThanOrEqual(3);
+  });
+
   test("responsive controls - settings modal opens cleanly across viewports", async ({ page }) => {
     const settingsBtn = page.locator("#open-settings-modal-btn");
     await expect(settingsBtn).toBeVisible();

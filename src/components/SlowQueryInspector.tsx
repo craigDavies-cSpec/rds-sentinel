@@ -15,6 +15,9 @@ interface SlowQueryInspectorProps {
   setActiveAdvisorQueryId: (id: string | null) => void;
   copiedDdlQueryId: string | null;
   setCopiedDdlQueryId: (id: string | null) => void;
+  onTouchStart?: (componentKey: string) => void;
+  onTouchMove?: (e: React.TouchEvent) => void;
+  onTouchEnd?: () => void;
 }
 
 export function SlowQueryInspector({
@@ -31,6 +34,9 @@ export function SlowQueryInspector({
   handleTierClick,
   filteredLogs,
   hasFeature,
+  onTouchStart,
+  onTouchMove,
+  onTouchEnd,
 }: SlowQueryInspectorProps & {
   tier?: string;
   handleTierClick?: (tier: any) => void;
@@ -43,7 +49,15 @@ export function SlowQueryInspector({
       <div className="bg-aws-lightContainer/90 dark:bg-aws-container/90 backdrop-blur-md border border-aws-lightBorder/80 dark:border-aws-border/80 rounded-xl shadow-lg hover:shadow-xl p-5 transition-all duration-300">
         <div className="flex justify-between items-center pb-3 border-b border-aws-lightBorder dark:border-aws-border mb-3">
           <div className="flex items-center gap-2">
-            <span className="text-aws-orange font-mono cursor-grab active:cursor-grabbing text-xs tracking-tighter" title={t("dragHandleTitle", language)}>{"⋮⋮"}</span>
+            <span
+              className="text-aws-orange font-mono cursor-grab active:cursor-grabbing text-xs tracking-tighter select-none touch-none"
+              onTouchStart={() => onTouchStart && onTouchStart("logs")}
+              onTouchMove={(e) => onTouchMove && onTouchMove(e)}
+              onTouchEnd={() => onTouchEnd && onTouchEnd()}
+              title={t("dragHandleTitle", language)}
+            >
+              {"⋮⋮"}
+            </span>
             <h2 className="text-sm font-black text-aws-lightTextPrimary dark:text-aws-orange uppercase tracking-wider flex items-center gap-2">
               {t("logWatcher", language)}
             </h2>

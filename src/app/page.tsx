@@ -226,11 +226,14 @@ export default function Dashboard() {
   };
 
   const [draggedKey, setDraggedKey] = useState<string | null>(null);
+  const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
+  const [touchDragSource, setTouchDragSource] = useState<string | null>(null);
 
   const resetDefaultLayout = async () => {
     const defaultOrder = ["databases", "balancer", "logs"];
     setLayoutOrder(defaultOrder);
     await saveLayoutAction(defaultOrder);
+    setDragOverColumn(null);
     showToast(t("layoutResetToast", language));
   };
 
@@ -240,13 +243,31 @@ export default function Dashboard() {
     e.dataTransfer.effectAllowed = "move";
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
+  const handleDragEnter = (e: React.DragEvent, componentKey: string) => {
+    e.preventDefault();
+    if (draggedKey && draggedKey !== componentKey) {
+      setDragOverColumn(componentKey);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent, componentKey: string) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = "move";
+    if (draggedKey && draggedKey !== componentKey && dragOverColumn !== componentKey) {
+      setDragOverColumn(componentKey);
+    }
+  };
+
+  const handleDragLeave = (e: React.DragEvent, componentKey: string) => {
+    e.preventDefault();
+    if (dragOverColumn === componentKey) {
+      setDragOverColumn(null);
+    }
   };
 
   const handleDrop = async (e: React.DragEvent, targetKey: string) => {
     e.preventDefault();
+    setDragOverColumn(null);
     if (!draggedKey || draggedKey === targetKey) return;
 
     const fromIndex = layoutOrder.indexOf(draggedKey);
@@ -261,6 +282,45 @@ export default function Dashboard() {
       await saveLayoutAction(newOrder);
       showToast(t("layoutReorderedToast", language));
     }
+  };
+
+  const handleTouchStart = (componentKey: string) => {
+    setTouchDragSource(componentKey);
+    setDraggedKey(componentKey);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!touchDragSource) return;
+    const touch = e.touches[0];
+    const targetElement = document.elementFromPoint(touch.clientX, touch.clientY);
+    if (targetElement) {
+      const section = targetElement.closest("section[data-layout-key]");
+      if (section) {
+        const key = section.getAttribute("data-layout-key");
+        if (key && key !== touchDragSource) {
+          setDragOverColumn(key);
+        }
+      }
+    }
+  };
+
+  const handleTouchEnd = async () => {
+    if (touchDragSource && dragOverColumn && touchDragSource !== dragOverColumn) {
+      const fromIndex = layoutOrder.indexOf(touchDragSource);
+      const toIndex = layoutOrder.indexOf(dragOverColumn);
+
+      if (fromIndex !== -1 && toIndex !== -1) {
+        const newOrder = [...layoutOrder];
+        const [removed] = newOrder.splice(fromIndex, 1);
+        newOrder.splice(toIndex, 0, removed);
+        setLayoutOrder(newOrder);
+        await saveLayoutAction(newOrder);
+        showToast(t("layoutReorderedToast", language));
+      }
+    }
+    setTouchDragSource(null);
+    setDraggedKey(null);
+    setDragOverColumn(null);
   };
 
   // Multi-Account & Cost-Center Filtering
@@ -441,12 +501,19 @@ export default function Dashboard() {
       <main className="max-w-[1600px] mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Column 1: Telemetry Sandbox & Topology Visualizer */}
         <section
+          data-layout-key="databases"
           draggable={true}
           onDragStart={(e) => handleDragStart(e, "databases")}
-          onDragOver={handleDragOver}
+          onDragEnter={(e) => handleDragEnter(e, "databases")}
+          onDragOver={(e) => handleDragOver(e, "databases")}
+          onDragLeave={(e) => handleDragLeave(e, "databases")}
           onDrop={(e) => handleDrop(e, "databases")}
           style={{ order: layoutOrder.indexOf("databases") >= 0 ? layoutOrder.indexOf("databases") : 0 }}
-          className="flex flex-col gap-6 transition-all duration-200"
+          className={`flex flex-col gap-6 transition-all duration-300 rounded-xl p-1.5 ${
+            dragOverColumn === "databases"
+              ? "ring-2 ring-aws-orange ring-offset-2 ring-offset-aws-lightBg dark:ring-offset-slate-950 bg-aws-orange/5 animate-pulse border-2 border-dashed border-aws-orange/60"
+              : "border border-transparent"
+          }`}
         >
           <TelemetrySandbox
             filteredInstances={filteredInstances}
@@ -472,6 +539,9 @@ export default function Dashboard() {
             setHoveredSparklineIndex={setHoveredSparklineIndex}
             moveLeft={moveLeft}
             moveRight={moveRight}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
           />
 
           <TopologyVisualizer
@@ -484,12 +554,19 @@ export default function Dashboard() {
 
         {/* Column 2: Cost Recommendations & Optimization Tools */}
         <section
+          data-layout-key="balancer"
           draggable={true}
           onDragStart={(e) => handleDragStart(e, "balancer")}
-          onDragOver={handleDragOver}
+          onDragEnter={(e) => handleDragEnter(e, "balancer")}
+          onDragOver={(e) => handleDragOver(e, "balancer")}
+          onDragLeave={(e) => handleDragLeave(e, "balancer")}
           onDrop={(e) => handleDrop(e, "balancer")}
           style={{ order: layoutOrder.indexOf("balancer") >= 0 ? layoutOrder.indexOf("balancer") : 1 }}
-          className="flex flex-col gap-6 transition-all duration-200"
+          className={`flex flex-col gap-6 transition-all duration-300 rounded-xl p-1.5 ${
+            dragOverColumn === "balancer"
+              ? "ring-2 ring-aws-orange ring-offset-2 ring-offset-aws-lightBg dark:ring-offset-slate-950 bg-aws-orange/5 animate-pulse border-2 border-dashed border-aws-orange/60"
+              : "border border-transparent"
+          }`}
         >
           <CostRecommendations
             totalCost={accountMonthlyCost}
@@ -507,17 +584,27 @@ export default function Dashboard() {
             showToast={showToast}
             moveLeft={moveLeft}
             moveRight={moveRight}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
           />
         </section>
 
         {/* Column 3: Slow Query Inspector & Log Watcher */}
         <section
+          data-layout-key="logs"
           draggable={true}
           onDragStart={(e) => handleDragStart(e, "logs")}
-          onDragOver={handleDragOver}
+          onDragEnter={(e) => handleDragEnter(e, "logs")}
+          onDragOver={(e) => handleDragOver(e, "logs")}
+          onDragLeave={(e) => handleDragLeave(e, "logs")}
           onDrop={(e) => handleDrop(e, "logs")}
           style={{ order: layoutOrder.indexOf("logs") >= 0 ? layoutOrder.indexOf("logs") : 2 }}
-          className="flex flex-col gap-6 transition-all duration-200"
+          className={`flex flex-col gap-6 transition-all duration-300 rounded-xl p-1.5 ${
+            dragOverColumn === "logs"
+              ? "ring-2 ring-aws-orange ring-offset-2 ring-offset-aws-lightBg dark:ring-offset-slate-950 bg-aws-orange/5 animate-pulse border-2 border-dashed border-aws-orange/60"
+              : "border border-transparent"
+          }`}
         >
           <SlowQueryInspector
             filteredSlowQueries={filteredSlowQueries}
@@ -533,6 +620,9 @@ export default function Dashboard() {
             handleTierClick={handleRequestTierChange}
             filteredLogs={filteredLogs}
             hasFeature={hasFeature}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
           />
         </section>
       </main>

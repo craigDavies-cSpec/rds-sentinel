@@ -23,6 +23,9 @@ interface CostRecommendationsProps {
   showToast: (msg: string) => void;
   moveLeft: (key: string) => void;
   moveRight: (key: string) => void;
+  onTouchStart?: (componentKey: string) => void;
+  onTouchMove?: (e: React.TouchEvent) => void;
+  onTouchEnd?: () => void;
 }
 
 export function CostRecommendations({
@@ -41,6 +44,9 @@ export function CostRecommendations({
   showToast,
   moveLeft,
   moveRight,
+  onTouchStart,
+  onTouchMove,
+  onTouchEnd,
 }: CostRecommendationsProps) {
   const [webhookUrl, setWebhookUrl] = useState("https://hooks.slack.com/services/T0000/B0000/XXXXX");
   const [webhookTarget, setWebhookTarget] = useState<"slack" | "teams" | "pagerduty">("slack");
@@ -50,7 +56,15 @@ export function CostRecommendations({
       {/* Header */}
       <div className="flex justify-between items-center border-b border-aws-lightBorder dark:border-aws-border pb-3">
         <div className="flex items-center gap-2">
-          <span className="text-aws-orange font-mono cursor-grab active:cursor-grabbing text-xs tracking-tighter" title={t("dragHandleTitle", language)}>{"⋮⋮"}</span>
+          <span
+            className="text-aws-orange font-mono cursor-grab active:cursor-grabbing text-xs tracking-tighter select-none touch-none"
+            onTouchStart={() => onTouchStart && onTouchStart("balancer")}
+            onTouchMove={(e) => onTouchMove && onTouchMove(e)}
+            onTouchEnd={() => onTouchEnd && onTouchEnd()}
+            title={t("dragHandleTitle", language)}
+          >
+            {"⋮⋮"}
+          </span>
           <h2 className="text-sm font-black text-aws-lightTextPrimary dark:text-aws-orange uppercase tracking-wider flex items-center gap-2">
             {t("costBalancer", language)}
           </h2>
