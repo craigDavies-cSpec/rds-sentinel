@@ -61,6 +61,38 @@ export function TelemetrySandbox({
   onTouchMove,
   onTouchEnd,
 }: TelemetrySandboxProps) {
+  const sparklineContainerRef = React.useRef<HTMLDivElement>(null);
+  const [sparklineWidth, setSparklineWidth] = React.useState<number>(260);
+
+  React.useEffect(() => {
+    if (!sparklineContainerRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.contentRect.width > 0) {
+          setSparklineWidth(Math.floor(entry.contentRect.width));
+        }
+      }
+    });
+    observer.observe(sparklineContainerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  const svgHeight = 64;
+  const dataPoints = cpuSparklineData && cpuSparklineData.length > 0 ? cpuSparklineData : [20, 25, 22, 30, 28, 35, 40, 32, 28, 25];
+  const stepX = dataPoints.length > 1 ? sparklineWidth / (dataPoints.length - 1) : sparklineWidth;
+
+  const pointsString = dataPoints
+    .map((val, idx) => {
+      const x = (idx * stepX).toFixed(1);
+      const y = (svgHeight - (val / 100) * (svgHeight - 12) - 6).toFixed(1);
+      return `${x},${y}`;
+    })
+    .join(" ");
+
+  const fillPathString = `M 0,${svgHeight} L ${dataPoints
+    .map((val, idx) => `${(idx * stepX).toFixed(1)} ${(svgHeight - (val / 100) * (svgHeight - 12) - 6).toFixed(1)}`)
+    .join(" L ")} L ${sparklineWidth},${svgHeight} Z`;
+
   return (
     <div className="bg-aws-lightContainer/90 dark:bg-aws-container/90 backdrop-blur-md border border-aws-lightBorder/80 dark:border-aws-border/80 rounded-xl shadow-lg hover:shadow-xl p-5 flex flex-col gap-4 transition-all duration-300">
       {/* Header */}
@@ -221,6 +253,78 @@ export function TelemetrySandbox({
                   onChange={(e) => handleCpuSliderChange(Number(e.target.value))}
                   className="w-full accent-aws-orange cursor-pointer h-1.5 bg-aws-lightBorder dark:bg-aws-border rounded-lg appearance-none"
                 />
+              </div>
+
+              {/* Dynamic Resizable Sparkline Graph */}
+              <div className="mt-3 p-2.5 bg-aws-lightBg dark:bg-aws-dark border border-aws-lightBorder dark:border-aws-border rounded-lg flex flex-col gap-1.5">
+                <div className="flex justify-between items-center text-[10px] font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary">
+                  <span>{t("cpuHistorySparkline", language)}</span>
+                  <span className="font-mono text-[9px] text-aws-orange">
+                    {hoveredSparklineIndex !== null ? `${dataPoints[hoveredSparklineIndex]}% @ T-${(dataPoints.length - 1 - hoveredSparklineIndex) * 5}s` : `Live Peak: ${Math.max(...dataPoints)}%`}
+                  </span>
+                </div>
+                <div ref={sparklineContainerRef} className="w-full h-16 relative overflow-hidden flex items-center justify-center">
+                  <svg
+                    width="100%"
+                    height={svgHeight}
+                    viewBox={`0 0 ${sparklineWidth} ${svgHeight}`}
+                    className="w-full h-full overflow-visible"
+                  >
+                    <defs>
+                      <linearGradient id="sparkline-gradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#ff9900" stopOpacity="0.35" />
+                        <stop offset="100%" stopColor="#ff9900" stopOpacity="0.0" />
+                      </linearGradient>
+                    </defs>
+
+                    {/* Benchmark Grid Lines */}
+                    <line x1="0" y1={svgHeight * 0.25} x2={sparklineWidth} y2={svgHeight * 0.25} stroke="currentColor" strokeDasharray="2 2" className="text-aws-lightBorder dark:text-aws-border opacity-60" />
+                    <line x1="0" y1={svgHeight * 0.5} x2={sparklineWidth} y2={svgHeight * 0.5} stroke="currentColor" strokeDasharray="2 2" className="text-aws-lightBorder dark:text-aws-border opacity-60" />
+                    <line x1="0" y1={svgHeight * 0.75} x2={sparklineWidth} y2={svgHeight * 0.75} stroke="currentColor" strokeDasharray="2 2" className="text-aws-lightBorder dark:text-aws-border opacity-60" />
+
+                    {/* Dynamic Area Fill */}
+                    <path
+                      d={fillPathString}
+                      fill="url(#sparkline-gradient)"
+                      className="transition-all duration-300 ease-in-out"
+                    />
+
+                    {/* Dynamic Sparkline Path */}
+                    <polyline
+                      fill="none"
+                      stroke="#ff9900"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      points={pointsString}
+                      className="transition-all duration-300 ease-in-out"
+                    />
+
+                    {/* Interactive Data Point Dots */}
+                    {dataPoints.map((val, idx) => {
+                      const cx = idx * stepX;
+                      const cy = svgHeight - (val / 100) * (svgHeight - 12) - 6;
+                      const isHovered = hoveredSparklineIndex === idx;
+                      return (
+                        <circle
+                          key={idx}
+                          cx={cx}
+                          cy={cy}
+                          r={isHovered ? 4.5 : 2.5}
+                          className={`cursor-pointer transition-all duration-200 ${
+                            isHovered
+                              ? "fill-aws-orange stroke-aws-lightBg dark:stroke-slate-950 stroke-2"
+                              : "fill-amber-400 opacity-70 hover:opacity-100"
+                          }`}
+                          onMouseEnter={() => setHoveredSparklineIndex(idx)}
+                          onMouseLeave={() => setHoveredSparklineIndex(null)}
+                        >
+                          <title>{`${val}% CPU`}</title>
+                        </circle>
+                      );
+                    })}
+                  </svg>
+                </div>
               </div>
             </div>
 

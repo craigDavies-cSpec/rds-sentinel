@@ -391,6 +391,7 @@ export interface TranslationDictionary {
   presetAppliedToast: string;
   layoutProfilesHeader: string;
   systemControlsHeader: string;
+  cpuHistorySparkline: string;
 }
 
 export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
@@ -741,6 +742,7 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     presetAppliedToast: "🎯 Layout preset applied",
     layoutProfilesHeader: "Operational Layout Profiles",
     systemControlsHeader: "System Diagnostics & Controls",
+    cpuHistorySparkline: "📈 Historical CPU Trend (Sparkline)",
   },
   de: {
     dashboardTitle: "RDS Sentinel",
@@ -1089,6 +1091,7 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     presetAppliedToast: "🎯 Layout-Vorlage angewendet",
     layoutProfilesHeader: "Betriebliche Layout-Profile",
     systemControlsHeader: "Systemdiagnose & Steuerung",
+    cpuHistorySparkline: "📈 Historischer CPU-Trend (Sparkline)",
   },
   fr: {
     dashboardTitle: "RDS Sentinel",
@@ -1437,6 +1440,7 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     presetAppliedToast: "🎯 Préréglage de disposition appliqué",
     layoutProfilesHeader: "Profils de Disposition Opérationnels",
     systemControlsHeader: "Diagnostics Système & Contrôles",
+    cpuHistorySparkline: "📈 Tendance Historique du CPU (Sparkline)",
   },
   ja: {
     dashboardTitle: "RDS Sentinel",
@@ -1785,6 +1789,7 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     presetAppliedToast: "🎯 レイアウトプリセットを適用しました",
     layoutProfilesHeader: "運用レイアウトプロファイル",
     systemControlsHeader: "システム診断とコントロール",
+    cpuHistorySparkline: "📈 過去のCPU使用率トレンド (スパークライン)",
   },
 };
 
