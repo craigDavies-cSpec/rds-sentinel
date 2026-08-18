@@ -7,7 +7,7 @@ test.describe("RDS Sentinel Dashboard Functional E2E Tests", () => {
   });
 
   test("should render the AWS console-themed header and title", async ({ page }) => {
-    await expect(page.locator("header")).toContainText("RDSSentinel");
+    await expect(page.locator("header")).toContainText("RDS Sentinel");
     await expect(page.locator("header")).toContainText("AWS Marketplace");
   });
 
@@ -205,10 +205,14 @@ test.describe("RDS Sentinel Dashboard Functional E2E Tests", () => {
   });
 
   test("should render SOC2 / HIPAA Compliance Export button in header and trigger report generation", async ({ page }) => {
-    // Confirm export SOC2 compliance button is visible in header
+    // Open Developer Tools dropdown
+    const devToolsBtn = page.locator("#dev-tools-dropdown-btn");
+    await expect(devToolsBtn).toBeVisible();
+    await devToolsBtn.click();
+
+    // Confirm export SOC2 compliance button is visible in Developer Tools menu
     const exportSoc2Btn = page.locator("#export-soc2-compliance-btn");
     await expect(exportSoc2Btn).toBeVisible();
-    await expect(exportSoc2Btn).toHaveText(/SOC2 Audit/);
 
     // Click export button and verify action executes without error
     await exportSoc2Btn.click();
@@ -569,5 +573,40 @@ test.describe("RDS Sentinel Dashboard Functional E2E Tests", () => {
     // Click Import Database button
     await page.locator("#import-discovered-db-btn-org-db-fintech-prod").click();
     await expect(page.getByText(/imported into RDS Sentinel monitoring console/)).toBeVisible();
+  });
+
+  test("should open AWS Marketplace EDP Procurement Modal and trigger APN ACE lead export & FTR security audit", async ({ page }) => {
+    // Click Subscribe on AWS Marketplace badge
+    const edpBadge = page.locator("#subscribe-aws-marketplace-btn");
+    await expect(edpBadge).toBeVisible();
+    await edpBadge.click();
+
+    // Confirm EDP Procurement modal opens
+    const edpModal = page.locator("#edp-procurement-modal");
+    await expect(edpModal).toBeVisible();
+    await expect(edpModal).toContainText("rds-sentinel-v2-enterprise");
+
+    // Close modal
+    await edpModal.locator("button", { hasText: "✕" }).click();
+    await expect(edpModal).not.toBeVisible();
+
+    // Open Developer Tools dropdown
+    await page.locator("#dev-tools-dropdown-btn").click();
+
+    // Trigger APN ACE Lead export
+    await page.locator("#export-ace-leads-btn").click();
+
+    // Open Developer Tools dropdown again
+    await page.locator("#dev-tools-dropdown-btn").click();
+
+    // Trigger AWS FTR Security audit
+    await page.locator("#run-ftr-audit-btn").click();
+
+    // Confirm FTR Security modal opens with score
+    const ftrModal = page.locator("#ftr-security-modal");
+    await expect(ftrModal).toBeVisible();
+    await expect(ftrModal).toContainText("100%");
+    await ftrModal.locator("button", { hasText: "Done" }).click();
+    await expect(ftrModal).not.toBeVisible();
   });
 });

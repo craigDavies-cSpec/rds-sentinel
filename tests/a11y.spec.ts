@@ -6,6 +6,7 @@ test.describe("Accessibility Audits - rds-sentinel", () => {
     await page.goto("/");
     
     // Toggle console theme to light mode by clicking the button
+    await page.waitForSelector("button[title='Toggle Theme']");
     const themeButton = page.locator("button[title='Toggle Theme']");
     await expect(themeButton).toBeVisible();
     await themeButton.click();
@@ -30,6 +31,7 @@ test.describe("Accessibility Audits - rds-sentinel", () => {
     await page.goto("/");
     
     // Default mode is dark; wait for hydration to complete and apply dark class
+    await page.waitForSelector("html.dark");
     await expect(page.locator("html")).toHaveClass(/dark/);
     await expect(page.locator("button[title='Toggle Theme']")).toBeVisible();
     

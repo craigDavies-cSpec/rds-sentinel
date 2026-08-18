@@ -8,7 +8,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: "html",
   use: {
-    baseURL: "http://localhost:3001",
+    baseURL: "http://127.0.0.1:3001",
     trace: "on-first-retry",
   },
   projects: [
@@ -19,6 +19,25 @@ export default defineConfig({
         launchOptions: {
           args: ["--disable-web-security"]
         }
+      },
+    },
+    {
+      name: "desktop-mac-safari",
+      use: { 
+        ...devices["Desktop Safari"],
+      },
+    },
+    {
+      name: "desktop-firefox",
+      use: { 
+        ...devices["Desktop Firefox"],
+      },
+    },
+    {
+      name: "mobile-iphone",
+      testMatch: /.*responsive\.spec\.ts/,
+      use: { 
+        ...devices["iPhone 14"],
       },
     },
     {
@@ -52,7 +71,7 @@ export default defineConfig({
   ],
   webServer: {
     command: "npx.cmd next dev -p 3001",
-    url: "http://localhost:3001",
+    url: "http://127.0.0.1:3001",
     reuseExistingServer: !process.env.CI,
     stdout: "ignore",
     stderr: "pipe",

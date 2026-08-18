@@ -3,7 +3,8 @@ import { test, expect } from "@playwright/test";
 test.describe("Multi-Device Responsive & Visual Audits - RDS Sentinel", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
+    await page.waitForTimeout(300);
   });
 
   // 1. Mobile & Tablet Layout Integrity Tests
@@ -22,7 +23,7 @@ test.describe("Multi-Device Responsive & Visual Audits - RDS Sentinel", () => {
     const viewportSize = page.viewportSize();
     if (viewportSize && viewportSize.width < 640) {
       // On narrow mobile viewports (<640px), partner badge hides gracefully
-      const partnerBadge = page.locator("header span").filter({ hasText: /AWS Marketplace Partner/i });
+      const partnerBadge = page.locator("#subscribe-aws-marketplace-btn");
       await expect(partnerBadge).toBeHidden();
     }
   });
