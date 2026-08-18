@@ -28,7 +28,7 @@ export function GraphQLInspectorModal({
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border rounded-xl shadow-2xl w-full max-w-3xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <div id="graphql-modal-card" className="bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border rounded-xl shadow-2xl w-full max-w-3xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         {/* Modal Header */}
         <div className="px-6 py-4 border-b border-aws-lightBorder dark:border-aws-border flex justify-between items-center bg-aws-lightBg dark:bg-aws-dark">
           <div className="flex items-center gap-2">

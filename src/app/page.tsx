@@ -399,7 +399,7 @@ export default function Dashboard() {
       {/* Main Grid View Layout */}
       <main className="max-w-[1600px] mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Column 1: Telemetry Sandbox & Topology Visualizer */}
-        <section style={{ order: layoutOrder.indexOf("databases") }} className="flex flex-col gap-6">
+        <section style={{ order: layoutOrder.indexOf("databases") >= 0 ? layoutOrder.indexOf("databases") : 0 }} className="flex flex-col gap-6">
           <TelemetrySandbox
             filteredInstances={filteredInstances}
             selectedDbId={selectedDbId}
