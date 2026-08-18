@@ -398,8 +398,8 @@ export default function Dashboard() {
 
       {/* Main Grid View Layout */}
       <main className="max-w-[1600px] mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Column 1: Telemetry Sandbox */}
-        <section style={{ order: layoutOrder.indexOf("databases") }}>
+        {/* Column 1: Telemetry Sandbox & Topology Visualizer */}
+        <section style={{ order: layoutOrder.indexOf("databases") }} className="flex flex-col gap-6">
           <TelemetrySandbox
             filteredInstances={filteredInstances}
             selectedDbId={selectedDbId}
@@ -425,17 +425,17 @@ export default function Dashboard() {
             moveLeft={moveLeft}
             moveRight={moveRight}
           />
-        </section>
 
-        {/* Column 2: Topology & Cost Recommendations */}
-        <section style={{ order: layoutOrder.indexOf("balancer") >= 0 ? layoutOrder.indexOf("balancer") : 1 }} className="flex flex-col gap-6">
           <TopologyVisualizer
             topologyData={clusterTopology}
             selectedTopologyNode={selectedTopologyNode}
             setSelectedTopologyNode={setSelectedTopologyNode}
             language={language}
           />
+        </section>
 
+        {/* Column 2: Cost Recommendations & Optimization Tools */}
+        <section style={{ order: layoutOrder.indexOf("balancer") >= 0 ? layoutOrder.indexOf("balancer") : 1 }} className="flex flex-col gap-6">
           <CostRecommendations
             totalCost={accountMonthlyCost}
             potentialSavings={potentialSavings}
