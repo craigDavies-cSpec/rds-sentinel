@@ -1,5 +1,6 @@
-import TrustpilotBadge from './TrustpilotBadge';
 "use client";
+import TrustpilotBadge from './TrustpilotBadge';
+
 
 import React from "react";
 import { DBInstance, CostRecommendation, SlowQuery } from "@/lib/mockTelemetry";

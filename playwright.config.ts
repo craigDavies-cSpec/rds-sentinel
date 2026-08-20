@@ -68,13 +68,5 @@ export default defineConfig({
         }
       },
     },
-  ],
-  webServer: {
-    command: "npx.cmd next dev -p 3001",
-    url: "http://127.0.0.1:3001",
-    reuseExistingServer: !process.env.CI,
-    stdout: "ignore",
-    stderr: "pipe",
-    timeout: 60 * 1000,
-  },
+  ]
 });
