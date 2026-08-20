@@ -21,7 +21,7 @@
 ---
 
 ### 🥈 Priority 3: Enterprise Alerting & Multi-Region Filters
-- [ ] **Slack (`#aws-alerts`) & PagerDuty Webhook Integration**:
+- [x] **Slack (`#aws-alerts`) & PagerDuty Webhook Integration**:
   - Add slow query alert webhook settings for instant Slack & PagerDuty incident notifications.
 - [ ] **AWS Multi-Region Selector**:
   - Top bar dropdown filter to toggle telemetry between `eu-west-1 (London)`, `us-east-1 (N. Virginia)`, and `ap-northeast-1 (Tokyo)`.
