@@ -81,3 +81,9 @@ A living backlog of deferred items, future roadmap features, and architectural i
 
 ## 🎬 Product Video Demo & Marketplace Showcase Kit
 - [ ] **v1.0 Product Video Walkthrough**: Record 60-90 second demo video of RDS Sentinel query diagnostics and CloudWatch ingestion for AWS Marketplace listing and cspec.uk video modal.
+
+
+## 💼 Business User Audit Recommendations (Persona: Marcus Vance, AWS Architect)
+- [ ] **1-Click AWS CloudFormation Launch Stack**: Add direct CloudFormation / Terraform launch button on hero for sandbox testing.
+- [ ] **Slack & PagerDuty Webhook Integration**: Add slow query alert webhook settings for `#aws-alerts` & PagerDuty.
+- [ ] **AWS Multi-Region Filter**: Top bar dropdown for `eu-west-1`, `us-east-1`, and `ap-northeast-1`.
