@@ -1,3 +1,4 @@
+import TrustpilotBadge from './TrustpilotBadge';
 "use client";
 
 import React from "react";
@@ -104,6 +105,7 @@ export function HeaderToolbar({
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 max-w-[1600px] mx-auto">
         {/* Left Side: Brand Logo & Title */}
         <div className="flex items-center gap-3">
+          <TrustpilotBadge />
           <div className="flex items-center gap-2">
             <span className="text-2xl">🛡️</span>
             <div>
@@ -362,6 +364,7 @@ export function HeaderToolbar({
         <div className="max-w-[1600px] mx-auto px-4 lg:px-6 py-2 flex flex-wrap items-center justify-between text-xs font-sans gap-3">
           {/* Left: Account & Cost Center Selectors */}
           <div className="flex items-center gap-3">
+          <TrustpilotBadge />
             <div className="flex items-center gap-1.5">
               <span className="text-[10px] uppercase font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary tracking-wider hidden sm:inline-block">
                 {t("accountLabel", language)}
@@ -408,6 +411,7 @@ export function HeaderToolbar({
 
           {/* Right: Tier Badge, Account Health Score & Pricing Sync */}
           <div className="flex items-center gap-3">
+          <TrustpilotBadge />
             {/* Active Subscription Tier Selector */}
             <div id="header-tier-selector" className="flex items-center gap-1.5">
               <span className="text-[10px] uppercase font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary tracking-wider">

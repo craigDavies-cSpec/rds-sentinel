@@ -13,9 +13,9 @@
 ## 📋 Additional Prioritized Backlog
 
 ### 🛡️ Priority 2: Security & Trust Infrastructure
-- [ ] **Google reCAPTCHA v3 Protection**:
+- [x] **Google reCAPTCHA v3 Protection**:
   - Protect account registration & trial request forms against bot submissions.
-- [ ] **Trustpilot SaaS Rating Badge**:
+- [x] **Trustpilot SaaS Rating Badge**:
   - Embed Trustpilot SaaS review widget on landing page and AWS Marketplace listing.
 
 ---
