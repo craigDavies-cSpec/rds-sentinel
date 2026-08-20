@@ -106,6 +106,29 @@ export function HeaderToolbar({
         {/* Left Side: Brand Logo & Title */}
         <div className="flex items-center gap-3">
           <TrustpilotBadge />
+            {/* AWS Multi-Region Telemetry Selector */}
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] uppercase font-bold text-aws-lightTextSecondary dark:text-aws-textSecondary tracking-wider hidden sm:inline-block">
+                AWS Region:
+              </span>
+              <select
+                id="aws-region-selector"
+                aria-label="Select AWS Telemetry Region"
+                value={pricingSyncMetadata.region}
+                onChange={async (e) => {
+                  const newRegion = e.target.value;
+                  const fresh = await syncLiveAWSPricings(newRegion);
+                  setPricingSyncMetadata(fresh);
+                  if (showToast) showToast(`🌐 Telemetry Region Changed to AWS ${newRegion}`);
+                }}
+                className="px-2.5 py-1 rounded-md bg-aws-lightContainer dark:bg-aws-container border border-aws-lightBorder dark:border-aws-border text-aws-lightTextPrimary dark:text-aws-textPrimary text-xs font-bold transition-all shadow-sm cursor-pointer hover:border-aws-orange focus:outline-none"
+              >
+                <option value="eu-west-1">🇬🇧 London (eu-west-1)</option>
+                <option value="us-east-1">🇺🇸 N. Virginia (us-east-1)</option>
+                <option value="ap-northeast-1">🇯🇵 Tokyo (ap-northeast-1)</option>
+                <option value="eu-central-1">🇩🇪 Frankfurt (eu-central-1)</option>
+              </select>
+            </div>
           <div className="flex items-center gap-2">
             <span className="text-2xl">🛡️</span>
             <div>
