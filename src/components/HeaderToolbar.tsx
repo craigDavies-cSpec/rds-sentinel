@@ -325,6 +325,38 @@ export function HeaderToolbar({
         </div>
       </div>
 
+      
+      {/* 1-Click AWS CloudFormation Launch Stack WCAG High-Contrast Banner */}
+      <div className="bg-gradient-to-r from-amber-500 via-amber-600 to-orange-600 text-slate-950 px-4 lg:px-6 py-2.5 shadow-md flex flex-wrap items-center justify-between gap-3 font-sans border-b border-amber-400">
+        <div className="flex items-center gap-2.5">
+          <span className="text-base p-1 bg-slate-950 rounded-md text-amber-400 font-bold shadow-inner">☁️</span>
+          <div>
+            <span className="font-extrabold text-xs uppercase tracking-wider text-slate-950">
+              AWS Sandbox Evaluation Setup:
+            </span>
+            <span className="text-xs font-bold text-slate-900 ml-1.5 hidden md:inline-block">
+              Deploy Kinesis telemetry IAM role template to your AWS Sandbox account without manual configuration.
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              const templateYaml = generateCloudFormationRoleTemplate("rds-sentinel-sandbox-role");
+              downloadTemplateFile("rds-sentinel-sandbox-cloudformation.yml", templateYaml);
+              window.open("https://console.aws.amazon.com/cloudformation/home#/stacks/quickcreate?stackName=RDSSentinelSandboxRole&param_ExternalId=rds-sentinel-demo-external-id", "_blank");
+            }}
+            className="px-4 py-1.5 bg-slate-950 hover:bg-slate-900 text-amber-400 border border-amber-300 font-black text-xs rounded-lg transition-all shadow-lg flex items-center gap-2 cursor-pointer active:scale-95"
+            title="Download CloudFormation YAML & Open AWS Quick Create Console"
+          >
+            <span>🚀</span> 1-Click AWS CloudFormation Launch Stack
+          </button>
+        </div>
+      </div>
+
+
       {/* Global Operational Subheader Filter Strip */}
       <div className="border-t border-aws-lightBorder/50 dark:border-aws-border/50 bg-aws-lightBg/40 dark:bg-aws-dark/40 backdrop-blur-sm">
         <div className="max-w-[1600px] mx-auto px-4 lg:px-6 py-2 flex flex-wrap items-center justify-between text-xs font-sans gap-3">
