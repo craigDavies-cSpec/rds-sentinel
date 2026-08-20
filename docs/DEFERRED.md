@@ -5,7 +5,7 @@
 ## 🏆 Master Execution Priorities
 
 ### 🥇 Priority 1 (Immediate Focus): 1-Click AWS CloudFormation Launch Stack
-- [ ] **1-Click AWS CloudFormation Sandbox Launch Stack**:
+- [x] **1-Click AWS CloudFormation Sandbox Launch Stack** (COMPLETED 2026-08-20):
   - Add direct CloudFormation / Terraform launch button on hero for frictionless evaluation in sandbox AWS accounts without manual IAM configuration.
 
 ---

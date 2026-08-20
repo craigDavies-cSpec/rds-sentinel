@@ -457,6 +457,14 @@ export default function Dashboard() {
     );
   }, []);
 
+  
+  const handleLaunchCloudFormationStack = () => {
+    const templateYaml = generateCloudFormationRoleTemplate("rds-sentinel-sandbox-role");
+    downloadTemplateFile("rds-sentinel-sandbox-cloudformation.yml", templateYaml);
+    const awsConsoleUrl = `https://console.aws.amazon.com/cloudformation/home#/stacks/quickcreate?stackName=RDSSentinelSandboxRole&param_ExternalId=rds-sentinel-demo-external-id`;
+    window.open(awsConsoleUrl, '_blank');
+  };
+
   return (
     <div className="min-h-screen bg-aws-lightBg dark:bg-aws-dark transition-colors duration-200">
       {/* Toast Notification Banner */}
