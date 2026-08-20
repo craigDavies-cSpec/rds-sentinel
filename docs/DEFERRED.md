@@ -77,3 +77,7 @@ A living backlog of deferred items, future roadmap features, and architectural i
 * **Multi-Cloud Database Monitoring (GCP Cloud SQL & Azure Database for PostgreSQL)** (Senior Dev): Expand RDS Sentinel into a unified multi-cloud database performance console.
 * **Automated Zero-Downtime Index Creation Scheduler** (AWS Expert): Schedule suggested `CREATE INDEX CONCURRENTLY` DDL statements during low-traffic maintenance windows.
 * **Custom Anomaly Detection ML Engine (Exponential Moving Average & Seasonality)** (Security Auditor): Train lightweight edge ML models to detect seasonal query load spikes.
+
+
+## 🎬 Product Video Demo & Marketplace Showcase Kit
+- [ ] **v1.0 Product Video Walkthrough**: Record 60-90 second demo video of RDS Sentinel query diagnostics and CloudWatch ingestion for AWS Marketplace listing and cspec.uk video modal.
