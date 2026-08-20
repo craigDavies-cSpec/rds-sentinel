@@ -12,7 +12,15 @@
 
 ## 📋 Additional Prioritized Backlog
 
-### 🥈 Priority 2: Enterprise Alerting & Multi-Region Filters
+### 🛡️ Priority 2: Security & Trust Infrastructure
+- [ ] **Google reCAPTCHA v3 Protection**:
+  - Protect account registration & trial request forms against bot submissions.
+- [ ] **Trustpilot SaaS Rating Badge**:
+  - Embed Trustpilot SaaS review widget on landing page and AWS Marketplace listing.
+
+---
+
+### 🥈 Priority 3: Enterprise Alerting & Multi-Region Filters
 - [ ] **Slack (`#aws-alerts`) & PagerDuty Webhook Integration**:
   - Add slow query alert webhook settings for instant Slack & PagerDuty incident notifications.
 - [ ] **AWS Multi-Region Selector**:
@@ -20,6 +28,6 @@
 
 ---
 
-### 🎬 Priority 3: Product Showcase Strategy (v1.0 Completion)
+### 🎬 Priority 4: Product Showcase Strategy (v1.0 Completion)
 - [ ] **v1.0 AWS Marketplace Product Demo Video**:
   - Record 60-90s walkthrough of RDS query diagnostics and CloudWatch ingestion for AWS Marketplace listing.
