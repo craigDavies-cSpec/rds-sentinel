@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>cSpec Solutions — Master Unified Engineering &amp; Product Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+JP:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #090d12; --panel: #121820; --panel-hover: #17202a; --line: #273140; --line-subtle: #1a222d;
+    --ink: #f0f6fc; --ink2: #94a3b8; --ink3: #64748b;
+    --musubi: #d4af37; --musubi-glow: rgba(212, 175, 55, 0.15);
+    --tradesentinel: #58a6ff; --tradesentinel-glow: rgba(88, 166, 255, 0.15);
+    --rds: #ff9900; --rds-glow: rgba(255, 153, 0, 0.15);
+    --ok: #22c55e; --ok-glow: rgba(34, 197, 94, 0.15);
+    --warn: #f59e0b; --warn-glow: rgba(245, 158, 11, 0.15);
+    --bad: #ef4444; --bad-glow: rgba(239, 68, 68, 0.15);
+    --purple: #a855f7; --purple-glow: rgba(168, 85, 247, 0.15);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: 'Inter', 'Noto Sans JP', system-ui, -apple-system, sans-serif;
+    line-height: 1.6; padding: 24px; max-width: 1200px; margin: 0 auto;
+  }
+  header {
+    background: linear-gradient(135deg, #182230 0%, #0d1219 100%);
+    border: 1px solid var(--line); border-radius: 18px; padding: 32px;
+    margin-bottom: 24px; box-shadow: 0 12px 36px rgba(0,0,0,0.6);
+    position: relative; overflow: hidden;
+  }
+  header::after {
+    content: ""; position: absolute; top: -50%; right: -15%; width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(212,175,55,0.12) 0%, rgba(88,166,255,0.08) 50%, transparent 70%);
+    pointer-events: none;
+  }
+  .company-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.05); color: var(--ink2);
+    border: 1px solid var(--line); padding: 4px 14px;
+    border-radius: 99px; font-size: 12px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.08em; margin-bottom: 14px;
+  }
+  h1 { font-size: 30px; font-weight: 900; letter-spacing: -0.03em; margin-bottom: 8px; }
+  p.subtitle { color: var(--ink2); font-size: 15px; max-width: 820px; line-height: 1.6; }
+
+  /* Strategic Recommendation Box */
+  .strategy-box {
+    background: linear-gradient(135deg, rgba(212,175,55,0.08) 0%, rgba(18,24,32,0.95) 100%);
+    border: 1px solid rgba(212,175,55,0.4); border-radius: 16px; padding: 24px;
+    margin-bottom: 32px; box-shadow: 0 8px 28px rgba(0,0,0,0.4);
+  }
+  .strategy-box-header {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; margin-bottom: 14px; flex-wrap: wrap;
+  }
+  .strategy-title {
+    font-size: 18px; font-weight: 800; color: var(--musubi);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .strategy-verdict {
+    background: var(--musubi-glow); color: var(--musubi);
+    border: 1px solid rgba(212,175,55,0.5); padding: 4px 12px;
+    border-radius: 99px; font-size: 12px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .strategy-content { font-size: 14px; color: var(--ink); line-height: 1.7; }
+  .strategy-points {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 14px; margin-top: 16px;
+  }
+  .point-card {
+    background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 10px; padding: 14px;
+  }
+  .point-card h4 { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+  .point-card p { font-size: 12px; color: var(--ink2); line-height: 1.5; }
+
+  /* Project Tabs / Filter Strip */
+  .filter-strip {
+    display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;
+    align-items: center; justify-content: space-between;
+  }
+  .filter-group { display: flex; gap: 8px; flex-wrap: wrap; }
+  .filter-btn {
+    background: var(--panel); border: 1px solid var(--line); color: var(--ink2);
+    padding: 8px 16px; border-radius: 99px; font-size: 12px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .filter-btn:hover { background: var(--panel-hover); color: var(--ink); border-color: var(--ink2); }
+  .filter-btn.active { background: var(--ink); color: #090d12; border-color: var(--ink); font-weight: 700; }
+  .filter-btn.active-musubi { background: var(--musubi); color: #0b0f14; border-color: var(--musubi); }
+  .filter-btn.active-tradesentinel { background: var(--tradesentinel); color: #0d1117; border-color: var(--tradesentinel); }
+  .filter-btn.active-rds { background: var(--rds); color: #0f172a; border-color: var(--rds); }
+
+  /* Master Stats Grid */
+  .stats-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px; margin-bottom: 28px;
+  }
+  .stat-card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+    padding: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  }
+  .stat-card .val { font-size: 24px; font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .stat-card .lbl { font-size: 11px; color: var(--ink2); text-transform: uppercase; font-weight: 700; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .stat-card .sub { font-size: 11px; color: var(--ink3); }
+
+  /* Priority Section Titles */
+  .section-title {
+    font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--ink2); margin: 28px 0 14px; display: flex; align-items: center; gap: 8px;
+  }
+  .section-title::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+  /* Todo Cards */
+  .todo-card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
+    padding: 20px; margin-bottom: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    transition: transform 0.2s, border-color 0.2s; position: relative;
+  }
+  .todo-card:hover { transform: translateY(-2px); border-color: var(--ink2); }
+
+  .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 8px; }
+  .card-title-group { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .rank-badge {
+    font-size: 13px; font-weight: 800; font-family: 'JetBrains Mono', monospace;
+    background: rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 6px; border: 1px solid var(--line);
+  }
+  .todo-title { font-size: 16px; font-weight: 700; color: var(--ink); }
+  
+  .proj-pill {
+    font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 99px; text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .proj-musubi { background: var(--musubi-glow); color: var(--musubi); border: 1px solid rgba(212,175,55,0.3); }
+  .proj-tradesentinel { background: var(--tradesentinel-glow); color: var(--tradesentinel); border: 1px solid rgba(88,166,255,0.3); }
+  .proj-rds { background: var(--rds-glow); color: var(--rds); border: 1px solid rgba(255,153,0,0.3); }
+
+  .p-tag {
+    font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 99px; text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .p1 { background: var(--bad-glow); color: var(--bad); border: 1px solid rgba(239, 68, 68, 0.4); }
+  .p2 { background: var(--warn-glow); color: var(--warn); border: 1px solid rgba(245, 158, 11, 0.4); }
+  .p3 { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); }
+  .p4 { background: var(--purple-glow); color: var(--purple); border: 1px solid rgba(168, 85, 247, 0.4); }
+
+  .todo-desc { font-size: 13px; color: var(--ink2); line-height: 1.55; margin-bottom: 12px; }
+  .todo-meta { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--ink3); font-family: 'JetBrains Mono', monospace; }
+  .code-pill { background: rgba(0,0,0,0.35); border: 1px solid var(--line-subtle); padding: 2px 6px; border-radius: 4px; color: var(--ink); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="company-badge">cSpec Solutions Ltd — Unified Portfolio Architecture</div>
+  <h1>Master Prioritized Engineering Roadmap</h1>
+  <p class="subtitle">Unified cross-project execution backlog across <b>GiftMusubi (結び)</b>, <b>TradeSentinel</b>, and <b>RDS Sentinel</b>, ranked strictly by revenue velocity, commercial time-to-market, and technical leverage.</p>
+</header>
+
+<!-- Strategic Perspective & Executive Recommendation -->
+<div class="strategy-box">
+  <div class="strategy-box-header">
+    <div class="strategy-title">💡 Strategic Recommendation: Why Focusing on GiftMusubi (結び) is 100% the Right Move</div>
+    <span class="strategy-verdict">Strategic Focus: GiftMusubi</span>
+  </div>
+  <div class="strategy-content">
+    <p>You mentioned leaning towards putting focus on <b>GiftMusubi</b>. <b>From an ROI, cashflow, and product lifecycle perspective, this is without doubt the best immediate focus.</b> Here is why:</p>
+  </div>
+  <div class="strategy-points">
+    <div class="point-card">
+      <h4>1. Fastest Path to Immediate Cashflow</h4>
+      <p>GiftMusubi has 52 curated products, multi-currency conversion, a live B2B corporate order engine, and 1-click LINE social gifting. Deploying to AWS CloudFront + wiring affiliate subIDs immediately unlocks active revenue from Japanese consumers and corporate gift buyers.</p>
+    </div>
+    <div class="point-card">
+      <h4>2. TradeSentinel is Stable &amp; Automated</h4>
+      <p>TradeSentinel's core blockers (market scanner prioritization, 60-confidence gating, mobile data cards) are now completely solved. It is safely running on paper demo mode. It needs time to passively accumulate trade statistical edge rather than daily developer intervention.</p>
+    </div>
+    <div class="point-card">
+      <h4>3. RDS Sentinel Enterprise Cycle</h4>
+      <p>RDS Sentinel has 137/137 passing tests and a zero-knowledge security vault. However, enterprise AWS Marketplace listings require vendor verification cycles. GiftMusubi's consumer &amp; B2B affiliate model has zero platform approval friction.</p>
+    </div>
+  </div>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="lbl">GiftMusubi (結び)</div>
+    <div class="val" style="color:var(--musubi)">P1 Launch Ready</div>
+    <div class="sub">52 Products · 47 Prefectures · LINE e-Gift</div>
+  </div>
+  <div class="stat-card">
+    <div class="lbl">TradeSentinel</div>
+    <div class="val" style="color:var(--tradesentinel)">Automated Paper</div>
+    <div class="sub">0-Token Scanner · Trailing Stops · 60% Gate</div>
+  </div>
+  <div class="stat-card">
+    <div class="lbl">RDS Sentinel</div>
+    <div class="val" style="color:var(--rds)">137/137 Tests</div>
+    <div class="sub">AES-256 Vault · 1-Click CDK · Free Tier</div>
+  </div>
+  <div class="stat-card">
+    <div class="lbl">Total Active Backlog</div>
+    <div class="val" style="color:var(--ink)">15 Remaining (1 Completed)</div>
+    <div class="sub">5 Musubi · 6 TradeSentinel · 5 RDS Sentinel</div>
+  </div>
+</div>
+
+<div class="filter-strip">
+  <div class="filter-group" id="proj-filters">
+    <button class="filter-btn active" onclick="filterProj('all', this)">All Projects (16)</button>
+    <button class="filter-btn" onclick="filterProj('musubi', this)">🎁 GiftMusubi (5)</button>
+    <button class="filter-btn" onclick="filterProj('tradesentinel', this)">📈 TradeSentinel (6)</button>
+    <button class="filter-btn" onclick="filterProj('rds', this)">🛡️ RDS Sentinel (5)</button>
+  </div>
+</div>
+
+<div class="section-title">🏆 Unified Priority Ranking (Ranked 1 to 16 by Business Value &amp; ROI)</div>
+
+<!-- 1. Musubi CloudFront -->
+<div class="todo-card" data-proj="musubi">
+  <div class="card-top">
+    <div class="card-title-group">
+      <span class="rank-badge">#1</span>
+      <span class="proj-pill proj-musubi">GiftMusubi</span>
+      <div class="todo-title">AWS CloudFront Edge Deployment &amp; Custom Domain Live Launch</div>
+    </div>
+    <span class="p-tag p1">P1 — Go-Live</span>
+  </div>
+  <p class="todo-desc">Deploy static PWA assets to S3 with AWS CloudFront edge distribution, ACM SSL certificates, HTTP/3, and Brotli compression for sub-second page loads globally.</p>
+  <div class="todo-meta">
+    <span>📁 <span class="code-pill">gift-musubi/infra/cloudfront.yml</span></span>
+    <span>⚡ Impact: Public Commercial Launch</span>
+  </div>
+</div>
+
+<!-- 2. Musubi Mobile UX (COMPLETED) -->
+<div class="todo-card completed" data-proj="musubi" style="opacity: 0.8; border-color: rgba(34, 197, 94, 0.4);">
+  <div class="card-top">
+    <div class="card-title-group">
+      <span class="rank-badge" style="background:rgba(34,197,94,0.15);color:#22c55e;">COMPLETED</span>
+      <span class="proj-pill proj-musubi">GiftMusubi</span>
+      <div class="todo-title">✅ Mobile UX Polish (1-Tap Quick Buy Sheet, Mobile Sticky Filter Ribbon &amp; 1:1 Aspect Ratio)</div>
+    </div>
+    <span class="p-tag" style="background:rgba(34,197,94,0.15);color:#22c55e;border:1px solid rgba(34,197,94,0.4);">Verified 25/25 Tests</span>
+  </div>
+  <p class="todo-desc">Implemented responsive bottom-sheet purchase modal with 1-click LINE e-Gift trigger, strict 1:1 square image containment across all 52 artisan products, and floating sticky filter bar.</p>
+  <div class="todo-meta">
+    <span>📁 <span class="code-pill">gift-musubi/index.html</span></span>
+    <span>⚡ Status: Verified Across 5 Browsers</span>
+  </div>
+</div>
+
+<!-- 3. Musubi Affiliate Router -->
+<div class="todo-card" data-proj="musubi">
+  <div class="card-top">
+    <div class="card-title-group">
+      <span class="rank-badge">#3</span>
+      <span class="proj-pill proj-musubi">GiftMusubi</span>
+      <div class="todo-title">Live Affiliate Network Deep-Link Tracking &amp; SubID Webhooks</div>
+    </div>
+    <span class="p-tag p1">P1 — Monetization</span>
+  </div>
+  <p class="todo-desc">Connect live affiliate tracking parameters (A8.net, ValueCommerce, Rakuten Affiliate, Amazon Associates) into gift card buy buttons with SubID attribution.</p>
+  <div class="todo-meta">
+    <span>📁 <span class="code-pill">gift-musubi/js/affiliate_router.js</span></span>
+    <span>⚡ Impact: Immediate Inbound Revenue</span>
+  </div>
+</div>
+
+<!-- 4. TradeSentinel Form 4 Weighting -->
+<div class="todo-card" data-proj="tradesentinel">
+  <div class="card-top">
+    <div class="card-title-group">
+      <span class="rank-badge">#4</span>
+      <span class="proj-pill proj-tradesentinel">TradeSentinel</span>
+      <div class="todo-title">SEC Form 4 Transaction Code &amp; Executive Weighting</div>
+    </div>
+    <span class="p-tag p2">P2 — Alpha</span>
+  </div>
+  <p class="todo-desc">Differentiate open-market buys (code <code>P</code>) from option exercises (<code>M</code>) and tax dispositions (<code>F</code>). Weight CEO/CFO cluster purchases over independent directors.</p>
+  <div class="todo-meta">
+    <span>📁 <span class="code-pill">autoTrader/sources/insiders.py</span></span>
+    <span>⚡ Impact: False-Positive Cluster Elimination</span>
+  </div>
+</div>
+
+<!-- 5. Musubi Programmatic SEO -->
+<div class="todo-card" data-proj="musubi">
+  <div class="card-top">
+    <div class="card-title-group">
+      <span class="rank-badge">#5</span>
+      <span class="proj-pill proj-musubi">GiftMusubi</span>
+      <div class="todo-title">Programmatic SEO Expansion (Seasonal Occasion Hubs)</div>
+    </div>
+    <span class="p-tag p2">P2 — Organic Growth</span>
+  </div>
+  <p class="todo-desc">Generate static programmatic Japanese landing pages for upcoming high-intent gifting occasions: <i>Oseibo</i>, <i>New Year Gifting (お年賀)</i>, and <i>White Day</i>.</p>
+  <div class="todo-meta">
+    <span>📁 <span class="code-pill">gift-musubi/scripts/build_seo_pages.js</span></span>
+    <span>⚡ Impact: Zero-CAC Organic Search Traffic</span>
+  </div>
+</div>
+
+<!-- 6. RDS Sentinel Multi-Region -->
+<div class="todo-card" data-proj="rds">
+  <div class="card-top">
+    <div class="card-title-group">
+      <span class="rank-badge">#6</span>
+      <span class="proj-pill proj-rds">RDS Sentinel</span>
+      <div class="todo-title">AWS Multi-Region Telemetry &amp; RDS Cluster Selector</div>
+    </div>
+    <span class="p-tag p2">P2 — Enterprise UI</span>
+  </div>
+  <p class="todo-desc">Top bar dropdown filter to toggle telemetry between <code>eu-west-1 (London)</code>, <code>us-east-1 (N. Virginia)</code>, and <code>ap-northeast-1 (Tokyo)</code>.</p>
+  <div class="todo-meta">
+    <span>📁 <span class="code-pill">rds-sentinel/src/components/RegionSelector.tsx</span></span>
+    <span>⚡ Impact: Global Enterprise Support</span>
+  </div>
+</div>
+
+<!-- 7. TradeSentinel Automated Review -->
+<div class="todo-card" data-proj="tradesentinel">
+  <div class="card-top">
+    <div class="card-title-group">
+      <span class="rank-badge">#7</span>
+      <span class="proj-pill proj-tradesentinel">TradeSentinel</span>
+      <div class="todo-title">Automated Post-Market Daily Review &amp; Journaling</div>
+    </div>
+    <span class="p-tag p2">P2 — Operational</span>
+  </div>
+  <p class="todo-desc">Automate weekday post-market <code>run_review.py</code> runs at 22:00 UK / 17:00 NY to grade trader calls against 3-day moves and record daily realized P&amp;L.</p>
+  <div class="todo-meta">
+    <span>📁 <span class="code-pill">autoTrader/run_review.py</span></span>
+    <span>⚡ Impact: Self-Improving Feedback Loop</span>
+  </div>
+</div>
+
+<!-- 8. TradeSentinel Webhooks -->
+<div class="todo-card" data-proj="tradesentinel">
+  <div class="card-top">
+    <div class="card-title-group">
+      <span class="rank-badge">#8</span>
+      <span class="proj-pill proj-tradesentinel">TradeSentinel</span>
+      <div class="todo-title">Real-Time Discord &amp; Telegram Signal Dispatch Webhooks</div>
+    </div>
+    <span class="p-tag p2">P2 — Alerting</span>
+  </div>
+  <p class="todo-desc">Dispatch confirmed trade entry, trailing stop ratchet, and take-profit exit triggers instantly to Discord and Telegram channels.</p>
+  <div class="todo-meta">
+    <span>📁 <span class="code-pill">autoTrader/signal_webhooks.py</span></span>
+    <span>⚡ Impact: Instant Signal Transparency</span>
+  </div>
+</div>
+
+<!-- 9. RDS Sentinel Demo Video -->
+<div class="todo-card" data-proj="rds">
+  <div class="card-top">
+    <div class="card-title-group">
+      <span class="rank-badge">#9</span>
+      <span class="proj-pill proj-rds">RDS Sentinel</span>
+      <div class="todo-title">v1.0 AWS Marketplace Product Demo Video &amp; Listing Submission</div>
+    </div>
+    <span class="p-tag p3">P3 — Marketplace</span>
+  </div>
+  <p class="todo-desc">Record a crisp 60–90 second walkthrough of zero-knowledge query masking, automated 1-click CloudFormation launch, and instant slow query alerts.</p>
+  <div class="todo-meta">
+    <span>📁 <span class="code-pill">rds-sentinel/docs/AWS_MARKETPLACE_SUBMISSION.md</span></span>
+    <span>⚡ Impact: AWS Partner Listing Launch</span>
+  </div>
+</div>
+
+<!-- 10. Musubi User Reviews -->
+<div class="todo-card" data-proj="musubi">
+  <div class="card-top">
+    <div class="card-title-group">
+      <span class="rank-badge">#10</span>
+      <span class="proj-pill proj-musubi">GiftMusubi</span>
+      <div class="todo-title">Client-Side User Reviews &amp; Verified Recipient Ratings</div>
+    </div>
+    <span class="p-tag p3">P3 — Social Proof</span>
+  </div>
+  <p class="todo-desc">Enable gift givers to submit 5-star reviews, delivery timeliness feedback, and unboxing photos with client-side LocalStorage caching.</p>
+  <div class="todo-meta">
+    <span>📁 <span class="code-pill">gift-musubi/index.html</span></span>
+    <span>⚡ Impact: Social Proof &amp; Conversion</span>
+  </div>
+</div>
+
+<!-- 11. RDS Sentinel SaaS Metering -->
+<div class="todo-card" data-proj="rds">
+  <div class="card-top">
+    <div class="card-title-group">
+      <span class="rank-badge">#11</span>
+      <span class="proj-pill proj-rds">RDS Sentinel</span>
+      <div class="todo-title">AWS Marketplace SaaS Metering API Integration</div>
+    </div>
+    <span class="p-tag p3">P3 — Commercial Billing</span>
+  </div>
+  <p class="todo-desc">Integrate AWS Marketplace Metering SDK (<code>BatchMeterUsage</code>) to report active monitored RDS database instance-hours for automated billing.</p>
+  <div class="todo-meta">
+    <span>📁 <span class="code-pill">rds-sentinel/src/lib/awsMarketplaceMetering.ts</span></span>
+    <span>⚡ Impact: Automated SaaS Revenue Collection</span>
+  </div>
+</div>
+
+<!-- 12. TradeSentinel Shadow Analytics -->
+<div class="todo-card" data-proj="tradesentinel">
+  <div class="card-top">
+    <div class="card-title-group">
+      <span class="rank-badge">#12</span>
+      <span class="proj-pill proj-tradesentinel">TradeSentinel</span>
+      <div class="todo-title">Interactive Dashboard Shadow Tracking Analytics Card</div>
+    </div>
+    <span class="p-tag p3">P3 — Quant UI</span>
+  </div>
+  <p class="todo-desc">Add an interactive Shadow Tracking panel to the local dashboard UI displaying the statistical edge ratio of avoided traps vs missed gains.</p>
+  <div class="todo-meta">
+    <span>📁 <span class="code-pill">autoTrader/templates/dashboard.html</span></span>
+    <span>⚡ Impact: Strategy Performance Visibility</span>
+  </div>
+</div>
+
+<!-- 13. RDS Sentinel ACU FinOps -->
+<div class="todo-card" data-proj="rds">
+  <div class="card-top">
+    <div class="card-title-group">
+      <span class="rank-badge">#13</span>
+      <span class="proj-pill proj-rds">RDS Sentinel</span>
+      <div class="todo-title">Aurora Serverless v2 Auto-Scaling ACU Cost Optimizer</div>
+    </div>
+    <span class="p-tag p3">P3 — FinOps</span>
+  </div>
+  <p class="todo-desc">Analyze Aurora Capacity Unit utilization curves and generate proactive minimum/maximum ACU scale recommendations to eliminate over-provisioned idle spend.</p>
+  <div class="todo-meta">
+    <span>📁 <span class="code-pill">rds-sentinel/src/lib/acuCostOptimizer.ts</span></span>
+    <span>⚡ Impact: Customer Cost Optimization</span>
+  </div>
+</div>
+
+<!-- 14. TradeSentinel Dynamic ATR Stops -->
+<div class="todo-card" data-proj="tradesentinel">
+  <div class="card-top">
+    <div class="card-title-group">
+      <span class="rank-badge">#14</span>
+      <span class="proj-pill proj-tradesentinel">TradeSentinel</span>
+      <div class="todo-title">Volatility-Adjusted ATR Trailing Stop Losses</div>
+    </div>
+    <span class="p-tag p3">P3 — Risk Mgmt</span>
+  </div>
+  <p class="todo-desc">Compute dynamic ATR trailing stops in <code>stops.py</code> for high-beta micro-caps (allowing 1.8x–2.5x ATR room during pullbacks while locking +5% MFE).</p>
+  <div class="todo-meta">
+    <span>📁 <span class="code-pill">autoTrader/stops.py</span></span>
+    <span>⚡ Impact: Reduced Premature Stopouts</span>
+  </div>
+</div>
+
+<!-- 15. TradeSentinel Weekly Digest -->
+<div class="todo-card" data-proj="tradesentinel">
+  <div class="card-top">
+    <div class="card-title-group">
+      <span class="rank-badge">#15</span>
+      <span class="proj-pill proj-tradesentinel">TradeSentinel</span>
+      <div class="todo-title">Weekly Automated Synthesis Email Digest</div>
+    </div>
+    <span class="p-tag p4">P4 — Reporting</span>
+  </div>
+  <p class="todo-desc">Generate and dispatch a weekly Markdown-formatted HTML executive digest every Friday evening summarizing win-rate, total closed P&amp;L, and macro lessons.</p>
+  <div class="todo-meta">
+    <span>📁 <span class="code-pill">autoTrader/run_review.py --weekly</span></span>
+    <span>⚡ Impact: Stakeholder Reporting</span>
+  </div>
+</div>
+
+<!-- 16. RDS Sentinel Multi-Account -->
+<div class="todo-card" data-proj="rds">
+  <div class="card-top">
+    <div class="card-title-group">
+      <span class="rank-badge">#16</span>
+      <span class="proj-pill proj-rds">RDS Sentinel</span>
+      <div class="todo-title">Multi-Account AWS Organizations Cross-Account Ingestion</div>
+    </div>
+    <span class="p-tag p4">P4 — Enterprise Scale</span>
+  </div>
+  <p class="todo-desc">Support central hub-and-spoke telemetry monitoring across multiple AWS accounts via IAM <code>sts:AssumeRole</code> delegation with strict <code>ExternalId</code> guards.</p>
+  <div class="todo-meta">
+    <span>📁 <span class="code-pill">rds-sentinel/src/lib/crossAccountConnector.ts</span></span>
+    <span>⚡ Impact: Multi-Account AWS Deployments</span>
+  </div>
+</div>
+
+<script>
+function filterProj(proj, btn) {
+  document.querySelectorAll('#proj-filters .filter-btn').forEach(b => {
+    b.className = 'filter-btn';
+  });
+  if (proj === 'all') btn.className = 'filter-btn active';
+  else if (proj === 'musubi') btn.className = 'filter-btn active-musubi';
+  else if (proj === 'tradesentinel') btn.className = 'filter-btn active-tradesentinel';
+  else if (proj === 'rds') btn.className = 'filter-btn active-rds';
+
+  document.querySelectorAll('.todo-card').forEach(card => {
+    if (proj === 'all' || card.dataset.proj === proj) {
+      card.style.display = 'block';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+</script>
+
+</body>
+</html>
